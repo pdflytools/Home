@@ -3,26 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PDFly Tools | HD Advanced Digital Suite</title>
+    <title>PDFly Tools | Ultra HD Advanced Digital Suite</title>
     
     <!-- SEO & Meta Tags -->
-    <meta name="description" content="PDFly Tools is an advanced, ultra-fast suite for image editing, PDF formatting, and smart digital utilities. Designed by GT Rao.">
-    <meta name="keywords" content="PDF Tools, Image Editor, Password Generator, Format Converter, GT Rao, Web Tools">
+    <meta name="description" content="PDFly Tools is an advanced, ultra-fast suite for image editing, PDF formatting, and smart digital utilities.">
+    <meta name="keywords" content="PDF Tools, Image Editor, Password Generator, Format Converter, Web Tools">
     <meta name="author" content="GT Rao">
     <meta name="theme-color" content="#020617">
 
-    <!-- Fonts: Plus Jakarta Sans for a crisp HD look -->
+    <!-- Fonts: Plus Jakarta Sans for crisp, Ultra-HD Typography -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- FontAwesome HD Vector Icons -->
+    <!-- Vector Icons (Infinite resolution, will never pixelate) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* ================= CSS VARIABLES & THEMES ================= */
+        /* ================= CSS VARIABLES ================= */
         :root {
-            /* Midnight Modern Dark Theme (Default) */
             --bg-body: #020617; 
-            --bg-nav: rgba(2, 6, 23, 0.85);
+            --bg-nav: rgba(2, 6, 23, 0.75);
             --bg-footer: #0a0f1c;
             --bg-card: #0f172a;
             --bg-card-hover: #1e293b;
@@ -32,354 +31,223 @@
             --primary: #3b82f6;
             --secondary: #8b5cf6;
             --gradient-primary: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            --shadow-glow: 0 10px 30px -10px rgba(59, 130, 246, 0.5);
-            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 10px 40px -10px rgba(59, 130, 246, 0.6);
+            --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        /* Light Theme */
+        /* Light Theme Values */
         body.light-theme {
             --bg-body: #f8fafc;
-            --bg-nav: rgba(255, 255, 255, 0.9);
+            --bg-nav: rgba(255, 255, 255, 0.85);
             --bg-footer: #f1f5f9;
             --bg-card: #ffffff;
             --bg-card-hover: #f8fafc;
             --text-main: #0f172a;
             --text-muted: #475569;
-            --border-color: rgba(0, 0, 0, 0.1);
-            --shadow-glow: 0 10px 30px -10px rgba(59, 130, 246, 0.3);
-            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --shadow-glow: 0 10px 40px -10px rgba(59, 130, 246, 0.25);
+            --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
         }
 
-        /* ================= GLOBAL SETTINGS ================= */
+        /* ================= GLOBAL HD SETTINGS ================= */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        
         html { scroll-behavior: smooth; }
-        
         body { 
             background-color: var(--bg-body); 
             color: var(--text-main); 
             line-height: 1.6; 
             overflow-x: hidden; 
+            transition: background-color 0.4s ease, color 0.4s ease;
+            /* Ultra-HD Text Rendering Flags */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             text-rendering: optimizeLegibility;
-            transition: background-color 0.4s, color 0.4s;
         }
 
-        /* Scroll Progress Bar */
-        #scroll-progress {
-            position: fixed; top: 0; left: 0; height: 3px; background: var(--gradient-primary);
-            width: 0%; z-index: 9999; transition: width 0.1s;
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--gradient-primary); width: 0%; z-index: 9999; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-body); }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        /* ================= FLOATING NAVBAR ================= */
-        .navbar-wrapper {
-            position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
-            width: 95%; max-width: 1200px; z-index: 1000;
+        /* ================= RESPONSIVE NAVBAR ================= */
+        .navbar-wrapper { position: fixed; top: clamp(10px, 2vw, 20px); left: 50%; transform: translateX(-50%); width: 95%; max-width: 1200px; z-index: 1000; }
+        nav { 
+            background: var(--bg-nav); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid var(--border-color); border-radius: 50px; 
+            padding: clamp(10px, 1.5vw, 12px) clamp(15px, 3vw, 30px); 
+            display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: var(--shadow-card); transition: var(--transition); 
         }
         
-        nav {
-            background: var(--bg-nav);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border-color);
-            border-radius: 50px;
-            padding: 10px 25px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: var(--shadow-card);
-            transition: var(--transition);
-        }
-
-        .logo { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
-        .logo i { color: var(--primary); font-size: 1.5rem; }
+        .logo { font-size: clamp(1.2rem, 2vw, 1.5rem); font-weight: 800; display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; }
+        .logo i { color: var(--primary); font-size: clamp(1.4rem, 2.5vw, 1.7rem); }
+        .logo span { background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        .nav-actions { display: flex; align-items: center; gap: 12px; }
+        .nav-actions { display: flex; align-items: center; gap: clamp(8px, 1.5vw, 15px); }
         
-        .search-box {
-            position: relative;
-            background: var(--bg-body);
-            border: 1px solid var(--border-color);
-            border-radius: 30px;
-            padding: 8px 15px 8px 35px;
-            display: flex; align-items: center;
-            transition: var(--transition);
-        }
-        .search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
-        .search-box i { position: absolute; left: 12px; color: var(--text-muted); font-size: 0.9rem; }
-        .search-box input { background: transparent; border: none; color: var(--text-main); outline: none; width: 120px; transition: width 0.3s; font-size: 0.9rem; }
+        .search-box { position: relative; background: var(--bg-body); border: 1px solid var(--border-color); border-radius: 30px; padding: 8px 35px 8px 35px; display: flex; align-items: center; transition: var(--transition); }
+        .search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+        .search-box .fa-magnifying-glass { position: absolute; left: 14px; color: var(--text-muted); font-size: 0.9rem; }
+        .search-box input { background: transparent; border: none; color: var(--text-main); outline: none; width: clamp(80px, 10vw, 130px); transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); font-size: 0.95rem; }
         .search-box input::placeholder { color: var(--text-muted); }
-        .search-box input:focus { width: 180px; }
+        .search-box input:focus { width: clamp(130px, 15vw, 200px); }
+        
+        .clear-search { position: absolute; right: 14px; color: var(--text-muted); font-size: 0.9rem; cursor: pointer; display: none; transition: var(--transition); }
+        .clear-search:hover { color: #ef4444; }
 
-        .theme-btn {
-            background: var(--bg-body); border: 1px solid var(--border-color);
-            color: var(--text-main); width: 38px; height: 38px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            transition: var(--transition);
-        }
-        .theme-btn:hover { background: var(--primary); border-color: var(--primary); color: #fff; transform: rotate(15deg); }
+        .theme-btn { background: var(--bg-body); border: 1px solid var(--border-color); color: var(--text-main); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); font-size: 1.1rem; }
+        .theme-btn:hover { background: var(--primary); border-color: var(--primary); color: #fff; transform: rotate(15deg) scale(1.05); }
 
         /* ================= HERO SECTION ================= */
-        .hero { padding: 160px 5% 60px; text-align: center; position: relative; }
-        .hero h1 { font-size: clamp(2rem, 5vw, 4rem); font-weight: 800; line-height: 1.2; margin-bottom: 15px; letter-spacing: -1px; }
+        .hero { padding: clamp(140px, 15vh, 180px) 5% clamp(40px, 5vh, 60px); text-align: center; position: relative; }
+        .greeting-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 6px 18px; border-radius: 30px; font-size: clamp(0.85rem, 1.5vw, 0.95rem); font-weight: 700; margin-bottom: 20px; border: 1px solid rgba(59, 130, 246, 0.25); letter-spacing: 0.5px; }
+        .hero h1 { font-size: clamp(2.2rem, 6vw, 4.2rem); font-weight: 800; line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px; }
         .hero h1 span { background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+        .hero p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.15rem); max-width: 650px; margin: 0 auto; line-height: 1.7; }
 
-        /* ================= ADVANCED TABS ================= */
-        .tabs-container {
-            display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
-            margin-bottom: 40px; padding: 0 5%;
-        }
-        .tab-btn {
-            background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);
-            padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
-            transition: var(--transition);
-        }
+        /* ================= TABS ================= */
+        .tabs-container { display: flex; justify-content: center; gap: clamp(8px, 2vw, 15px); flex-wrap: wrap; margin-bottom: clamp(30px, 5vh, 50px); padding: 0 5%; }
+        .tab-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); padding: clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 25px); border-radius: 30px; font-size: clamp(0.85rem, 1.5vw, 0.95rem); font-weight: 600; cursor: pointer; transition: var(--transition); }
         .tab-btn:hover { background: var(--bg-card-hover); border-color: var(--primary); }
         .tab-btn.active { background: var(--primary); border-color: var(--primary); color: white; box-shadow: var(--shadow-glow); }
 
-        /* ================= TOOLS GRID SYSTEM ================= */
-        .container { max-width: 1300px; margin: 0 auto; padding: 0 5% 80px; }
-        
-        .category-wrapper { margin-bottom: 60px; transition: opacity 0.3s; }
-        .section-title {
-            font-size: 1.4rem; font-weight: 700; margin-bottom: 25px;
-            display: flex; align-items: center; gap: 12px; color: var(--text-main);
-        }
+        /* ================= RESPONSIVE GRID SYSTEM ================= */
+        .container { max-width: 1350px; margin: 0 auto; padding: 0 5% 80px; }
+        .category-wrapper { margin-bottom: clamp(40px, 6vh, 70px); transition: opacity 0.3s; }
+        .section-title { font-size: clamp(1.2rem, 2.5vw, 1.5rem); font-weight: 800; margin-bottom: clamp(20px, 3vh, 30px); display: flex; align-items: center; gap: 12px; color: var(--text-main); }
         .section-title i { color: var(--primary); }
 
+        /* Perfect Scaling Grid */
         .grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
-            gap: 20px; 
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+            gap: clamp(15px, 2vw, 25px); 
         }
 
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 25px 20px;
-            text-align: center; cursor: pointer;
-            transition: var(--transition);
-            box-shadow: var(--shadow-card);
-            position: relative; overflow: hidden;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        .card { 
+            background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; 
+            padding: clamp(20px, 3vw, 30px) 15px; text-align: center; cursor: pointer; 
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s, border-color 0.3s, background 0.3s; 
+            box-shadow: var(--shadow-card); position: relative; overflow: hidden; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            animation: fadeUp 0.5s ease backwards; 
         }
+        .card:hover { transform: translateY(-8px); border-color: var(--primary); background: var(--bg-card-hover); box-shadow: var(--shadow-glow); }
 
-        .card:hover { 
-            transform: translateY(-6px); 
-            border-color: var(--primary); 
-            background: var(--bg-card-hover);
-            box-shadow: var(--shadow-glow); 
+        .icon-wrapper { 
+            width: clamp(55px, 6vw, 70px); height: clamp(55px, 6vw, 70px); margin-bottom: 18px; 
+            background: rgba(59, 130, 246, 0.08); border-radius: 18px; 
+            display: flex; align-items: center; justify-content: center; transition: var(--transition); 
         }
-
-        .icon-wrapper {
-            width: 65px; height: 65px; margin-bottom: 15px;
-            background: rgba(59, 130, 246, 0.08); 
-            border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            transition: var(--transition);
-        }
-        .card:hover .icon-wrapper { 
-            background: var(--gradient-primary); 
-            transform: scale(1.1); 
-        }
-
-        .card i { font-size: 1.8rem; color: var(--primary); transition: var(--transition); }
+        .card:hover .icon-wrapper { background: var(--gradient-primary); transform: scale(1.1) rotate(5deg); box-shadow: 0 10px 20px rgba(59,130,246,0.3); }
+        .card i { font-size: clamp(1.5rem, 2vw, 1.8rem); color: var(--primary); transition: var(--transition); }
         .card:hover i { color: #ffffff; }
 
-        .card h3 { font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
-        .card p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; opacity: 0.8; }
+        .card h3 { font-size: clamp(0.95rem, 1.5vw, 1.1rem); font-weight: 700; color: var(--text-main); margin-bottom: 8px; letter-spacing: 0.3px; }
+        .card p { font-size: clamp(0.75rem, 1.2vw, 0.85rem); color: var(--text-muted); line-height: 1.5; opacity: 0.9; padding: 0 10px; }
 
-        /* ================= ADVANCED THEMED FOOTER ================= */
-        footer {
-            background: var(--bg-footer);
-            border-top: 1px solid var(--border-color);
-            padding: 60px 5% 20px;
-            transition: var(--transition); 
-        }
-        
-        .footer-grid {
-            max-width: 1300px; margin: 0 auto;
-            display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; margin-bottom: 50px;
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
-        .footer-brand h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
+        /* ================= FOOTER ================= */
+        footer { background: var(--bg-footer); border-top: 1px solid var(--border-color); padding: clamp(40px, 8vh, 80px) 5% 20px; }
+        .footer-grid { max-width: 1350px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: clamp(30px, 5vw, 50px); margin-bottom: clamp(40px, 6vh, 60px); }
+        .footer-brand h2 { font-size: clamp(1.3rem, 2vw, 1.6rem); font-weight: 800; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
         .footer-brand h2 i { color: var(--primary); }
-        .footer-brand p { color: var(--text-muted); font-size: 0.9rem; max-width: 350px; margin-bottom: 20px; }
+        .footer-brand p { color: var(--text-muted); font-size: 0.95rem; max-width: 380px; margin-bottom: 25px; line-height: 1.7; }
         
-        .social-links { display: flex; gap: 12px; }
-        .social-links a {
-            width: 38px; height: 38px; border-radius: 50%; background: var(--bg-card);
-            display: flex; align-items: center; justify-content: center; color: var(--text-main);
-            transition: var(--transition); border: 1px solid var(--border-color);
-        }
-        .social-links a:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-3px); }
+        .social-links { display: flex; gap: 15px; }
+        .social-links a { width: 42px; height: 42px; border-radius: 50%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; color: var(--text-main); transition: var(--transition); border: 1px solid var(--border-color); font-size: 1.1rem; }
+        .social-links a:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-4px); box-shadow: var(--shadow-glow); }
 
-        .footer-links h4 { font-size: 1.05rem; font-weight: 700; margin-bottom: 15px; color: var(--text-main); }
+        .footer-links h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; color: var(--text-main); }
         .footer-links ul { list-style: none; }
-        .footer-links ul li { margin-bottom: 10px; }
-        .footer-links ul li a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: var(--transition); cursor: pointer; }
-        .footer-links ul li a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-links ul li { margin-bottom: 12px; }
+        .footer-links ul li a { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: var(--transition); cursor: pointer; display: inline-block; }
+        .footer-links ul li a:hover { color: var(--primary); transform: translateX(5px); }
 
-        .footer-bottom {
-            max-width: 1300px; margin: 0 auto; padding-top: 25px;
-            border-top: 1px solid var(--border-color);
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
-        }
-        .copyright { color: var(--text-muted); font-size: 0.85rem; }
+        .footer-bottom { max-width: 1350px; margin: 0 auto; padding-top: 30px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .copyright { color: var(--text-muted); font-size: 0.9rem; }
         
-        /* Developer Badge Clickable */
-        .dev-badge {
-            background: var(--bg-card); border: 1px solid var(--border-color); padding: 8px 18px;
-            border-radius: 30px; font-size: 0.9rem; color: var(--text-muted); font-weight: 500;
-            cursor: pointer; transition: var(--transition);
-        }
-        .dev-badge:hover { border-color: var(--primary); box-shadow: var(--shadow-glow); }
+        .dev-badge { background: var(--bg-card); border: 1px solid var(--border-color); padding: 10px 22px; border-radius: 30px; font-size: 0.9rem; color: var(--text-muted); font-weight: 500; cursor: pointer; transition: var(--transition); }
+        .dev-badge:hover { border-color: var(--primary); box-shadow: var(--shadow-glow); background: var(--bg-card-hover); }
         .dev-badge span { color: var(--primary); font-weight: 800; letter-spacing: 0.5px; }
 
-        /* ================= MODALS & POPUPS ================= */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 10000; opacity: 0; pointer-events: none; transition: var(--transition);
-        }
+        /* ================= MODALS (Responsive & HD) ================= */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; pointer-events: none; transition: var(--transition); padding: 20px; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         
-        .modal-box {
-            background: var(--bg-card); border: 1px solid var(--border-color);
-            padding: 30px; border-radius: 20px; width: 90%; max-width: 400px;
-            box-shadow: var(--shadow-glow); text-align: center;
-            transform: translateY(30px); transition: var(--transition); position: relative;
-        }
-        .modal-overlay.active .modal-box { transform: translateY(0); }
+        .modal-box { background: var(--bg-card); border: 1px solid var(--border-color); padding: clamp(25px, 4vw, 40px); border-radius: 24px; width: 100%; max-width: 450px; max-height: 90vh; box-shadow: var(--shadow-glow); text-align: center; transform: translateY(30px) scale(0.95); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s; position: relative; overflow-y: auto; }
+        .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
         
-        .modal-close {
-            position: absolute; top: 15px; right: 15px;
-            background: transparent; border: none; color: var(--text-muted);
-            font-size: 1.2rem; cursor: pointer; transition: var(--transition);
-        }
-        .modal-close:hover { color: #ef4444; transform: rotate(90deg); }
+        .modal-close { position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-main); font-size: 1.1rem; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: #ef4444; color: white; border-color: #ef4444; transform: rotate(90deg); }
 
-        /* Password Modal Specifics */
-        .modal-box i.fa-lock { font-size: 2.5rem; color: var(--primary); margin-bottom: 15px; }
-        .modal-box h3 { font-size: 1.4rem; color: var(--text-main); margin-bottom: 10px; }
-        .modal-box input[type="password"] {
-            width: 100%; padding: 12px 15px; margin: 10px 0 5px;
-            background: var(--bg-body); border: 1px solid var(--border-color);
-            color: var(--text-main); border-radius: 10px; outline: none; font-size: 1rem;
-            text-align: center; letter-spacing: 1px; transition: var(--transition);
-        }
-        .modal-box input[type="password"]:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
-        .modal-box .hint { font-size: 0.75rem; color: var(--primary); margin-bottom: 20px; display: block; font-weight: 600; }
+        .dev-img-container { width: clamp(90px, 15vw, 110px); height: clamp(90px, 15vw, 110px); border-radius: 50%; margin: 0 auto 20px; background: var(--gradient-primary); padding: 4px; position: relative; }
+        .dev-img-container img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: var(--bg-body); border: 4px solid var(--bg-card); }
         
-        .btn-submit {
-            background: var(--gradient-primary); color: white; border: none;
-            padding: 12px 25px; border-radius: 10px; font-weight: 700; width: 100%;
-            cursor: pointer; transition: var(--transition); font-size: 1rem;
-        }
-        .btn-submit:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: var(--shadow-glow); }
-        .error-msg { color: #ef4444; font-size: 0.85rem; margin-top: 10px; display: none; }
+        .dev-name { font-size: clamp(1.5rem, 2.5vw, 1.8rem); font-weight: 800; color: var(--text-main); margin-bottom: 2px; }
+        .dev-subtitle { color: var(--primary); font-size: 0.9rem; font-weight: 700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1.5px; }
+        .dev-bio { color: var(--text-muted); font-size: clamp(0.9rem, 1.5vw, 1rem); line-height: 1.7; margin-bottom: 25px; }
+        .dev-tags { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .dev-tags span { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); color: var(--primary); font-size: 0.8rem; padding: 6px 15px; border-radius: 20px; font-weight: 600; transition: var(--transition); cursor: default; }
+        .dev-tags span:hover { background: var(--primary); color: #fff; transform: translateY(-2px); }
 
-        /* Developer Profile Specifics */
-        .dev-img-container {
-            width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 15px;
-            background: var(--gradient-primary); padding: 3px;
-        }
-        .dev-img-container img {
-            width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
-            background: var(--bg-body); border: 3px solid var(--bg-card);
-        }
-        .dev-name { font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-bottom: 5px; }
-        .dev-subtitle { color: var(--primary); font-size: 0.9rem; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-        .dev-bio { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px; }
-        .dev-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        .dev-tags span {
-            background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3);
-            color: var(--primary); font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; font-weight: 600;
-        }
+        .legal-box { max-width: 650px; display: flex; flex-direction: column; }
+        .legal-box h3 { font-size: clamp(1.4rem, 2vw, 1.8rem); color: var(--text-main); margin-bottom: 20px; text-align: left; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        .legal-content { overflow-y: auto; text-align: left; font-size: clamp(0.9rem, 1.5vw, 1rem); color: var(--text-muted); line-height: 1.8; padding-right: 15px; }
+        .legal-content h4 { color: var(--text-main); margin: 20px 0 10px; font-size: 1.1rem; }
 
-        /* Legal Modal Specifics */
-        .legal-box { max-width: 600px; display: flex; flex-direction: column; max-height: 80vh; }
-        .legal-box h3 { font-size: 1.6rem; color: var(--text-main); margin-bottom: 15px; text-align: left; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-        .legal-content {
-            overflow-y: auto; text-align: left; font-size: 0.95rem; color: var(--text-muted);
-            line-height: 1.7; padding-right: 15px;
-        }
-        .legal-content h4 { color: var(--text-main); margin: 15px 0 8px; font-size: 1.05rem; }
-        .legal-content p { margin-bottom: 12px; }
-
-        /* Custom Scrollbar for Legal Text */
-        .legal-content::-webkit-scrollbar { width: 5px; }
-        .legal-content::-webkit-scrollbar-track { background: transparent; }
-        .legal-content::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 5px; }
-
-        /* ================= SMART COMPONENTS ================= */
-        #backToTop {
-            position: fixed; bottom: -50px; right: 25px; z-index: 999;
-            width: 45px; height: 45px; border-radius: 50%;
-            background: var(--primary); color: white; border: none;
-            box-shadow: var(--shadow-glow); cursor: pointer;
-            display: flex; justify-content: center; align-items: center; font-size: 1.2rem;
-            transition: var(--transition); opacity: 0; pointer-events: none;
-        }
+        /* ================= SMART UI COMPONENTS ================= */
+        #backToTop { position: fixed; bottom: -60px; right: 25px; z-index: 999; width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: var(--shadow-glow); cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; transition: var(--transition); opacity: 0; pointer-events: none; }
         #backToTop.visible { bottom: 25px; opacity: 1; pointer-events: auto; }
         #backToTop:hover { transform: translateY(-5px); background: var(--secondary); }
 
-        .toast-box {
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(100px);
-            background: var(--text-main); color: var(--bg-body);
-            padding: 12px 25px; border-radius: 30px; font-weight: 600; font-size: 0.9rem;
-            display: flex; align-items: center; gap: 10px; z-index: 10000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: var(--transition); opacity: 0;
-        }
+        .toast-box { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--text-main); color: var(--bg-body); padding: 14px 30px; border-radius: 40px; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 12px; z-index: 10000; box-shadow: 0 15px 40px rgba(0,0,0,0.3); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s; opacity: 0; }
         .toast-box.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .toast-box i { color: var(--primary); font-size: 1.2rem; }
+        .toast-box i { color: var(--primary); font-size: 1.3rem; }
 
+        /* ================= DEVICE SPECIFIC BREAKPOINTS ================= */
+        
+        /* Tablet & Large Mobile */
         @media (max-width: 768px) {
             .navbar-wrapper { width: 100%; top: 0; }
-            nav { border-radius: 0; border-top: none; border-left: none; border-right: none; padding: 12px 15px; }
-            .hero { padding: 120px 5% 40px; }
-            .hero h1 { font-size: 2.2rem; }
-            .search-box input { width: 90px; }
-            .search-box:focus-within input { width: 140px; }
-            
-            .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-            .card { padding: 15px 10px; min-height: 140px; }
-            .icon-wrapper { width: 50px; height: 50px; margin-bottom: 10px; }
-            .card i { font-size: 1.4rem; }
-            .card h3 { font-size: 0.85rem; margin-bottom: 4px; }
-            .card p { display: none; }
-            
-            .footer-grid { grid-template-columns: 1fr; gap: 30px; text-align: center; }
+            nav { border-radius: 0; border-top: none; border-left: none; border-right: none; }
+            .grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+            .footer-grid { grid-template-columns: 1fr; text-align: center; gap: 35px; }
             .footer-brand p { margin: 0 auto 20px; }
             .social-links { justify-content: center; }
             .footer-bottom { flex-direction: column; text-align: center; }
-            
             .legal-box { width: 95%; max-height: 85vh; padding: 25px 20px; }
+        }
+
+        /* Small Smartphone Breakpoint (Ensures 2 exact columns without breaking) */
+        @media (max-width: 480px) {
+            .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+            .card { padding: 18px 12px; }
+            .card p { display: none; /* Keep UI clean on tiny screens */ }
+            .search-box input { width: 90px; }
+            .search-box:focus-within input { width: 130px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Scroll Progress Bar -->
     <div id="scroll-progress"></div>
 
-    <!-- Floating Navbar -->
     <div class="navbar-wrapper">
         <nav>
-            <div class="logo"><i class="fa-solid fa-shapes"></i> PDFly</div>
+            <a href="index.html" class="logo"><i class="fa-solid fa-shapes"></i> <span>PDFly Tools</span></a>
             <div class="nav-actions">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="searchInput" placeholder="Search..." onkeyup="searchTools()">
+                    <input type="text" id="searchInput" placeholder="Search..." oninput="handleSearchInput()" onkeyup="searchTools()">
+                    <i class="fa-solid fa-xmark clear-search" id="clearSearch" onclick="clearSearchInput()"></i>
                 </div>
                 <button class="theme-btn" id="themeToggle" onclick="toggleTheme()" title="Switch Theme">
                     <i class="fa-solid fa-moon" id="themeIcon"></i>
@@ -388,13 +256,12 @@
         </nav>
     </div>
 
-    <!-- Hero Section -->
     <section class="hero">
-        <h1>Welcome to <br><span>PDFly Tools.</span></h1>
-        <p>An ultra-fast, privacy-focused toolkit for seamless PDF formatting, image editing, and smart digital tasks.</p>
+        <div class="greeting-badge" id="greetingBadge"><i class="fa-regular fa-sun"></i> Good Morning</div>
+        <h1><span id="heroTitle">PDFly</span> Digital Suite.</h1>
+        <p>An ultra-fast, HD, privacy-focused toolkit for seamless PDF formatting, image editing, and smart digital tasks perfectly fitted for your screen.</p>
     </section>
 
-    <!-- Category Tabs -->
     <div class="tabs-container">
         <button class="tab-btn active" onclick="filterCategory('all')">All Tools</button>
         <button class="tab-btn" onclick="filterCategory('image')">Image Tools</button>
@@ -402,67 +269,61 @@
         <button class="tab-btn" onclick="filterCategory('other')">Smart Utilities</button>
     </div>
 
-    <!-- Main Content Container -->
     <main class="container">
 
         <!-- 1. IMAGE TOOLS -->
         <div class="category-wrapper" data-category="image">
             <h2 class="section-title"><i class="fa-solid fa-image"></i> Image Utilities</h2>
             <div class="grid">
-                <div class="card tool-card" onclick="runTool('Image Resizer')">
-                    <div class="icon-wrapper"><i class="fa-solid fa-expand"></i></div>
-                    <h3>Image Resizer</h3>
-                    <p>Change image dimensions instantly.</p>
+                <div class="card tool-card" onclick="runTool('Enhance Image')" title="Upscale and clear blurry photos">
+                    <div class="icon-wrapper"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <h3>Enhance Image</h3>
+                    <p>Clear blurry photos using AI.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Image Compressor')">
+                <div class="card tool-card" onclick="runTool('Resize Image')" title="Change image dimensions instantly">
+                    <div class="icon-wrapper"><i class="fa-solid fa-expand"></i></div>
+                    <h3>Resize Image</h3>
+                    <p>Change dimensions instantly.</p>
+                </div>
+                <div class="card tool-card" onclick="runTool('Compress Image')" title="Reduce size without quality loss">
                     <div class="icon-wrapper"><i class="fa-solid fa-compress"></i></div>
-                    <h3>Image Compressor</h3>
+                    <h3>Compress Image</h3>
                     <p>Reduce size without quality loss.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Image Cropper')">
+                <div class="card tool-card" onclick="runTool('Crop Image')" title="Trim your photos perfectly">
                     <div class="icon-wrapper"><i class="fa-solid fa-crop-simple"></i></div>
-                    <h3>Image Cropper</h3>
+                    <h3>Crop Image</h3>
                     <p>Trim your photos perfectly.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Image Watermark')">
+                <div class="card tool-card" onclick="runTool('Add Watermark')" title="Protect images with custom marks">
                     <div class="icon-wrapper"><i class="fa-solid fa-stamp"></i></div>
                     <h3>Add Watermark</h3>
                     <p>Protect images with custom marks.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Background Remover')">
-                    <div class="icon-wrapper"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-                    <h3>Background Remover</h3>
+                <div class="card tool-card" onclick="runTool('Remove BG')" title="Erase background via Smart AI">
+                    <div class="icon-wrapper"><i class="fa-solid fa-eraser"></i></div>
+                    <h3>Remove BG</h3>
                     <p>Erase background via Smart AI.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Image Converter')">
+                <div class="card tool-card" onclick="runTool('Convert Image')" title="Change JPG, PNG, WEBP formats">
                     <div class="icon-wrapper"><i class="fa-solid fa-right-left"></i></div>
-                    <h3>Image Converter</h3>
+                    <h3>Convert Image</h3>
                     <p>Change JPG, PNG, WEBP formats.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('SVG to PNG')">
-                    <div class="icon-wrapper"><i class="fa-solid fa-vector-square"></i></div>
-                    <h3>SVG to PNG</h3>
-                    <p>Convert vector graphics easily.</p>
-                </div>
-                <div class="card tool-card" onclick="runTool('Photo & Sign Joiner')">
+                <div class="card tool-card" onclick="runTool('Merge Photo Sign')" title="Merge photo and sign for forms">
                     <div class="icon-wrapper"><i class="fa-solid fa-user-group"></i></div>
-                    <h3>Photo & Sign Joiner</h3>
+                    <h3>Merge Photo Sign</h3>
                     <p>Merge photo and sign for forms.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Photo Size DOB Joiner')">
+                <div class="card tool-card" onclick="runTool('Add DOB to Photo')" title="Attach Date of Birth easily">
                     <div class="icon-wrapper"><i class="fa-solid fa-id-card-clip"></i></div>
-                    <h3>Size & DOB Joiner</h3>
+                    <h3>Add DOB to Photo</h3>
                     <p>Attach Date of Birth easily.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Text to Image')">
+                <div class="card tool-card" onclick="runTool('Text to Image')" title="Create visual text graphics">
                     <div class="icon-wrapper"><i class="fa-solid fa-font"></i></div>
                     <h3>Text to Image</h3>
                     <p>Create visual text graphics.</p>
-                </div>
-                <div class="card tool-card" onclick="runTool('Image to PDF')">
-                    <div class="icon-wrapper"><i class="fa-solid fa-file-pdf"></i></div>
-                    <h3>Image to PDF</h3>
-                    <p>Turn pictures into a PDF doc.</p>
                 </div>
             </div>
         </div>
@@ -471,32 +332,42 @@
         <div class="category-wrapper" data-category="pdf">
             <h2 class="section-title"><i class="fa-solid fa-file-lines"></i> PDF Processing</h2>
             <div class="grid">
-                <div class="card tool-card" onclick="runTool('PDF to Image')">
+                <div class="card tool-card" onclick="runTool('Image to PDF')" title="Turn pictures into a PDF doc">
+                    <div class="icon-wrapper"><i class="fa-solid fa-images"></i></div>
+                    <h3>Image to PDF</h3>
+                    <p>Turn pictures into a PDF doc.</p>
+                </div>
+                <div class="card tool-card" onclick="runTool('PDF to Image')" title="Extract pages as JPG/PNG">
                     <div class="icon-wrapper"><i class="fa-solid fa-file-image"></i></div>
                     <h3>PDF to Image</h3>
                     <p>Extract pages as JPG/PNG.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('PDF Compressor')">
+                <div class="card tool-card" onclick="runTool('PDF to Text')" title="Extract text from any PDF">
+                    <div class="icon-wrapper"><i class="fa-solid fa-file-word"></i></div>
+                    <h3>PDF to Text</h3>
+                    <p>Extract text from any PDF.</p>
+                </div>
+                <div class="card tool-card" onclick="runTool('Compress PDF')" title="Shrink heavy PDF documents">
                     <div class="icon-wrapper"><i class="fa-solid fa-file-zipper"></i></div>
-                    <h3>PDF Compressor</h3>
+                    <h3>Compress PDF</h3>
                     <p>Shrink heavy PDF documents.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('PDF Merger')">
+                <div class="card tool-card" onclick="runTool('Merge PDF')" title="Combine multiple PDFs together">
                     <div class="icon-wrapper"><i class="fa-solid fa-object-ungroup"></i></div>
-                    <h3>PDF Merger</h3>
+                    <h3>Merge PDF</h3>
                     <p>Combine multiple PDFs together.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('PDF Splitter')">
+                <div class="card tool-card" onclick="runTool('Split PDF')" title="Extract specific PDF pages">
                     <div class="icon-wrapper"><i class="fa-solid fa-scissors"></i></div>
-                    <h3>PDF Splitter</h3>
+                    <h3>Split PDF</h3>
                     <p>Extract specific PDF pages.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Protect PDF')">
+                <div class="card tool-card" onclick="runTool('Protect PDF')" title="Add password to your PDF">
                     <div class="icon-wrapper"><i class="fa-solid fa-file-shield"></i></div>
                     <h3>Protect PDF</h3>
                     <p>Add password to your PDF.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Unlock PDF')">
+                <div class="card tool-card" onclick="runTool('Unlock PDF')" title="Remove PDF passwords easily">
                     <div class="icon-wrapper"><i class="fa-solid fa-unlock-keyhole"></i></div>
                     <h3>Unlock PDF</h3>
                     <p>Remove PDF passwords easily.</p>
@@ -504,161 +375,132 @@
             </div>
         </div>
 
-        <!-- 3. OTHER TOOLS -->
+        <!-- 3. SMART UTILITIES -->
         <div class="category-wrapper" data-category="other">
             <h2 class="section-title"><i class="fa-solid fa-toolbox"></i> Smart Utilities</h2>
             <div class="grid">
-                <div class="card tool-card" onclick="runTool('Measure Converter')">
+                <div class="card tool-card" onclick="runTool('Unit Converter')" title="Convert units easily">
                     <div class="icon-wrapper"><i class="fa-solid fa-ruler-combined"></i></div>
-                    <h3>Measure Converter</h3>
+                    <h3>Unit Converter</h3>
                     <p>Convert units easily.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Age Calculator')">
+                <div class="card tool-card" onclick="runTool('Age Calculator')" title="Find exact age in days & years">
                     <div class="icon-wrapper"><i class="fa-solid fa-calculator"></i></div>
                     <h3>Age Calculator</h3>
-                    <p>Find exact age in days & years.</p>
+                    <p>Find exact age in days or years.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Words Counter')">
+                <div class="card tool-card" onclick="runTool('Word Counter')" title="Count text length instantly">
                     <div class="icon-wrapper"><i class="fa-solid fa-spell-check"></i></div>
-                    <h3>Words Counter</h3>
+                    <h3>Word Counter</h3>
                     <p>Count text length instantly.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('E-Mail Validator')">
+                
+                <!-- Email Validator replaced with Email Variant -->
+                <div class="card tool-card" onclick="runTool('Email Variant')" title="Generate email variations">
                     <div class="icon-wrapper"><i class="fa-solid fa-envelope-circle-check"></i></div>
-                    <h3>E-Mail Validator</h3>
-                    <p>Check if email is active.</p>
+                    <h3>Email Variant</h3>
+                    <p>Generate email variations.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Password Generator')">
+
+                <div class="card tool-card" onclick="runTool('Password Gen')" title="Create strong secure passwords">
                     <div class="icon-wrapper"><i class="fa-solid fa-key"></i></div>
-                    <h3>Password Generator</h3>
+                    <h3>Password Gen</h3>
                     <p>Create strong secure passwords.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Text Encryptor')">
+                <div class="card tool-card" onclick="runTool('Encrypt Text')" title="Hide data with encryption">
                     <div class="icon-wrapper"><i class="fa-solid fa-lock"></i></div>
-                    <h3>Text Encryptor</h3>
+                    <h3>Encrypt Text</h3>
                     <p>Hide data with encryption.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Base64 Encoder')">
-                    <div class="icon-wrapper"><i class="fa-solid fa-file-code"></i></div>
-                    <h3>Base64 Encoder</h3>
-                    <p>Encode/Decode strings instantly.</p>
+                
+                <div class="card tool-card" onclick="runTool('Hide Text')" title="Hide text within visible text">
+                    <div class="icon-wrapper"><i class="fa-solid fa-user-secret"></i></div>
+                    <h3>Hide Text</h3>
+                    <p>Hide text within visible text.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('JSON Formatter')">
-                    <div class="icon-wrapper"><i class="fa-solid fa-code"></i></div>
-                    <h3>JSON Formatter</h3>
-                    <p>Beautify and validate JSON code.</p>
+                <div class="card tool-card" onclick="runTool('Secret QR Message')" title="Encode secret messages in QR">
+                    <div class="icon-wrapper"><i class="fa-solid fa-comment-sms"></i></div>
+                    <h3>Secret QR Message</h3>
+                    <p>Encode secret messages in QR.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('CSS Minifier')">
-                    <div class="icon-wrapper"><i class="fa-brands fa-css3-alt"></i></div>
-                    <h3>CSS Minifier</h3>
-                    <p>Compress CSS for faster loading.</p>
-                </div>
-                <div class="card tool-card" onclick="runTool('Secure Chat Room')">
+                <div class="card tool-card" onclick="runTool('Secure Chat')" title="Private temporary chatting">
                     <div class="icon-wrapper"><i class="fa-solid fa-comments"></i></div>
-                    <h3>Secure Chat Room</h3>
+                    <h3>Secure Chat</h3>
                     <p>Private temporary chatting.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Birthday Matcher')">
+
+                <div class="card tool-card" onclick="runTool('Match Birthday')" title="Check birth compatibility">
                     <div class="icon-wrapper"><i class="fa-solid fa-calendar-check"></i></div>
-                    <h3>Birthday Matcher</h3>
+                    <h3>Match Birthday</h3>
                     <p>Check birth compatibility.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('BioData Generator')">
+                <div class="card tool-card" onclick="runTool('Biodata Maker')" title="Create marriage biodata">
                     <div class="icon-wrapper"><i class="fa-solid fa-address-card"></i></div>
-                    <h3>BioData Generator</h3>
+                    <h3>Biodata Maker</h3>
                     <p>Create marriage biodata.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Colour Picker')">
+                <div class="card tool-card" onclick="runTool('Color Picker')" title="Get HEX codes easily">
                     <div class="icon-wrapper"><i class="fa-solid fa-eye-dropper"></i></div>
-                    <h3>Colour Picker</h3>
+                    <h3>Color Picker</h3>
                     <p>Get HEX codes easily.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Link Shortcut')">
+                <div class="card tool-card" onclick="runTool('Shorten URL')" title="Shorten long web URLs">
                     <div class="icon-wrapper"><i class="fa-solid fa-link"></i></div>
-                    <h3>Link Shortcut</h3>
+                    <h3>Shorten URL</h3>
                     <p>Shorten long web URLs.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('QR Code Generator')">
+                <div class="card tool-card" onclick="runTool('QR Code Maker')" title="Make scannable QR codes">
                     <div class="icon-wrapper"><i class="fa-solid fa-qrcode"></i></div>
-                    <h3>QR Code Generator</h3>
+                    <h3>QR Code Maker</h3>
                     <p>Make scannable QR codes.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Lorem Ipsum Generator')">
-                    <div class="icon-wrapper"><i class="fa-solid fa-align-left"></i></div>
-                    <h3>Dummy Text Generator</h3>
-                    <p>Generate placeholder text.</p>
+                <div class="card tool-card" onclick="runTool('Fancy Text')" title="Generate stylish social text">
+                    <div class="icon-wrapper"><i class="fa-solid fa-font"></i></div>
+                    <h3>Fancy Text</h3>
+                    <p>Generate stylish social text.</p>
                 </div>
-                <div class="card tool-card" onclick="runTool('Text Art Generator')">
+                <div class="card tool-card" onclick="runTool('ASCII Art')" title="Create cool ASCII text art">
                     <div class="icon-wrapper"><i class="fa-solid fa-pen-nib"></i></div>
-                    <h3>Text Art Generator</h3>
+                    <h3>ASCII Art</h3>
                     <p>Create cool ASCII text art.</p>
-                </div>
-                <div class="card tool-card" onclick="runTool('Hash Generator')">
-                    <div class="icon-wrapper"><i class="fa-solid fa-fingerprint"></i></div>
-                    <h3>Hash Generator</h3>
-                    <p>Generate MD5/SHA256 hashes.</p>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Smart Components -->
     <button id="backToTop" onclick="window.scrollTo(0,0)" title="Go to top"><i class="fa-solid fa-arrow-up"></i></button>
     <div class="toast-box" id="globalToast"><i class="fa-solid fa-circle-check"></i> <span id="toastMsg">Action Successful</span></div>
 
-    <!-- Modals for Developer Easter Egg -->
-    
-    <!-- 1. Password Prompt Modal -->
-    <div class="modal-overlay" id="passwordModal">
-        <div class="modal-box">
-            <button class="modal-close" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></button>
-            <i class="fa-solid fa-lock"></i>
-            <h3>Developer Access</h3>
-            <span class="hint">Hint: Password is Developer's name</span>
-            <input type="password" id="devPassword" placeholder="Enter Password" onkeypress="handleEnter(event)">
-            <div class="error-msg" id="passError">Incorrect Password. Try again.</div>
-            <button class="btn-submit" onclick="verifyPassword()" style="margin-top: 15px;">Unlock</button>
-        </div>
-    </div>
-
-    <!-- 2. Developer Profile Modal (Updated Developer Profile) -->
+    <!-- Developer Profile Modal -->
     <div class="modal-overlay" id="profileModal">
         <div class="modal-box">
             <button class="modal-close" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></button>
-            
             <div class="dev-img-container">
-                <!-- Using a professional Developer Avatar from DiceBear -->
                 <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Programmer&colors=3b82f6" alt="Developer Profile">
             </div>
-            
             <div class="dev-name">GT Rao</div>
             <div class="dev-subtitle">Creator & Developer</div>
-            
             <div class="dev-bio">
-                Hello! Building front-end web applications, writing clean code, and creating digital utility tools like PDFly are my core passions and hobbies. 
+                Hello! Building front-end web applications, writing clean code, and creating digital utility tools like PDFly are my core passions. 
             </div>
-            
             <div class="dev-tags">
                 <span><i class="fa-solid fa-graduation-cap"></i> Student</span>
                 <span><i class="fa-solid fa-code"></i> Web Developer</span>
                 <span><i class="fa-solid fa-laptop-code"></i> Coding</span>
-                <span><i class="fa-solid fa-music"></i> Hobbies</span>
+                <span><i class="fa-solid fa-bolt"></i> Ultra HD UI</span>
             </div>
         </div>
     </div>
 
-    <!-- 3. Legal Information Modal (New Addition) -->
+    <!-- Legal Modal -->
     <div class="modal-overlay" id="legalModal">
         <div class="modal-box legal-box">
             <button class="modal-close" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></button>
             <h3 id="legalTitle">Legal Information</h3>
-            <div class="legal-content" id="legalText">
-                <!-- Content will be injected dynamically via JS -->
-            </div>
+            <div class="legal-content" id="legalText"></div>
         </div>
     </div>
 
-    <!-- Themed Footer -->
     <footer>
         <div class="footer-grid">
             <div class="footer-brand">
@@ -690,9 +532,7 @@
         </div>
         <div class="footer-bottom">
             <div class="copyright">&copy; 2026 PDFly Tools. All Rights Reserved.</div>
-            
-            <!-- Developer Easter Egg Trigger -->
-            <div class="dev-badge" onclick="openPasswordModal()">
+            <div class="dev-badge" onclick="openProfileModal()">
                 Developed by <span>GT Rao</span>
             </div>
         </div>
@@ -700,21 +540,37 @@
 
     <!-- Script Logic -->
     <script>
-        // 1. Initial Setup & Local Storage Theme
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme');
             if(savedTheme === 'light') {
                 document.body.classList.add('light-theme');
                 document.getElementById('themeIcon').className = 'fa-solid fa-sun';
             }
+            
+            // Dynamic Greeting
+            const hour = new Date().getHours();
+            let greeting = "Good Evening";
+            let icon = "fa-moon";
+            
+            if (hour >= 5 && hour < 12) { greeting = "Good Morning"; icon = "fa-sun"; }
+            else if (hour >= 12 && hour < 18) { greeting = "Good Afternoon"; icon = "fa-cloud-sun"; }
+            
+            document.getElementById('greetingBadge').innerHTML = `<i class="fa-solid ${icon}"></i> ${greeting}`;
+            
+            assignAnimationDelays();
         });
 
-        // 2. Theme Toggle
+        function assignAnimationDelays() {
+            const visibleCards = Array.from(document.querySelectorAll('.tool-card')).filter(card => card.style.display !== 'none');
+            visibleCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.03}s`;
+            });
+        }
+
         function toggleTheme() {
             const body = document.body;
             const icon = document.getElementById('themeIcon');
             body.classList.toggle('light-theme');
-            
             if (body.classList.contains('light-theme')) {
                 icon.className = 'fa-solid fa-sun';
                 localStorage.setItem('theme', 'light');
@@ -726,7 +582,6 @@
             }
         }
 
-        // 3. Custom Toast UI
         function showToast(message) {
             const toast = document.getElementById('globalToast');
             document.getElementById('toastMsg').innerText = message;
@@ -734,12 +589,12 @@
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
 
-        // 4. Run Tool Click
         function runTool(toolName) {
             showToast(`Opening ${toolName}...`);
+            let formattedName = toolName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            setTimeout(() => { window.location.href = formattedName + '.html'; }, 600); 
         }
 
-        // 5. Scroll Progress & Back to Top Button
         window.onscroll = function() {
             let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
             let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -754,7 +609,18 @@
             }
         };
 
-        // 6. Live Search Filter
+        function handleSearchInput() {
+            const input = document.getElementById('searchInput').value;
+            const clearBtn = document.getElementById('clearSearch');
+            clearBtn.style.display = input.length > 0 ? 'block' : 'none';
+        }
+
+        function clearSearchInput() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('clearSearch').style.display = 'none';
+            searchTools();
+        }
+
         function searchTools() {
             let input = document.getElementById('searchInput').value.toLowerCase();
             let cards = document.querySelectorAll('.tool-card');
@@ -769,6 +635,7 @@
                     card.style.display = "flex";
                 } else {
                     card.style.display = "none";
+                    card.style.animationDelay = "0s";
                 }
             });
 
@@ -776,110 +643,50 @@
                 let visible = Array.from(cat.querySelectorAll('.tool-card')).some(c => c.style.display !== 'none');
                 cat.querySelector('.section-title').style.display = visible ? 'flex' : 'none';
             });
+            assignAnimationDelays();
         }
 
-        // 7. Category Tab Logic
         function filterCategory(catName) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-
-            document.getElementById('searchInput').value = '';
+            clearSearchInput();
 
             document.querySelectorAll('.category-wrapper').forEach(cat => {
                 if (catName === 'all' || cat.dataset.category === catName) {
                     cat.style.display = 'block';
-                    cat.querySelectorAll('.tool-card').forEach(c => c.style.display = 'flex');
+                    cat.querySelectorAll('.tool-card').forEach(c => {
+                        c.style.display = 'flex';
+                        c.style.animation = 'none';
+                        c.offsetHeight; 
+                        c.style.animation = null; 
+                    });
                     cat.querySelector('.section-title').style.display = 'flex';
                 } else {
                     cat.style.display = 'none';
                 }
             });
-            window.scrollTo(0, document.querySelector('.tabs-container').offsetTop - 100);
+            assignAnimationDelays();
+            window.scrollTo(0, document.querySelector('.tabs-container').offsetTop - 80);
         }
 
-        // ================= MODALS & POPUPS LOGIC =================
-
-        const passModal = document.getElementById('passwordModal');
         const profileModal = document.getElementById('profileModal');
         const legalModal = document.getElementById('legalModal');
-        
-        const passInput = document.getElementById('devPassword');
-        const errorMsg = document.getElementById('passError');
 
-        function openPasswordModal() {
+        function openProfileModal() {
             closeModals();
-            passModal.classList.add('active');
-            passInput.value = '';
-            errorMsg.style.display = 'none';
-            setTimeout(() => passInput.focus(), 100);
+            profileModal.classList.add('active');
         }
 
         function closeModals() {
-            passModal.classList.remove('active');
             profileModal.classList.remove('active');
             legalModal.classList.remove('active');
         }
 
-        function verifyPassword() {
-            if (passInput.value.toLowerCase() === 'gt rao') {
-                passModal.classList.remove('active');
-                setTimeout(() => {
-                    profileModal.classList.add('active');
-                    showToast('Developer Profile Unlocked!');
-                }, 300);
-            } else {
-                errorMsg.style.display = 'block';
-            }
-        }
-
-        function handleEnter(e) {
-            if (e.key === 'Enter') {
-                verifyPassword();
-            }
-        }
-
-        // ================= LEGAL PAGES DATA & LOGIC =================
         const legalData = {
-            'privacy': {
-                title: "Privacy Policy",
-                content: `
-                    <h4>1. Data Processing</h4>
-                    <p>At PDFly Tools, we prioritize your privacy. All file processing (image editing, PDF formatting) is performed securely. Uploaded files are processed in real-time and are automatically deleted from our temporary servers immediately after the task is completed.</p>
-                    <h4>2. Information Collection</h4>
-                    <p>We do not collect, store, or sell any personal data, documents, or images you upload. We only collect standard, non-identifying analytic data (such as browser type and screen resolution) to improve user experience.</p>
-                    <h4>3. Data Security</h4>
-                    <p>We implement industry-standard encryption protocols (HTTPS/SSL) to protect your data during transit. However, no internet transmission is 100% secure, and we advise against processing highly sensitive government or financial documents on public web tools.</p>`
-            },
-            'terms': {
-                title: "Terms of Service",
-                content: `
-                    <h4>1. Acceptance of Terms</h4>
-                    <p>By accessing and using PDFly Tools, you accept and agree to be bound by the terms and provisions of this agreement. If you do not agree to abide by these terms, please do not use this service.</p>
-                    <h4>2. Use of Service</h4>
-                    <p>Our tools are provided for personal and professional utility. You agree not to use the service for any illegal activities, copyright infringement, or malicious file distribution.</p>
-                    <h4>3. Intellectual Property</h4>
-                    <p>The design, code, and branding of PDFly Tools are the intellectual property of GT Rao. You may not duplicate, copy, or reuse any portion of the visual design elements or code without express written permission.</p>`
-            },
-            'cookies': {
-                title: "Cookies Policy",
-                content: `
-                    <h4>1. What are Cookies?</h4>
-                    <p>Cookies are small text files stored on your device when you visit our website. They help us remember your preferences (such as Dark/Light mode) and understand how you interact with our tools.</p>
-                    <h4>2. How We Use Cookies</h4>
-                    <p>We use essential cookies strictly to maintain core website functionality (like saving your theme preference in local storage) and basic performance monitoring. We do not use third-party tracking or advertising cookies.</p>
-                    <h4>3. Managing Cookies</h4>
-                    <p>You can choose to disable cookies through your browser settings. However, please note that disabling essential cookies may reset your UI preferences (like the Dark theme) upon every visit.</p>`
-            },
-            'disclaimer': {
-                title: "Disclaimer",
-                content: `
-                    <h4>1. "As-Is" Basis</h4>
-                    <p>The tools and utilities provided on PDFly Tools are offered on an "as is" and "as available" basis without any warranties of any kind, either express or implied, including accuracy, reliability, or suitability for a particular purpose.</p>
-                    <h4>2. Limitation of Liability</h4>
-                    <p>In no event shall the developer (GT Rao) or PDFly Tools be held liable for any direct, indirect, incidental, or consequential damages resulting from the use or inability to use the tools, including data loss or file corruption.</p>
-                    <h4>3. External Links</h4>
-                    <p>Our website may contain links to external sites that are not operated by us. We have no control over the content and practices of these sites and cannot accept responsibility for their respective privacy policies.</p>`
-            }
+            'privacy': { title: "Privacy Policy", content: `<h4>1. Data Processing</h4><p>All file processing is performed securely. Files are automatically deleted from servers after processing.</p><h4>2. Analytics</h4><p>We only collect standard, non-identifying analytic data.</p>` },
+            'terms': { title: "Terms of Service", content: `<h4>1. Acceptance</h4><p>By using PDFly Tools, you agree to these terms.</p><h4>2. Usage</h4><p>Tools are for personal and professional utility. No illegal activities permitted.</p>` },
+            'cookies': { title: "Cookies Policy", content: `<h4>1. Essential Cookies</h4><p>We use essential local storage to save your UI preferences (like Dark Mode).</p>` },
+            'disclaimer': { title: "Disclaimer", content: `<h4>1. "As-Is" Basis</h4><p>Tools are provided "as is" without warranty. We are not liable for any data loss.</p>` }
         };
 
         function openLegal(type) {
@@ -892,9 +699,8 @@
             }
         }
 
-        // Close modals when clicking on the dark overlay background
         window.onclick = function(event) {
-            if (event.target == passModal || event.target == profileModal || event.target == legalModal) {
+            if (event.target == profileModal || event.target == legalModal) {
                 closeModals();
             }
         }

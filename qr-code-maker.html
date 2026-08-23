@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>QR Code Generator - PDFly Tools</title>
+    <meta name="description" content="Generate high-resolution QR codes with logos, custom colors, and advanced formats. 100% Free, Secure, and Client-Side by PDFly Tools.">
+    <meta name="author" content="GT Rao">
+    
+    <!-- Google Fonts: Plus Jakarta Sans for Ultra-HD Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- QR Code Library -->
+    <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+
+    <style>
+        /* === UI/UX Variables (PDFly Standard) === */
+        :root {
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --radius-card: 16px;
+            --radius-pill: 9999px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Light Theme */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.85);
+            --bg-input: #f1f5f9;
+            --bg-hover: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.25);
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #020617;
+            --bg-card: #0f172a;
+            --bg-glass: rgba(2, 6, 23, 0.75);
+            --bg-input: #1e293b;
+            --bg-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 10px 30px rgba(59, 130, 246, 0.35);
+        }
+
+        /* === Base Styles === */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-body); color: var(--text-main); transition: background-color 0.4s ease, color 0.4s ease; overflow-x: hidden; }
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--gradient); width: 0%; z-index: 9999; }
+
+        /* === Navbar (Non-Floating/Static) === */
+        .navbar-wrapper { padding: 1.5rem 1rem 1rem; max-width: 1300px; margin: 0 auto; }
+        .navbar {
+            background: var(--bg-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 0.8rem 1.5rem; 
+            display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm);
+        }
+        .nav-brand { font-size: 1.3rem; font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; display: flex; align-items: center; gap: 8px;}
+        .nav-brand i { color: var(--primary); -webkit-text-fill-color: initial; }
+        .theme-toggle { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: var(--transition); font-size: 1.1rem; }
+        .theme-toggle:hover { background: var(--primary); color: white; transform: rotate(15deg); }
+
+        /* === Layout === */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1.2rem; }
+        .header { text-align: center; margin-bottom: 3rem; padding-top: 1rem; }
+        .header h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 0.8rem; line-height: 1.2; letter-spacing: -1px; }
+        .header h1 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.1rem); max-width: 700px; margin: 0 auto; line-height: 1.6; }
+
+        .qr-workspace { display: flex; flex-direction: column-reverse; gap: 2rem; margin-bottom: 3rem; }
+        @media (min-width: 992px) { 
+            .qr-workspace { flex-direction: row; align-items: flex-start; gap: 2.5rem; }
+            .left-panel { flex: 1.5; min-width: 0; }
+            .right-panel { flex: 1; min-width: 0; position: sticky; top: 20px; }
+        }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.2rem, 3vw, 1.8rem); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; }
+        .card h2 { font-size: 1.15rem; font-weight: 800; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
+
+        /* === Form Elements === */
+        .form-group { margin-bottom: 1rem; display: flex; flex-direction: column; width: 100%; }
+        .form-group label { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        input, select, textarea { width: 100%; padding: 0.9rem 1.1rem; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 10px; font-size: 0.95rem; transition: var(--transition); outline: none; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+        textarea.large { min-height: 90px; resize: vertical; }
+        
+        .input-with-icon { position: relative; width: 100%; }
+        .input-with-icon i { position: absolute; left: 1.1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.95rem; pointer-events: none; }
+        .input-with-icon input { padding-left: 2.8rem; }
+        
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 1rem; }
+
+        /* === Content Type Grid === */
+        .type-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-bottom: 1.5rem; max-height: 220px; overflow-y: auto; padding-right: 5px; }
+        .type-grid::-webkit-scrollbar { width: 4px; }
+        .type-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        .type-btn { background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 0.8rem 0.2rem; text-align: center; cursor: pointer; transition: var(--transition); color: var(--text-muted); display: flex; flex-direction: column; gap: 5px; }
+        .type-btn i { font-size: 1.3rem; }
+        .type-btn span { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 2px;}
+        .type-btn:hover { border-color: var(--primary); color: var(--text-main); transform: translateY(-2px); }
+        .type-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
+
+        /* === Custom Tabs === */
+        .sub-tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; background: var(--bg-input); padding: 0.4rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border); }
+        .sub-tab { flex: 1; padding: 0.6rem 0.2rem; border: none; background: transparent; color: var(--text-muted); font-weight: 700; border-radius: 8px; cursor: pointer; transition: var(--transition); font-size: 0.85rem; display: flex; justify-content: center; align-items: center; gap: 5px;}
+        .sub-tab.active { background: var(--bg-card); color: var(--primary); box-shadow: var(--shadow-sm); }
+        
+        .tab-pane { display: none; animation: fadeIn 0.3s ease; }
+        .tab-pane.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* === 2x3 Color Grid (Compact) === */
+        .color-grid-2x3 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; background: var(--bg-input); padding: 0.8rem; border-radius: 12px; border: 1px solid var(--border); }
+        .color-item { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.8rem; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border); gap: 5px; min-width: 0; }
+        .color-item span { font-size: 0.8rem; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        input[type="color"] { width: 30px; height: 30px; padding: 0; border: none; border-radius: 6px; cursor: pointer; background: transparent; flex-shrink: 0; }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 6px; }
+
+        .checkbox-wrap { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; flex-shrink: 0;}
+        input[type="checkbox"] { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: var(--primary); border-radius: 4px; }
+
+        /* === Logo Upload === */
+        .file-upload { border: 2px dashed var(--border); padding: 1.5rem; text-align: center; border-radius: 12px; cursor: pointer; background: var(--bg-input); transition: var(--transition); }
+        .file-upload:hover { border-color: var(--primary); background: rgba(59,130,246,0.05); }
+        .file-upload i { font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem; }
+        .hidden-file-input { display: none !important; }
+        input[type="range"] { height: 6px; background: var(--border); border-radius: 5px; appearance: none; cursor: pointer; margin-top: 5px; }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--primary); }
+
+        .preset-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); gap: 10px; margin-top: 8px;}
+        .preset-btn { height: 45px; border-radius: 8px; border: 2px solid var(--border); cursor: pointer; transition: var(--transition); }
+        .preset-btn:hover { transform: scale(1.05); border-color: var(--primary); }
+
+        /* === Live Preview Area (Fixed Clipping) === */
+        .preview-section { margin-top: 2rem; text-align: center; padding-bottom: 1.5rem; }
+        
+        .qr-canvas-wrapper { 
+            background: #ffffff; 
+            padding: 1.25rem; 
+            border-radius: 16px; 
+            box-shadow: var(--shadow-sm); 
+            border: 1px solid var(--border); 
+            width: 100%; 
+            max-width: 280px; 
+            aspect-ratio: 1 / 1; 
+            margin: 0 auto 1.5rem; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            position: relative;
+            overflow: visible; /* Prevents edge clipping */
+        }
+        
+        /* Empty State Placeholder */
+        .qr-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-weight: 700; text-align: center; background: #f8fafc; border-radius: 15px; border: 2px dashed #cbd5e1; z-index: 10; transition: opacity 0.3s; }
+        .qr-placeholder i { font-size: 3rem; margin-bottom: 0.5rem; color: #cbd5e1; }
+        [data-theme="dark"] .qr-placeholder { background: #0f172a; color: #64748b; border-color: #1e293b; }
+        [data-theme="dark"] .qr-placeholder i { color: #1e293b; }
+
+        #qrCodeCanvas { width: 100%; height: auto; aspect-ratio: 1/1; display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+        #qrCodeCanvas svg, #qrCodeCanvas canvas { width: 100% !important; height: auto !important; max-width: 100%; display: block; }
+        
+        .dl-controls { background: var(--bg-input); padding: 1rem; border-radius: 12px; border: 1px solid var(--border); margin: 0 auto 1.5rem; text-align: left; }
+        .dl-controls .form-group { margin-bottom: 0; }
+
+        .action-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .btn { padding: 1rem 1.5rem; border: none; font-weight: 700; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; transition: var(--transition); flex: 1; min-width: 140px; }
+        .btn-primary { background: var(--gradient); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5); transform: translateY(-2px); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--bg-hover); border-color: var(--danger); color: var(--danger); }
+
+        /* === 4 Features Grid === */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(1rem, 3vw, 1.5rem); margin: 4rem 0; }
+        .feature-card { background: var(--bg-card); padding: 1.5rem; text-align: center; border-radius: var(--radius-card); border: 1px solid var(--border); box-shadow: var(--shadow-sm); transition: var(--transition); }
+        .feature-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: var(--shadow-hover); }
+        .feature-card i { font-size: 2rem; margin-bottom: 1rem; color: var(--primary); transition: var(--transition); }
+        .feature-card:hover i { transform: scale(1.1) rotate(5deg); }
+        .feature-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 700; color: var(--text-main); }
+        .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* === SEO Friendly Card Section === */
+        .seo-text-section { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 3rem); margin: 3rem 0; box-shadow: var(--shadow-sm); }
+        .seo-text-section h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 800; margin-bottom: 1.5rem; color: var(--text-main); }
+        .seo-text-section h3 { font-size: clamp(1.1rem, 2vw, 1.4rem); font-weight: 700; margin: 2rem 0 1rem; color: var(--text-main); }
+        .seo-text-section p, .seo-text-section li { font-size: clamp(0.95rem, 1.5vw, 1.05rem); color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; }
+        .seo-text-section ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--text-muted); }
+
+        /* === Modals === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); z-index: 2000; padding: 1rem; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 2.5rem); transform: scale(0.9) translateY(20px); transition: var(--transition); border: 1px solid var(--border); box-shadow: var(--shadow-hover); position: relative; max-height: 90vh; overflow-y: auto; text-align: left; }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-input); border: 1px solid var(--border); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--text-main); cursor: pointer; transition: var(--transition); }
+        .modal-close:hover { color: white; background: var(--danger); border-color: var(--danger); transform: rotate(90deg); }
+        
+        /* Developer Profile */
+        .dev-profile { text-align: center; }
+        .dev-avatar { width: clamp(100px, 15vw, 120px); height: clamp(100px, 15vw, 120px); border-radius: 50%; background: var(--bg-card); margin: 0 auto 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); border: 4px solid var(--primary); padding: 0; }
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .dev-tags { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+        .dev-tag { background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(59,130,246,0.2); }
+        .dev-social { width: 45px; height: 45px; border-radius: 50%; background: var(--bg-input); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: var(--transition); border: 1px solid var(--border); text-decoration: none; }
+        .dev-social:hover { background: var(--primary); color: white; transform: translateY(-3px); border-color: var(--primary); box-shadow: var(--shadow-sm); }
+
+        /* === Footer === */
+        .footer { margin-top: 4rem; padding: clamp(3rem, 5vw, 4rem) 1rem 2rem; border-top: 1px solid var(--border); background: var(--bg-card); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2.5rem; max-width: 1300px; margin: 0 auto 2rem; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--text-main); font-weight: 800; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; transition: var(--transition); font-size: 0.95rem; font-weight: 500; cursor: pointer;}
+        .footer-links a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
+        .dev-badge { background: var(--bg-input); padding: 0.6rem 1.2rem; border-radius: var(--radius-pill); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 700; font-size: 0.9rem; border: 1px solid var(--border); transition: var(--transition); }
+        .dev-badge:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
+        /* === Toast Notification === */
+        #toast-container { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: max-content; max-width: 90vw; pointer-events: none;}
+        .toast { background: var(--text-main); color: var(--bg-body); padding: 1rem 1.5rem; border-radius: var(--radius-pill); box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px; animation: slideUp 0.4s forwards, fadeOut 0.4s forwards 2.5s; font-weight: 700; font-size: 0.95rem; }
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        @keyframes slideUp { from { transform: translateY(100px); } to { transform: translateY(0); } }
+        @keyframes fadeOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(20px); opacity: 0; } }
+        
+        #backToTop { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: var(--shadow-hover); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 1000; font-size: 1.2rem; }
+        #backToTop.show { opacity: 1; visibility: visible; }
+        #backToTop:hover { transform: translateY(-5px) scale(1.05); }
+    </style>
+</head>
+<body>
+    <div id="scroll-progress"></div>
+
+    <div class="navbar-wrapper">
+        <nav class="navbar">
+            <a href="index.html" class="nav-brand">
+                <i class="fa-solid fa-qrcode"></i>
+                <span>PDFly Tools</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                <i class="fa-solid fa-sun" id="themeIcon"></i>
+            </button>
+        </nav>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1>QR Code <span>Generator</span></h1>
+            <p>Generate highly customizable, professional QR codes with advanced data formats.</p>
+        </header>
+
+        <!-- TOP CONTROLS -->
+        <main class="qr-workspace">
+            
+            <!-- LEFT PANEL: CONTROLS -->
+            <div class="left-panel">
+                <!-- 1. Data Type Selection -->
+                <div class="card">
+                    <h2><i class="fa-solid fa-database text-primary"></i> 1. Enter QR Content</h2>
+                    
+                    <div class="type-grid">
+                        <div class="type-btn active" data-type="link"><i class="fa-solid fa-link"></i><span>URL</span></div>
+                        <div class="type-btn" data-type="text"><i class="fa-solid fa-align-left"></i><span>Text</span></div>
+                        <div class="type-btn" data-type="vcard"><i class="fa-solid fa-address-card"></i><span>VCard</span></div>
+                        <div class="type-btn" data-type="wifi"><i class="fa-solid fa-wifi"></i><span>Wi-Fi</span></div>
+                        <div class="type-btn" data-type="whatsapp"><i class="fa-brands fa-whatsapp"></i><span>Chat</span></div>
+                        <div class="type-btn" data-type="email"><i class="fa-solid fa-envelope"></i><span>Email</span></div>
+                        <div class="type-btn" data-type="tel"><i class="fa-solid fa-phone"></i><span>Call</span></div>
+                        <div class="type-btn" data-type="instagram"><i class="fa-brands fa-instagram"></i><span>Insta</span></div>
+                        <div class="type-btn" data-type="youtube"><i class="fa-brands fa-youtube"></i><span>Video</span></div>
+                        <div class="type-btn" data-type="event"><i class="fa-solid fa-calendar-days"></i><span>Event</span></div>
+                        <div class="type-btn" data-type="maps"><i class="fa-solid fa-map-location-dot"></i><span>Maps</span></div>
+                        <div class="type-btn" data-type="crypto"><i class="fa-brands fa-bitcoin"></i><span>Crypto</span></div>
+                    </div>
+
+                    <!-- All Inputs are empty by default so QR is not pre-generated -->
+                    <div id="inputFields">
+                        <div class="tab-pane active" id="linkInput">
+                            <div class="input-with-icon"><i class="fa-solid fa-globe"></i><input type="url" id="linkData" placeholder="https://yourwebsite.com"></div>
+                        </div>
+                        <div class="tab-pane" id="textInput">
+                            <textarea id="textData" class="large" placeholder="Enter plain text, serial number, etc..."></textarea>
+                        </div>
+                        
+                        <!-- Extended VCard -->
+                        <div class="tab-pane" id="vcardInput">
+                            <div class="grid-2">
+                                <div class="input-with-icon"><i class="fa-solid fa-user"></i><input type="text" id="vcFirst" placeholder="First Name"></div>
+                                <div class="input-with-icon"><i class="fa-solid fa-user"></i><input type="text" id="vcLast" placeholder="Last Name"></div>
+                            </div>
+                            <div class="grid-2" style="margin-top:0.8rem;">
+                                <div class="input-with-icon"><i class="fa-solid fa-mobile-screen"></i><input type="tel" id="vcMobile" placeholder="Mobile Number"></div>
+                                <div class="input-with-icon"><i class="fa-solid fa-phone"></i><input type="tel" id="vcWork" placeholder="Work Phone"></div>
+                            </div>
+                            <div class="grid-2" style="margin-top:0.8rem;">
+                                <div class="input-with-icon"><i class="fa-solid fa-envelope"></i><input type="email" id="vcEmail" placeholder="Email Address"></div>
+                                <div class="input-with-icon"><i class="fa-solid fa-globe"></i><input type="url" id="vcWeb" placeholder="Website URL"></div>
+                            </div>
+                            <div class="grid-2" style="margin-top:0.8rem;">
+                                <div class="input-with-icon"><i class="fa-solid fa-building"></i><input type="text" id="vcOrg" placeholder="Company Name"></div>
+                                <div class="input-with-icon"><i class="fa-solid fa-id-badge"></i><input type="text" id="vcTitle" placeholder="Job Title"></div>
+                            </div>
+                            <div class="form-group" style="margin-top:0.8rem;">
+                                <div class="input-with-icon"><i class="fa-solid fa-map-pin"></i><input type="text" id="vcStreet" placeholder="Street Address"></div>
+                            </div>
+                            <div class="grid-3">
+                                <input type="text" id="vcCity" placeholder="City">
+                                <input type="text" id="vcZip" placeholder="Zip/PIN">
+                                <input type="text" id="vcCountry" placeholder="Country">
+                            </div>
+                        </div>
+
+                        <!-- WiFi -->
+                        <div class="tab-pane" id="wifiInput">
+                            <div class="form-group"><div class="input-with-icon"><i class="fa-solid fa-wifi"></i><input type="text" id="wifiSSID" placeholder="Network Name (SSID)"></div></div>
+                            <div class="grid-2">
+                                <div class="input-with-icon"><i class="fa-solid fa-key"></i><input type="text" id="wifiPass" placeholder="Password"></div>
+                                <select id="wifiEnc">
+                                    <option value="WPA">WPA/WPA2</option>
+                                    <option value="WEP">WEP</option>
+                                    <option value="nopass">No Password</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- WhatsApp -->
+                        <div class="tab-pane" id="whatsappInput">
+                            <div class="grid-2">
+                                <div class="input-with-icon"><i class="fa-brands fa-whatsapp"></i><input type="tel" id="waNum" placeholder="Phone (with country code)"></div>
+                                <div class="input-with-icon"><i class="fa-regular fa-comment"></i><input type="text" id="waMsg" placeholder="Pre-filled Message"></div>
+                            </div>
+                        </div>
+
+                        <!-- Email & Call & Socials -->
+                        <div class="tab-pane" id="emailInput">
+                            <div class="grid-2">
+                                <div class="input-with-icon"><i class="fa-solid fa-at"></i><input type="email" id="emailAddr" placeholder="Email To"></div>
+                                <div class="input-with-icon"><i class="fa-solid fa-heading"></i><input type="text" id="emailSub" placeholder="Subject"></div>
+                            </div>
+                            <textarea id="emailBody" style="margin-top:0.8rem; min-height: 80px;" placeholder="Email Body Content..."></textarea>
+                        </div>
+                        <div class="tab-pane" id="telInput"><div class="input-with-icon"><i class="fa-solid fa-phone"></i><input type="tel" id="telNumber" placeholder="Phone Number"></div></div>
+                        <div class="tab-pane" id="instagramInput"><div class="input-with-icon"><i class="fa-brands fa-instagram"></i><input type="text" id="instaUser" placeholder="Instagram Username (without @)"></div></div>
+                        <div class="tab-pane" id="youtubeInput"><div class="input-with-icon"><i class="fa-brands fa-youtube"></i><input type="url" id="ytLink" placeholder="YouTube Video/Channel URL"></div></div>
+                        
+                        <!-- Extended Event -->
+                        <div class="tab-pane" id="eventInput">
+                            <div class="form-group"><div class="input-with-icon"><i class="fa-solid fa-calendar"></i><input type="text" id="evtTitle" placeholder="Event Title"></div></div>
+                            <div class="grid-2">
+                                <div class="form-group"><label>Start Date/Time</label><input type="datetime-local" id="evtStart"></div>
+                                <div class="form-group"><label>End Date/Time</label><input type="datetime-local" id="evtEnd"></div>
+                            </div>
+                            <div class="form-group" style="margin-top:0.8rem;"><div class="input-with-icon"><i class="fa-solid fa-location-dot"></i><input type="text" id="evtLoc" placeholder="Event Location / Address"></div></div>
+                            <textarea id="evtDesc" placeholder="Event Description Notes..."></textarea>
+                        </div>
+
+                        <!-- Maps & Crypto -->
+                        <div class="tab-pane" id="mapsInput">
+                            <div class="grid-2">
+                                <div class="input-with-icon"><i class="fa-solid fa-map-pin"></i><input type="number" step="any" id="mapLat" placeholder="Latitude (e.g. 28.6139)"></div>
+                                <div class="input-with-icon"><i class="fa-solid fa-map-pin"></i><input type="number" step="any" id="mapLng" placeholder="Longitude (e.g. 77.2090)"></div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="cryptoInput">
+                            <div class="grid-2">
+                                <select id="cryptoType">
+                                    <option value="bitcoin">Bitcoin (BTC)</option>
+                                    <option value="ethereum">Ethereum (ETH)</option>
+                                    <option value="litecoin">Litecoin (LTC)</option>
+                                </select>
+                                <div class="input-with-icon"><i class="fa-brands fa-bitcoin"></i><input type="text" id="cryptoAddr" placeholder="Wallet Address"></div>
+                            </div>
+                            <div class="form-group" style="margin-top:0.8rem;"><div class="input-with-icon"><i class="fa-solid fa-coins"></i><input type="number" step="any" id="cryptoAmt" placeholder="Amount (Optional)"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Customization -->
+                <div class="card">
+                    <h2><i class="fa-solid fa-wand-magic-sparkles text-primary"></i> 2. Customize Style</h2>
+                    
+                    <div class="sub-tabs">
+                        <button class="sub-tab active" data-target="tab-color"><i class="fa-solid fa-palette"></i> Colors</button>
+                        <button class="sub-tab" data-target="tab-design"><i class="fa-solid fa-shapes"></i> Design</button>
+                        <button class="sub-tab" data-target="tab-logo"><i class="fa-solid fa-image"></i> Logo</button>
+                    </div>
+
+                    <!-- 2x3 Color Grid (Responsive & Compact) -->
+                    <div class="tab-pane active" id="tab-color">
+                        <div class="form-group">
+                            <label>Fill Style</label>
+                            <select id="colorType">
+                                <option value="solid">Solid Color</option>
+                                <option value="gradient">Linear Gradient</option>
+                            </select>
+                        </div>
+                        
+                        <div class="color-grid-2x3">
+                            <div class="color-item"><span>Main Fill</span><input type="color" id="dotsColor1" value="#3b82f6"></div>
+                            <div class="color-item"><span>Gradient End</span><input type="color" id="dotsColor2" value="#8b5cf6"></div>
+                            <div class="color-item"><span>Eye Frame</span><input type="color" id="cornerBorderColor" value="#0f172a"></div>
+                            <div class="color-item"><span>Eye Center</span><input type="color" id="cornerDotColor" value="#3b82f6"></div>
+                            <div class="color-item"><span>Background</span><input type="color" id="bgColor" value="#ffffff"></div>
+                            <div class="color-item">
+                                <span>Transparent</span>
+                                <div class="checkbox-wrap"><input type="checkbox" id="bgTransparent"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Design Patterns -->
+                    <div class="tab-pane" id="tab-design">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Pattern Style</label>
+                                <select id="dotsType">
+                                    <option value="square">Square</option>
+                                    <option value="dots">Dots</option>
+                                    <option value="extra-rounded" selected>Smooth Rounded</option>
+                                    <option value="classy">Classy</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Eye Frame Style</label>
+                                <select id="cornersType">
+                                    <option value="square">Square</option>
+                                    <option value="extra-rounded" selected>Rounded</option>
+                                    <option value="dot">Dot</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1rem;">
+                            <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:5px;">MAGIC PRESETS</label>
+                            <div class="preset-grid">
+                                <div class="preset-btn" style="background:#fff; border-color:#000;" onclick="applyPreset('classic')"></div>
+                                <div class="preset-btn" style="background:linear-gradient(135deg, #3b82f6, #8b5cf6);" onclick="applyPreset('gradient')"></div>
+                                <div class="preset-btn" style="background:linear-gradient(45deg, #f09433, #dc2743, #bc1888);" onclick="applyPreset('social')"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Auto-Crop Logo Upload -->
+                    <div class="tab-pane" id="tab-logo">
+                        <div class="file-upload" onclick="document.getElementById('logoInput').click()">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <h3 style="color:var(--text-main); font-size:1.05rem; margin-bottom:5px;">Upload Center Logo</h3>
+                            <p style="font-size:0.85rem; color:var(--text-muted);">Auto Circle Crop (JPG, PNG, SVG)</p>
+                            <input type="file" id="logoInput" accept="image/*" class="hidden-file-input">
+                        </div>
+                        <div id="logoControls" style="display:none;">
+                            <div class="form-group">
+                                <label>Logo Scale Size</label>
+                                <input type="range" id="logoSize" min="0.1" max="0.5" step="0.05" value="0.4">
+                            </div>
+                            <button class="btn btn-secondary" id="removeLogoBtn" style="width:100%; color:var(--danger); border-color:var(--danger); padding: 0.8rem; margin-top: 10px;">
+                                <i class="fa-solid fa-trash"></i> Remove Logo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: PREVIEW & EXPORT -->
+            <div class="right-panel">
+                <section class="preview-section card">
+                    <h2 style="justify-content: center; border-bottom: none;"><i class="fa-solid fa-qrcode"></i> Live QR Preview</h2>
+                    
+                    <div class="qr-canvas-wrapper">
+                        <!-- Empty State Placeholder -->
+                        <div class="qr-placeholder" id="qrPlaceholder">
+                            <i class="fa-solid fa-qrcode"></i>
+                            <span>Type data to<br>generate QR</span>
+                        </div>
+                        
+                        <!-- Canvas Container -->
+                        <div id="qrCodeCanvas"></div>
+                    </div>
+
+                    <div class="dl-controls">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Quality Size</label>
+                                <select id="downloadQuality">
+                                    <option value="1000">1000px</option>
+                                    <option value="2000" selected>2000px (HD)</option>
+                                    <option value="4000">4000px (Print)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Format</label>
+                                <select id="downloadFormat">
+                                    <option value="png">PNG</option>
+                                    <option value="jpeg">JPG</option>
+                                    <option value="svg">SVG Vector</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="downloadBtn" class="btn btn-primary" disabled><i class="fa-solid fa-download"></i> Download QR</button>
+                        <button id="resetBtn" class="btn btn-secondary"><i class="fa-solid fa-eraser"></i> Reset</button>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Features Grid -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <h3>Dynamic Customization</h3>
+                <p>Adjust colors, apply linear gradients, and modify patterns (rounded, dotted) to perfectly match your brand.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-image"></i>
+                <h3>High-Res Vector Export</h3>
+                <p>Download print-ready, crisp QR codes in multiple formats including PNG, JPG, and scaleable SVG vector files.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-network-wired"></i>
+                <h3>12+ Advanced Formats</h3>
+                <p>Generate highly functional codes for URLs, WiFi logins, VCards, Crypto Addresses, Maps, and instant WhatsApp messages.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-microchip"></i>
+                <h3>100% Client-Side Privacy</h3>
+                <p>All generation happens directly on your device using browser JavaScript. We never track or store your QR data.</p>
+            </div>
+        </div>
+
+        <!-- SEO Content -->
+        <div class="seo-text-section">
+            <h2>Why Use PDFly QR Code Generator?</h2>
+            <p>Our completely free <strong>QR Code Generator</strong> empowers businesses, developers, and individuals to create highly engaging, custom-designed QR codes without any subscription fees. Whether you need a simple URL code for a poster, a detailed digital VCard for a networking event, or a complex WiFi login format, our platform processes everything instantly and entirely inside your browser.</p>
+            
+            <h3>The Importance of High-Quality QR Codes</h3>
+            <p>While a standard black-and-white QR code gets the job done, custom-designed QR codes that integrate your brand colors and logo have been proven to significantly increase scan rates. Our tool automatically calculates Error Correction (up to 30%) to ensure your QR code remains highly scannable even with a large logo positioned right in the center.</p>
+            
+            <h3>Uncompromising Security</h3>
+            <p>Unlike other generators that log your URLs and data, PDFly Tools uses pure Client-Side processing. Your data, text, and uploaded logos are never sent to our servers. What you create on your device, stays on your device. Once exported, your QR code will never expire and has no scan limits.</p>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>
+                    <a href="index.html" style="text-decoration: none; color: var(--text-main);">
+                        <i class="fa-solid fa-qrcode" style="color:var(--primary)"></i> PDFly Tools
+                    </a>
+                </h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Your ultimate suite for free, secure, and blazing-fast web utilities. Crafted with Ultra HD fluid UI tech.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Top Tools</h4>
+                <ul class="footer-links">
+                    <li><a href="resize-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Resize Image</a></li>
+                    <li><a href="compress-pdf.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Compress PDF</a></li>
+                    <li><a href="password-gen.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Password Gen</a></li>
+                    <li><a href="ghost-text.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Ghost Text</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal & Info</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="openModal('privacyModal', event)"><i class="fa-solid fa-shield"></i> Privacy Policy</a></li>
+                    <li><a href="#" onclick="openModal('termsModal', event)"><i class="fa-solid fa-file-contract"></i> Terms of Service</a></li>
+                    <li><a href="#" onclick="openModal('contactModal', event)"><i class="fa-solid fa-headset"></i> Contact Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="dev-badge" onclick="openModal('devProfileModal')">
+                <i class="fa-solid fa-code"></i> Developed by GT Rao
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">&copy; 2026 PDFly Tools. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('privacyModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; font-weight: 800; color: var(--text-main);"><i class="fa-solid fa-shield" style="color: var(--primary);"></i> Privacy Policy</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Your privacy is strictly protected. This QR generation tool operates 100% within your web browser utilizing client-side processing. No text, links, or logo images are ever transmitted to our servers.</p>
+            <button class="btn btn-primary" onclick="closeModal('privacyModal')" style="margin-top: 1rem;">Acknowledge</button>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('termsModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; font-weight: 800; color: var(--text-main);"><i class="fa-solid fa-file-contract" style="color: var(--primary);"></i> Terms of Service</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">By using PDFly Tools, you agree to use our utilities responsibly. Do not use this tool to generate malicious links. Commercial use of the generated codes is entirely free.</p>
+            <button class="btn btn-primary" onclick="closeModal('termsModal')" style="margin-top: 1rem;">I Agree</button>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('contactModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> Get in Touch</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Have suggestions or found a bug? We'd love to hear from you. Reach out to us directly:</p>
+            <div style="background: var(--bg-input); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <p style="color: var(--text-main); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope" style="color: var(--primary);"></i> 
+                    <a href="mailto:pdflytools@gmail.com" style="text-decoration: none; color: inherit;">pdflytools@gmail.com</a>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> Azamgarh, Uttar Pradesh, India
+                </p>
+            </div>
+            <button class="btn btn-primary" onclick="closeModal('contactModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- Developer Modal -->
+    <div class="modal-overlay" id="devProfileModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('devProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="dev-profile">
+                <div class="dev-avatar">
+                    <img src="dev-profile.png" alt="GT Rao - Developer" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GT+Rao&background=3b82f6&color=fff&size=128&font-size=0.33&bold=true';">
+                </div>
+                <h2 style="font-size: clamp(1.8rem, 4vw, 2.2rem); margin-bottom: 0.2rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">GT Rao</h2>
+                <p style="color: var(--text-main); font-weight: 600; font-size: 1rem; margin-top: 0.2rem;">Student & Web Developer</p>
+                <p style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Azamgarh, Uttar Pradesh, India</p>
+                
+                <div class="dev-tags">
+                    <span class="dev-tag"><i class="fa-brands fa-html5"></i> Web Dev</span>
+                    <span class="dev-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
+                    <span class="dev-tag"><i class="fa-solid fa-shield"></i> Security Auth</span>
+                    <span class="dev-tag"><i class="fa-solid fa-layer-group"></i> PDFly Tools</span>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center; padding: 1.25rem; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">
+                        Passionate Web Developer dedicated to crafting lightning-fast, secure, and user-centric web applications. I focus on writing clean code, building responsive interfaces, and ensuring absolute client-side privacy.
+                    </p>
+                </div>
+                
+                <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                     <a href="mailto:pdflytools@gmail.com" class="dev-social" title="Email Contact" target="_blank"><i class="fa-solid fa-envelope"></i></a>
+                     <a href="https://instagram.com/mr_gt_rao" class="dev-social" title="Personal Instagram" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                     <a href="https://instagram.com/educate_path" class="dev-social" title="Business / PDFly Tools" target="_blank"><i class="fa-solid fa-briefcase"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Overlays -->
+    <div id="toast-container"></div>
+    <button id="backToTop"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // === Core UI Management ===
+        const els = {
+            html: document.documentElement,
+            themeToggle: document.getElementById('themeToggle'),
+            themeIcon: document.getElementById('themeIcon'),
+            scrollProg: document.getElementById('scroll-progress'),
+            btt: document.getElementById('backToTop')
+        };
+
+        const initTheme = () => {
+            const saved = localStorage.getItem('pdfly-theme') || 'dark'; 
+            els.html.setAttribute('data-theme', saved);
+            els.themeIcon.className = saved === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        };
+        els.themeToggle.addEventListener('click', () => {
+            const next = els.html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            els.html.setAttribute('data-theme', next);
+            localStorage.setItem('pdfly-theme', next);
+            els.themeIcon.className = next === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        });
+        initTheme();
+
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            els.scrollProg.style.width = ((document.body.scrollTop || document.documentElement.scrollTop) / h) * 100 + "%";
+            els.btt.classList.toggle('show', (document.body.scrollTop || document.documentElement.scrollTop) > 300);
+        });
+        els.btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { if(container.contains(toast)) toast.remove(); }, 3500);
+        }
+
+        window.openModal = (id, e) => { if(e) e.preventDefault(); document.getElementById(id).classList.add('active'); };
+        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+        window.onclick = e => { if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('active'); };
+
+        // === QR Generator Logic ===
+        let currentType = 'link';
+        let processedLogoData = null;
+        let debounceTimer;
+
+        // Routing
+        document.querySelectorAll('.sub-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.card .tab-pane').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.target).classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active'); currentType = btn.dataset.type;
+                document.querySelectorAll('#inputFields .tab-pane').forEach(sec => {
+                    sec.classList.remove('active');
+                    if(sec.id === `${currentType}Input`) sec.classList.add('active');
+                });
+                triggerUpdate();
+            });
+        });
+
+        document.getElementById('colorType').addEventListener('change', function() {
+            document.getElementById('gradientColorDiv').style.display = this.value === 'gradient' ? 'flex' : 'none';
+            triggerUpdate();
+        });
+        document.getElementById('bgTransparent').addEventListener('change', triggerUpdate);
+
+        // INITIALIZE QR LIBRARY (NO DATA INITIALLY)
+        // Margin 15 ensures dots never cut the canvas bounds even when fully rounded
+        const qrCodeObj = new QRCodeStyling({
+            width: 300, height: 300, type: "svg", data: " ",
+            imageOptions: { crossOrigin: "anonymous", margin: 6, imageSize: 0.4, hideBackgroundDots: true },
+            qrOptions: { errorCorrectionLevel: 'H', margin: 15 } 
+        });
+        qrCodeObj.append(document.getElementById('qrCodeCanvas'));
+
+        // Watch all inputs
+        document.querySelectorAll('input, textarea, select').forEach(input => {
+            input.addEventListener('input', triggerUpdate);
+        });
+
+        // Logo Auto Circle Crop Processing
+        document.getElementById('logoInput').addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const size = Math.min(img.width, img.height);
+                        canvas.width = size; canvas.height = size;
+                        
+                        // Auto Circle Crop
+                        ctx.beginPath();
+                        ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+                        ctx.closePath();
+                        ctx.clip();
+                        
+                        ctx.drawImage(img, (img.width - size)/2, (img.height - size)/2, size, size, 0, 0, size, size);
+                        
+                        processedLogoData = canvas.toDataURL("image/png");
+                        document.getElementById('logoControls').style.display = 'block';
+                        showToast("Logo Processed & Applied!");
+                        triggerUpdate();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        document.getElementById('removeLogoBtn').addEventListener('click', () => {
+            processedLogoData = null; document.getElementById('logoInput').value = '';
+            document.getElementById('logoControls').style.display = 'none';
+            triggerUpdate(); showToast("Logo Removed");
+        });
+
+        // Format dates correctly for Event (iCal format expects UTC or local without dashes)
+        function formatDateTime(dtStr) {
+            if(!dtStr) return "";
+            return dtStr.replace(/[-:]/g,'').replace('T', 'T') + "00Z"; 
+        }
+
+        function getQrData() {
+            const val = (id) => document.getElementById(id) ? document.getElementById(id).value.trim() : "";
+            let d = "";
+            switch (currentType) {
+                case 'link': d = val('linkData'); break;
+                case 'text': d = val('textData'); break;
+                case 'email': 
+                    if(val('emailAddr')) d = `mailto:${val('emailAddr')}?subject=${encodeURIComponent(val('emailSub'))}&body=${encodeURIComponent(val('emailBody'))}`; 
+                    break;
+                case 'vcard': 
+                    if(val('vcFirst') || val('vcMobile')) {
+                        d = `BEGIN:VCARD\nVERSION:3.0\nN:${val('vcLast')};${val('vcFirst')};;;\nFN:${val('vcFirst')} ${val('vcLast')}`;
+                        if(val('vcOrg')) d += `\nORG:${val('vcOrg')}`;
+                        if(val('vcTitle')) d += `\nTITLE:${val('vcTitle')}`;
+                        if(val('vcMobile')) d += `\nTEL;TYPE=CELL:${val('vcMobile')}`;
+                        if(val('vcWork')) d += `\nTEL;TYPE=WORK:${val('vcWork')}`;
+                        if(val('vcEmail')) d += `\nEMAIL:${val('vcEmail')}`;
+                        if(val('vcWeb')) d += `\nURL:${val('vcWeb')}`;
+                        if(val('vcStreet')||val('vcCity')||val('vcZip')||val('vcCountry')) {
+                            d += `\nADR:;;${val('vcStreet')};${val('vcCity')};;${val('vcZip')};${val('vcCountry')}`;
+                        }
+                        d += `\nEND:VCARD`;
+                    }
+                    break;
+                case 'wifi': if(val('wifiSSID')) d = `WIFI:T:${val('wifiEnc')};S:${val('wifiSSID')};P:${val('wifiPass')};;`; break;
+                case 'whatsapp': if(val('waNum')) d = `https://wa.me/${val('waNum')}?text=${encodeURIComponent(val('waMsg'))}`; break;
+                case 'tel': if(val('telNumber')) d = `tel:${val('telNumber')}`; break;
+                case 'instagram': if(val('instaUser')) d = `https://instagram.com/${val('instaUser')}`; break;
+                case 'youtube': d = val('ytLink'); break;
+                case 'event': 
+                    if(val('evtTitle')) {
+                        d = `BEGIN:VEVENT\nSUMMARY:${val('evtTitle')}`;
+                        if(val('evtLoc')) d += `\nLOCATION:${val('evtLoc')}`;
+                        if(val('evtDesc')) d += `\nDESCRIPTION:${val('evtDesc')}`;
+                        if(val('evtStart')) d += `\nDTSTART:${formatDateTime(val('evtStart'))}`;
+                        if(val('evtEnd')) d += `\nDTEND:${formatDateTime(val('evtEnd'))}`;
+                        d += `\nEND:VEVENT`;
+                    }
+                    break;
+                case 'maps': if(val('mapLat')) d = `http://maps.google.com/maps?q=${val('mapLat')},${val('mapLng')}`; break;
+                case 'crypto': 
+                    if(val('cryptoAddr')) {
+                        d = `${val('cryptoType')}:${val('cryptoAddr')}`;
+                        if(val('cryptoAmt')) d += `?amount=${val('cryptoAmt')}`;
+                    }
+                    break;
+            }
+            return d;
+        }
+
+        function triggerUpdate() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                const data = getQrData();
+                const canvasEl = document.getElementById('qrCodeCanvas');
+                const placeholderEl = document.getElementById('qrPlaceholder');
+                const dlBtn = document.getElementById('downloadBtn');
+
+                // EMPTY STATE HANDLING: Only generate if user typed something
+                if (!data || data === "") {
+                    canvasEl.style.opacity = '0';
+                    canvasEl.style.pointerEvents = 'none';
+                    placeholderEl.style.opacity = '1';
+                    dlBtn.disabled = true;
+                    return; // Stop updating library with empty data
+                } else {
+                    canvasEl.style.opacity = '1';
+                    canvasEl.style.pointerEvents = 'auto';
+                    placeholderEl.style.opacity = '0';
+                    dlBtn.disabled = false;
+                }
+
+                const isTrans = document.getElementById('bgTransparent').checked;
+                const isGrad = document.getElementById('colorType').value === 'gradient';
+                const c1 = document.getElementById('dotsColor1').value;
+                const c2 = document.getElementById('dotsColor2').value;
+
+                let dotsOptions = { type: document.getElementById('dotsType').value };
+                if(isGrad) {
+                    dotsOptions.gradient = { type: 'linear', rotation: 45, colorStops: [{ offset: 0, color: c1 }, { offset: 1, color: c2 }] };
+                } else {
+                    dotsOptions.color = c1;
+                }
+                
+                qrCodeObj.update({
+                    data: data,
+                    image: processedLogoData,
+                    dotsOptions: dotsOptions,
+                    backgroundOptions: { color: isTrans ? "rgba(255,255,255,0)" : document.getElementById('bgColor').value },
+                    cornersSquareOptions: { color: document.getElementById('cornerBorderColor').value, type: document.getElementById('cornersType').value },
+                    cornersDotOptions: { color: document.getElementById('cornerDotColor').value, type: "dot" },
+                    imageOptions: { 
+                        crossOrigin: "anonymous", margin: 8, 
+                        imageSize: parseFloat(document.getElementById('logoSize') ? document.getElementById('logoSize').value : 0.4), 
+                        hideBackgroundDots: true 
+                    },
+                    qrOptions: { errorCorrectionLevel: 'H', margin: 15 } // Fixed clipping issue here
+                });
+            }, 100);
+        }
+
+        // Quick Magic Presets
+        window.applyPreset = function(preset) {
+            const setVal = (id, val) => { if(document.getElementById(id)) document.getElementById(id).value = val; };
+            if(preset === 'classic') {
+                setVal('colorType', 'solid'); setVal('dotsColor1', '#000000'); setVal('cornerBorderColor', '#000000'); setVal('cornerDotColor', '#000000');
+                setVal('dotsType', 'square'); setVal('cornersType', 'square');
+            } 
+            else if(preset === 'gradient') {
+                setVal('colorType', 'gradient'); setVal('dotsColor1', '#3b82f6'); setVal('dotsColor2', '#8b5cf6');
+                setVal('cornerBorderColor', '#0f172a'); setVal('cornerDotColor', '#3b82f6');
+                setVal('dotsType', 'extra-rounded'); setVal('cornersType', 'extra-rounded');
+            }
+            else if(preset === 'social') {
+                setVal('colorType', 'gradient'); setVal('dotsColor1', '#f09433'); setVal('dotsColor2', '#bc1888');
+                setVal('cornerBorderColor', '#e6683c'); setVal('cornerDotColor', '#cc2366');
+                setVal('dotsType', 'dots'); setVal('cornersType', 'dot');
+            }
+            document.getElementById('colorType').dispatchEvent(new Event('change')); triggerUpdate(); showToast("Magic Preset Applied!");
+        };
+
+        // Actions
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const format = document.getElementById('downloadFormat').value;
+            const quality = parseInt(document.getElementById('downloadQuality').value);
+            
+            // Temporary upscale for high res output
+            qrCodeObj.update({ width: quality, height: quality }); 
+            qrCodeObj.download({ name: `PDFly_QR_${Date.now()}`, extension: format });
+            
+            // Revert canvas size so UI doesn't break
+            setTimeout(() => { qrCodeObj.update({ width: 300, height: 300 }); showToast("Download Complete!"); }, 500);
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            document.querySelectorAll('input[type="text"], input[type="url"], input[type="email"], input[type="tel"], input[type="number"], input[type="datetime-local"], textarea').forEach(el => el.value = "");
+            processedLogoData = null; document.getElementById('logoInput').value = '';
+            document.getElementById('logoControls').style.display = 'none';
+            triggerUpdate(); showToast("Data Cleared!");
+        });
+        
+        // Ensure UI sets the correct initial state
+        triggerUpdate();
+    </script>
+</body>
+</html>

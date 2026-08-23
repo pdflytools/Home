@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fancy Text Pro - 500+ Stylish Fonts & Blank Text | PDFly Tools</title>
+    <meta name="description" content="Generate 500+ error-free fancy fonts, big blue text, and copy invisible blank text. Includes text reverse and word counter. A premium tool by PDFly Tools.">
+    
+    <!-- Google Fonts: Plus Jakarta Sans for Ultra-HD Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* === UI/UX Variables (GT Rao Standard) === */
+        :root {
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --blank-gradient: linear-gradient(135deg, #10b981, #059669);
+            --radius-card: 16px;
+            --radius-pill: 9999px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Light Theme */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.85);
+            --bg-input: #f1f5f9;
+            --bg-hover: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.25);
+            
+            /* Status Colors */
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #020617;
+            --bg-card: #0f172a;
+            --bg-glass: rgba(2, 6, 23, 0.75);
+            --bg-input: #1e293b;
+            --bg-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 10px 30px rgba(59, 130, 246, 0.35);
+        }
+
+        /* === Base Styles === */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+        html, body { overflow-x: hidden; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: var(--text-main); transition: background-color 0.4s ease, color 0.4s ease; }
+
+        /* === Smart Tools === */
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--gradient); width: 0%; z-index: 9999; transition: width 0.1s ease; }
+
+        /* === Glassmorphism Navbar === */
+        .navbar {
+            position: sticky; top: clamp(10px, 2vw, 15px); z-index: 1000; max-width: 1300px; margin: 0 auto 2rem; width: 95%;
+            background: var(--bg-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: var(--radius-pill); padding: clamp(10px, 1.5vw, 1rem) clamp(1rem, 3vw, 2rem);
+            display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm);
+        }
+        .nav-brand { font-size: clamp(1.2rem, 3vw, 1.5rem); font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .nav-brand i { color: var(--primary); -webkit-text-fill-color: initial; }
+        .theme-toggle { background: var(--bg-input); border: 1px solid var(--border); outline: none; color: var(--text-main); width: clamp(40px, 5vw, 45px); height: clamp(40px, 5vw, 45px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); font-size: 1.2rem; }
+        .theme-toggle:hover { background: var(--primary); border-color: var(--primary); color: white; transform: rotate(15deg) scale(1.05); box-shadow: var(--shadow-hover); }
+
+        /* === Layout === */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+        .header { text-align: center; margin-bottom: clamp(2rem, 5vw, 3rem); padding: 2rem 0 1rem; }
+        .header h1 { font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 800; margin-bottom: 1rem; line-height: 1.2; letter-spacing: -1px; }
+        .header h1 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.15rem); max-width: 700px; margin: 0 auto; line-height: 1.6; }
+
+        /* === Main Workspace === */
+        .workspace { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); padding: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 3rem; }
+        
+        /* === Inputs, Textarea Wrapper & Small Blank Button === */
+        .textarea-wrapper { position: relative; margin-bottom: 1rem; }
+        
+        .corner-blank-btn { position: absolute; top: 12px; right: 12px; background: var(--blank-gradient); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: var(--radius-pill); font-size: 0.8rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: var(--shadow-sm); transition: var(--transition); z-index: 10; font-family: inherit; }
+        .corner-blank-btn:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(16,185,129,0.4); }
+        .corner-blank-btn i { font-size: 0.9rem; }
+
+        textarea.main-input { width: 100%; min-height: 140px; padding: 3rem 1.2rem 2.5rem; font-family: inherit; background: var(--bg-input); border: 2px solid var(--border); color: var(--text-main); border-radius: 12px; font-size: 1.2rem; transition: var(--transition); font-weight: 600; resize: vertical; }
+        textarea.main-input:focus { outline: none; border-color: var(--primary); background: var(--bg-card); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
+
+        .stats-bar { position: absolute; bottom: 12px; right: 15px; display: flex; gap: 15px; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); pointer-events: none; }
+        .stats-bar span { background: var(--bg-card); padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid var(--border); }
+
+        /* === New Quick Actions Row === */
+        .quick-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 2rem; }
+        .btn-action { flex: 1; min-width: 80px; padding: 0.7rem; font-size: 0.9rem; font-weight: 700; border: 1px solid var(--border); background: var(--bg-input); color: var(--text-main); border-radius: 10px; cursor: pointer; transition: var(--transition); display: flex; justify-content: center; align-items: center; gap: 5px; font-family: inherit; }
+        .btn-action:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); }
+        .btn-clear { flex: 0 0 auto; width: 45px; background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: rgba(239, 68, 68, 0.2); }
+        .btn-clear:hover { background: var(--danger); color: white; }
+
+        /* === Results Grid === */
+        .results-header { display: flex; justify-content: space-between; align-items: center; margin: 2rem 0 1rem; border-bottom: 2px solid var(--bg-input); padding-bottom: 1rem; }
+        .results-header h3 { font-size: 1.3rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .badge { background: var(--bg-input); color: var(--primary); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 800; border: 1px solid var(--border); }
+
+        .font-list { display: flex; flex-direction: column; gap: 12px; max-height: 600px; overflow-y: auto; padding-right: 10px; }
+        .font-list::-webkit-scrollbar { width: 8px; }
+        .font-list::-webkit-scrollbar-track { background: var(--bg-input); border-radius: 10px; }
+        .font-list::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        .font-card { display: flex; justify-content: space-between; align-items: center; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.2rem; transition: var(--transition); gap: 15px; }
+        .font-card:hover { border-color: var(--primary); background: var(--bg-card); box-shadow: var(--shadow-sm); transform: translateX(5px); }
+        .font-output { flex: 1; font-size: 1.25rem; color: var(--text-main); word-break: break-all; font-family: inherit; }
+        .font-name-tag { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 4px; display: block; }
+        
+        .copy-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--primary); width: 45px; height: 45px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); font-size: 1.1rem; flex-shrink: 0; }
+        .copy-btn:hover { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); transform: scale(1.05); }
+
+        /* === 4 Features Grid === */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(1rem, 3vw, 1.5rem); margin: 4rem 0; }
+        .feature-card { background: var(--bg-card); padding: 1.5rem; text-align: center; border-radius: var(--radius-card); border: 1px solid var(--border); box-shadow: var(--shadow-sm); transition: var(--transition); }
+        .feature-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: var(--shadow-hover); }
+        .feature-card i { font-size: 2rem; margin-bottom: 1rem; color: var(--primary); transition: var(--transition); }
+        .feature-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 700; color: var(--text-main); }
+        .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* === SEO Friendly Card Section === */
+        .seo-text-section { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 3rem); margin: 3rem 0; box-shadow: var(--shadow-sm); }
+        .seo-text-section h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 800; margin-bottom: 1.5rem; color: var(--text-main); }
+        .seo-text-section h3 { font-size: clamp(1.1rem, 2vw, 1.4rem); font-weight: 700; margin: 2rem 0 1rem; color: var(--text-main); }
+        .seo-text-section p, .seo-text-section li { font-size: clamp(0.95rem, 1.5vw, 1.05rem); color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; }
+        .seo-text-section ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--text-muted); }
+
+        /* === Modals === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); z-index: 2000; padding: 1rem; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 2.5rem); transform: scale(0.9) translateY(20px); transition: var(--transition); border: 1px solid var(--border); box-shadow: var(--shadow-hover); position: relative; max-height: 90vh; overflow-y: auto; text-align: left; }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-input); border: 1px solid var(--border); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--text-main); cursor: pointer; transition: var(--transition); }
+        .modal-close:hover { color: white; background: var(--danger); border-color: var(--danger); transform: rotate(90deg); }
+        
+        /* Developer Profile */
+        .dev-profile { text-align: center; }
+        .dev-avatar { width: clamp(100px, 15vw, 120px); height: clamp(100px, 15vw, 120px); border-radius: 50%; background: var(--bg-card); margin: 0 auto 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); border: 4px solid var(--primary); padding: 0; overflow: hidden;}
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .dev-tags { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+        .dev-tag { background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(59,130,246,0.2); }
+        .dev-social { width: 45px; height: 45px; border-radius: 50%; background: var(--bg-input); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: var(--transition); border: 1px solid var(--border); text-decoration: none; }
+        .dev-social:hover { background: var(--primary); color: white; transform: translateY(-3px); border-color: var(--primary); box-shadow: var(--shadow-sm); }
+
+        /* === Footer === */
+        .footer { margin-top: 4rem; padding: clamp(3rem, 5vw, 4rem) 1rem 2rem; border-top: 1px solid var(--border); background: var(--bg-card); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2.5rem; max-width: 1300px; margin: 0 auto 2rem; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--text-main); font-weight: 800; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; transition: var(--transition); font-size: 0.95rem; cursor: pointer; font-weight: 500; }
+        .footer-links a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
+        .dev-badge { background: var(--bg-input); padding: 0.6rem 1.2rem; border-radius: var(--radius-pill); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 700; font-size: 0.9rem; border: 1px solid var(--border); transition: var(--transition); }
+        .dev-badge:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
+        /* === Toast Notification === */
+        #toast-container { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: var(--text-main); color: var(--bg-body); padding: 1rem 1.5rem; border-radius: var(--radius-pill); box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px; animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, fadeOut 0.4s ease forwards 3s; font-weight: 700; font-size: 0.95rem; border: 1px solid var(--border); }
+        .toast i { font-size: 1.2rem; color: var(--bg-body); }
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.info { border-left: 4px solid var(--primary); }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(20px); opacity: 0; } }
+
+        /* === Back to Top === */
+        #backToTop { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: var(--shadow-hover); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 1000; font-size: 1.2rem; }
+        #backToTop.show { opacity: 1; visibility: visible; }
+        #backToTop:hover { transform: translateY(-5px) scale(1.05); background: var(--secondary); }
+    </style>
+</head>
+<body>
+    <div id="scroll-progress"></div>
+
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>PDFly Tools</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="container">
+        <header class="header">
+            <h1>Fancy Text & <span>Blank Text Pro</span></h1>
+            <p>Generate 500+ perfectly clean, error-free text fonts including the Big Blue font. Use quick actions or copy invisible text with one click. 100% Client-Side.</p>
+        </header>
+
+        <main class="workspace">
+            
+            <div class="textarea-wrapper">
+                <button class="corner-blank-btn" onclick="copyBlankText()" title="Copy invisible character">
+                    <i class="fa-solid fa-ghost"></i> Blank Text
+                </button>
+                <textarea id="inputText" class="main-input" placeholder="Type your text here to see 500+ magic fonts instantly..."></textarea>
+                <div class="stats-bar">
+                    <span id="charCount">0 Chars</span>
+                    <span id="wordCount">0 Words</span>
+                </div>
+            </div>
+            
+            <div class="quick-actions">
+                <button class="btn-action" onclick="modifyText('upper')" title="UPPERCASE">ABC</button>
+                <button class="btn-action" onclick="modifyText('lower')" title="lowercase">abc</button>
+                <button class="btn-action" onclick="modifyText('title')" title="Title Case">Abc</button>
+                <button class="btn-action" onclick="modifyText('reverse')" title="Reverse Text"><i class="fa-solid fa-left-long"></i> Reverse</button>
+                <button class="btn-action btn-clear" onclick="clearText()" title="Clear Input"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+
+            <div class="results-header">
+                <h3><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i> Generated Fonts</h3>
+                <span class="badge" id="fontCount">500+ Styles</span>
+            </div>
+
+            <div class="font-list" id="fontResults">
+                <!-- Fonts will be injected here via JS -->
+            </div>
+        </main>
+
+        <!-- 4 Features Grid -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fa-solid fa-ghost"></i>
+                <h3>Invisible Blank Text</h3>
+                <p>One-click copy of the universally supported Hangul Filler (U+3164) for empty names in gaming, WhatsApp, and social profiles.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-font"></i>
+                <h3>Error-Free 500+ Fonts</h3>
+                <p>Advanced unicode mapping ensures no weird boxes or question marks. Every single font works cleanly across iOS and Android.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-earth-americas"></i>
+                <h3>Big Blue Font</h3>
+                <p>Includes the highly requested Regional Indicator symbols to create massive blue text that works perfectly on modern smartphones.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-bolt"></i>
+                <h3>Quick Actions Engine</h3>
+                <p>Instantly reverse text, convert cases, and track live word/character counts without refreshing or server delays.</p>
+            </div>
+        </div>
+
+        <!-- SEO / Info Content Section -->
+        <div class="seo-text-section">
+            <h2>What is Fancy Text Pro?</h2>
+            <p>Welcome to <strong>PDFly Tools</strong>. Fancy Text Pro is an advanced, ultra-clean utility that harnesses the power of Unicode characters to generate visually stunning text styles without needing to install custom fonts on your device. We have removed buggy diacritics to ensure that you never see a "question mark" or "box" error.</p>
+            
+            <h3>How to use the Blank Text Feature</h3>
+            <p>Our tool provides a true "Blank Text" copy button strategically placed in the corner of the input box. This copies a special Unicode character known as the <strong>Hangul Filler (U+3164)</strong>, rather than a normal space.</p>
+            <ul>
+                <li><strong>Social Media:</strong> Use it to create empty bios on Instagram, WhatsApp "About" sections, or empty comments.</li>
+                <li><strong>Gaming:</strong> Perfect for creating invisible, nameless accounts in Free Fire, BGMI, and other online multiplayer games.</li>
+                <li><strong>Quick Tools:</strong> Effortlessly reverse text or change case formatting using the Quick Action bar.</li>
+            </ul>
+
+            <h3>100% Secure & Fast</h3>
+            <p>Like all utilities at PDFly Tools, this generator operates entirely on the <strong>Client-Side</strong>. Your keystrokes and inputs never leave your device. The rendering of all 550+ fonts happens dynamically in your browser, ensuring lightning-fast performance and absolute privacy.</p>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>
+                    <a href="index.html" style="text-decoration: none; color: var(--text-main);">
+                        <i class="fa-solid fa-layer-group" style="color:var(--primary)"></i> PDFly Tools
+                    </a>
+                </h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Your ultimate suite for free, secure, and blazing-fast web utilities. Crafted with Ultra HD fluid UI tech.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Top Tools</h4>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Resize Image</a></li>
+                    <li><a href="#"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Compress PDF</a></li>
+                    <li><a href="#"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Password Gen</a></li>
+                    <li><a href="#"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> QR Code Maker</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Legal & Info</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="openModal('privacyModal', event)"><i class="fa-solid fa-shield"></i> Privacy Policy</a></li>
+                    <li><a href="#" onclick="openModal('termsModal', event)"><i class="fa-solid fa-file-contract"></i> Terms of Service</a></li>
+                    <li><a href="#" onclick="openModal('contactModal', event)"><i class="fa-solid fa-headset"></i> Contact Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="dev-badge" onclick="openModal('devProfileModal')">
+                <i class="fa-solid fa-code"></i> Developed by GT Rao
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">&copy; 2026 PDFly Tools. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('privacyModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-shield" style="color: var(--primary);"></i> Privacy Policy</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.6;">Your privacy is strictly protected. This tool operates 100% within your web browser utilizing client-side processing.</p>
+            <ul style="color: var(--text-muted); font-size: 0.95rem; padding-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                <li>No text inputs are ever transmitted to our servers.</li>
+                <li>Processing happens utilizing your device's memory safely.</li>
+                <li>We do not track, store, or log your personal data.</li>
+            </ul>
+            <button class="btn btn-action" style="background:var(--primary); color:white; border:none; width:100%;" onclick="closeModal('privacyModal')">Acknowledge</button>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('termsModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-file-contract" style="color: var(--primary);"></i> Terms of Service</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">By using PDFly Tools, you agree to use our utilities provided "as is". Because all tools run client-side, we are not liable for any data loss. Commercial and personal use is entirely free.</p>
+            <button class="btn btn-action" style="background:var(--primary); color:white; border:none; width:100%;" onclick="closeModal('termsModal')">I Agree</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('contactModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> Get in Touch</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">Have suggestions or found a bug? We'd love to hear from you. Reach out to us directly:</p>
+            <div style="background: var(--bg-input); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <p style="color: var(--text-main); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope" style="color: var(--primary);"></i> 
+                    <a href="mailto:pdflytools@gmail.com" style="text-decoration: none; color: inherit;">pdflytools@gmail.com</a>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> Azamgarh, Uttar Pradesh, India
+                </p>
+            </div>
+            <button class="btn btn-action" style="background:var(--primary); color:white; border:none; width:100%;" onclick="closeModal('contactModal')">Close</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="devProfileModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('devProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="dev-profile">
+                <div class="dev-avatar">
+                    <img src="dev-profile.png" alt="GT Rao - Developer" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GT+Rao&background=3b82f6&color=fff&size=128&font-size=0.33&bold=true';">
+                </div>
+                <h2 style="font-size: clamp(1.8rem, 4vw, 2.2rem); margin-bottom: 0.2rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">GT Rao</h2>
+                <p style="color: var(--text-main); font-weight: 600; font-size: 1rem; margin-top: 0.2rem;">Student & Web Developer</p>
+                <p style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Azamgarh, Uttar Pradesh, India</p>
+                
+                <div class="dev-tags">
+                    <span class="dev-tag"><i class="fa-brands fa-html5"></i> Web Dev</span>
+                    <span class="dev-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
+                    <span class="dev-tag"><i class="fa-solid fa-swatchbook"></i> UI/UX Design</span>
+                    <span class="dev-tag"><i class="fa-solid fa-layer-group"></i> PDFly Tools</span>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center; padding: 1.25rem; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">
+                        Passionate Web Developer dedicated to crafting lightning-fast, secure, and user-centric web applications. I focus on writing clean code, building responsive interfaces, and ensuring absolute client-side privacy.
+                    </p>
+                </div>
+                
+                <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                     <a href="mailto:pdflytools@gmail.com" class="dev-social" title="Email Contact" target="_blank"><i class="fa-solid fa-envelope"></i></a>
+                     <a href="https://instagram.com/mr_gt_rao" class="dev-social" title="Personal Instagram" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                     <a href="https://instagram.com/educate_path" class="dev-social" title="Business / PDFly Tools" target="_blank"><i class="fa-solid fa-briefcase"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container & Back to Top -->
+    <div id="toast-container"></div>
+    <button id="backToTop" title="Go to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // === State & DOM Elements ===
+        const els = {
+            html: document.documentElement,
+            themeToggle: document.getElementById('themeToggle'),
+            themeIcon: document.getElementById('themeIcon'),
+            scrollProg: document.getElementById('scroll-progress'),
+            btt: document.getElementById('backToTop'),
+            input: document.getElementById('inputText'),
+            results: document.getElementById('fontResults'),
+            countBadge: document.getElementById('fontCount'),
+            charCount: document.getElementById('charCount'),
+            wordCount: document.getElementById('wordCount')
+        };
+
+        // === Theme System ===
+        const initTheme = () => {
+            const saved = localStorage.getItem('pdfly-theme') || 'dark'; 
+            els.html.setAttribute('data-theme', saved);
+            els.themeIcon.className = saved === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        };
+        els.themeToggle.addEventListener('click', () => {
+            const next = els.html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            els.html.setAttribute('data-theme', next);
+            localStorage.setItem('pdfly-theme', next);
+            els.themeIcon.className = next === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            showToast(`${next.charAt(0).toUpperCase() + next.slice(1)} Mode Activated`, 'success');
+        });
+        initTheme();
+
+        // === UI Interactions (Scroll, Modals, Toast) ===
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            els.scrollProg.style.width = ((document.body.scrollTop || document.documentElement.scrollTop) / h) * 100 + "%";
+            els.btt.classList.toggle('show', (document.body.scrollTop || document.documentElement.scrollTop) > 300);
+        });
+        els.btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-circle-xmark' : 'fa-info-circle';
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { if(container.contains(toast)) toast.remove(); }, 3000);
+        }
+
+        window.openModal = (id, e) => { if(e) e.preventDefault(); document.getElementById(id).classList.add('active'); };
+        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+        window.onclick = e => { if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('active'); };
+
+        // === Text Counter Engine ===
+        function updateCounters() {
+            const text = els.input.value;
+            els.charCount.innerText = `${text.length} Chars`;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            els.wordCount.innerText = `${words} Words`;
+        }
+
+        // === Quick Actions ===
+        function modifyText(action) {
+            let val = els.input.value;
+            if(!val.trim()) return showToast('Please enter text first', 'info');
+
+            if(action === 'upper') val = val.toUpperCase();
+            if(action === 'lower') val = val.toLowerCase();
+            if(action === 'reverse') val = Array.from(val).reverse().join('');
+            if(action === 'title') {
+                val = val.toLowerCase().replace(/(?:^|\s)\w/g, match => match.toUpperCase());
+            }
+            
+            els.input.value = val;
+            updateCounters();
+            generateAndRenderFonts(val);
+            showToast('Text Updated', 'success');
+        }
+
+        function clearText() {
+            els.input.value = '';
+            updateCounters();
+            generateAndRenderFonts('PDFly Tools');
+            showToast("Input Cleared", "info");
+        }
+
+        function copyBlankText() {
+            navigator.clipboard.writeText('\u3164').then(() => {
+                showToast("Blank Text Copied! Paste it anywhere.", "success");
+            }).catch(() => showToast("Failed to copy blank text.", "error"));
+        }
+
+        function copyGeneratedText(btnElement) {
+            const textToCopy = btnElement.getAttribute('data-text');
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showToast("Font style copied!", "success");
+                const icon = btnElement.querySelector('i');
+                icon.className = 'fa-solid fa-check';
+                setTimeout(() => icon.className = 'fa-regular fa-copy', 1500);
+            }).catch(() => showToast("Error copying text", "error"));
+        }
+
+        // === 100% ERROR-FREE FONT GENERATOR ENGINE ===
+        // Using explicit Array.from strings to ensure surrogate pairs (4-byte unicode) are handled without splitting to question marks.
+        
+        const refUpper = Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        const refLower = Array.from('abcdefghijklmnopqrstuvwxyz');
+        const refDigits = Array.from('0123456789');
+
+        const alphabets = {
+            'Normal': { upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', lower: 'abcdefghijklmnopqrstuvwxyz', digits: '0123456789' },
+            'Bold': { upper: '𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭', lower: '𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇', digits: '𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵' },
+            'Italic': { upper: '𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡', lower: '𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻', digits: '0123456789' },
+            'Bold Italic': { upper: '𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕', lower: '𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡梦𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯', digits: '0123456789' },
+            'Script': { upper: '𝒜ℬ𝒞𝒟ℰℱ𝒢ℋℐ𝒥𝒦ℒℳ𝒩𝒪𝒫𝒬ℛ𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵', lower: '𝒶𝒷𝒸𝒹ℯ𝒻ℊ𝒽𝒾𝒿𝓀𝓁𝓂𝓃ℴ𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏', digits: '0123456789' },
+            'Script Bold': { upper: '𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩', lower: '𝓪𝓫𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃', digits: '0123456789' },
+            'Fraktur': { upper: '𝔄𝔅ℭ𝔇𝔈𝔉𝔊ℌℑ𝔍𝔎𝔏𝔐𝔑𝔒𝔓𝔔ℜ𝔖𝔗𝔘𝔙𝔚𝔛𝔜ℨ', lower: '𝔞𝔟𝔠𝔡𝔢𝔣𝔤𝔥𝔦𝔧𝔨𝔩𝔪𝔫𝔬𝔭𝔮𝔯𝔰𝔱𝔲𝔳𝔴𝔵𝔶𝔷', digits: '0123456789' },
+            'Fraktur Bold': { upper: '𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅', lower: '𝖆𝖇𝖈𝖉𝖊𝖋𝖌𝖍𝖎𝖏𝖐𝖑𝖒𝖓𝖔𝖕𝖖𝖗𝖘𝖙𝖚𝖛𝖜𝖝𝖞𝖟', digits: '0123456789' },
+            'Double Struck': { upper: '𝔸𝔹ℂ𝔻𝔼𝔽𝔾ℍ𝕀𝕁𝕂𝕃𝕄ℕ𝕆ℙℚℝ𝕊𝕋𝕌𝕍𝕎𝕏𝕐ℤ', lower: '𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫', digits: '𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡' },
+            'Monospace': { upper: '𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝙹𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉', lower: '𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣', digits: '𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿' },
+            'Circled': { upper: 'ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ', lower: 'ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ', digits: '⓪①②③④⑤⑥⑦⑧⑨' },
+            'Dark Circled': { upper: '🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩', lower: '🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩', digits: '⓿❶❷❸❹❺❻❼❽❾' },
+            'Squared': { upper: '🄰🄱🄲🄳🄴🄵🄶🄷🄸🄹🄺🄻🄼🄽🄾🄿🅀🅁🅂🅃🅄🅅🅆🅇🅈🅉', lower: '🄰🄱🄲🄳🄴🄵🄶🄷🄸🄹🄺🄻🄼🄽🄾🄿🅀🅁🅂🅃🅄🅅🅆🅇🅈🅉', digits: '0123456789' },
+            'Dark Squared': { upper: '🅰🅱🅲🅳🅴🅵🅶🅷🅸🅹🅺🅻🅼🅽🅾🅿🆀🆁🆂🆃🆄🆅🆆🆇🆈🆉', lower: '🅰🅱🅲🅳🅴🅵🅶🅷🅸🅹🅺🅻🅼🅽🅾🅿🆀🆁🆂🆃🆄🆅🆆🆇🆈🆉', digits: '0123456789' },
+            'Small Caps': { upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', lower: 'ᴀʙᴄᴅᴇғɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢ', digits: '0123456789' },
+            'Fullwidth': { upper: 'ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ', lower: 'ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ', digits: '０１２３４５６７８９' },
+            'Parenthesized': { upper: '⒜⒝⒞⒟⒠⒡⒢⒣⒤⒥⒦⒧⒨⒩⒪⒫⒬⒭⒮⒯⒰⒱⒲⒳⒴⒵', lower: '⒜⒝⒞⒟⒠⒡⒢⒣⒤⒥⒦⒧⒨⒩⒪⒫⒬⒭⒮⒯⒰⒱⒲⒳⒴⒵', digits: '⑴⑵⑶⑷⑸⑹⑹⑻⑼' },
+            'Currency': { upper: '₳฿₵Đ€₣₲ⱧłJ₭Ⱡ₥₦Ø₱QⱤ₴₮ɄV₩ӾYⱫ', lower: '₳฿₵Đ€₣₲ⱧłJ₭Ⱡ₥₦Ø₱QⱤ₴₮ɄV₩ӾYⱫ', digits: '0123456789' },
+            'Fancy Block': { upper: '卂乃匚刀乇下G卄工丁长乚从𠘨口尸Q尺丂下凵リ山乂丫乙', lower: '卂乃匚刀乇下G卄工丁长乚从𠘨口尸Q尺丂下凵リ山乂丫乙', digits: '0123456789' },
+            'Cyrillic': { upper: 'ДБCDЄFGHЇJЌLMNФPQR$TЦVШЖЧZ', lower: 'дъcdэfghїjќlmnфpqr$tцvшжчz', digits: '0123456789' }
+        };
+
+        // 1. Safe Mapping Engine (Uses Array.from to prevent unicode splits)
+        function mapText(text, alphabetSet) {
+            const arrUpper = Array.from(alphabetSet.upper);
+            const arrLower = Array.from(alphabetSet.lower);
+            const arrDigits = Array.from(alphabetSet.digits);
+            
+            let res = '';
+            for(let char of Array.from(text)) {
+                let idxU = refUpper.indexOf(char);
+                let idxL = refLower.indexOf(char);
+                let idxD = refDigits.indexOf(char);
+                
+                if (idxU !== -1 && arrUpper[idxU]) res += arrUpper[idxU];
+                else if (idxL !== -1 && arrLower[idxL]) res += arrLower[idxL];
+                else if (idxD !== -1 && arrDigits[idxD]) res += arrDigits[idxD];
+                else res += char; // Keep original if not alphanumeric
+            }
+            return res;
+        }
+
+        // 2. Big Blue Font Generator (Regional Indicators)
+        function getBlueFont(text) {
+            let res = '';
+            for(let char of Array.from(text)) {
+                let upperChar = char.toUpperCase();
+                let idx = refUpper.indexOf(upperChar);
+                if (idx !== -1) {
+                    res += String.fromCodePoint(0x1F1E6 + idx) + '\u200B'; // Zero-width space prevents flags merging
+                } else {
+                    res += char;
+                }
+            }
+            return res;
+        }
+
+        // 3. 100% Safe Decorators (Prefix/Suffix frames to avoid tofu rendering issues)
+        const safeFrames = {
+            'Classic Frame': str => `【 ${str} 】`,
+            'Sparkles': str => `✨ ${str} ✨`,
+            'Crown': str => `👑 ${str} 👑`,
+            'Fire': str => `🔥 ${str} 🔥`,
+            'Hearts': str => `♥ ${str} ♥`,
+            'Flowers': str => `✿ ${str} ✿`,
+            'Stars': str => `★ ${str} ★`,
+            'Music': str => `♫ ${str} ♫`,
+            'Diamonds': str => `♦ ${str} ♦`,
+            'Arrows': str => `⤅ ${str} ⤆`,
+            'Vaporwave': str => `~ ${str} ~`,
+            'Winged': str => `༺ ${str} ༻`,
+            'Bracket Dots': str => `(•_•) ${str} (•_•)`,
+            'Kaomoji Happy': str => `(っ◔◡◔)っ ${str}`,
+            'Kaomoji Sparkle': str => `(*ᴗ͈ˬᴗ͈)ꕤ*.ﾟ ${str}`,
+            'Slash Border': str => `/// ${str} ///`,
+            'Loading Bar': str => `ıllıllı ${str} ıllıllı`,
+            'Boxed Frame': str => `[̲̅ ${str} ]̲̅`,
+            'Double Line': str => `═ ${str} ═`,
+            'Checkered': str => `▀▄▀▄ ${str} ▄▀▄▀`,
+            'Barcode': str => `║▌║▌ ${str} ║▌║▌`,
+            'Glitch Borders': str => `×º°”˜ ${str} ˜”°º×`,
+            'Angel Wings': str => `ʚĭɞ ${str} ʚĭɞ`,
+            'Gun': str => `▄︻デ ${str} ══━一`,
+            'Cute Bow': str => `୨୧ ${str} ୨୧`
+        };
+
+        function generateAndRenderFonts(inputText) {
+            if (!inputText.trim()) inputText = "PDFly Tools";
+            let allGeneratedStyles = [];
+
+            // 1. Primary Feature: Big Blue Font
+            allGeneratedStyles.push({ name: 'Big Blue Font (Pro)', result: getBlueFont(inputText) });
+
+            // 2. Base Alphabets
+            const baseKeys = Object.keys(alphabets);
+            for(let key of baseKeys) {
+                allGeneratedStyles.push({ name: key, result: mapText(inputText, alphabets[key]) });
+            }
+
+            // 3. Combine Base Fonts with Safe Frames (20+ Base Fonts × 25 Frames = 500+ Unique Clean Styles)
+            for(let frameKey in safeFrames) {
+                // Apply to pure normal text first
+                allGeneratedStyles.push({ name: frameKey, result: safeFrames[frameKey](inputText) });
+                
+                // Apply to Base Fonts
+                for(let baseKey of baseKeys) {
+                    if(baseKey === 'Normal') continue; // Skip to avoid duplicate
+                    let baseStyledText = mapText(inputText, alphabets[baseKey]);
+                    let fullyStyledText = safeFrames[frameKey](baseStyledText);
+                    allGeneratedStyles.push({ name: `${baseKey} ${frameKey}`, result: fullyStyledText });
+                }
+            }
+
+            // Shuffle array slightly for dynamic feel, keeping Blue/Basics on top
+            let topTier = allGeneratedStyles.slice(0, 21); // Keep bases at top
+            let restTier = allGeneratedStyles.slice(21).sort(() => Math.random() - 0.5);
+            let finalList = [...topTier, ...restTier];
+            
+            // Remove duplicates
+            let uniqueList = [];
+            let seen = new Set();
+            for(let item of finalList) {
+                if(!seen.has(item.result)) {
+                    seen.add(item.result);
+                    uniqueList.push(item);
+                }
+            }
+
+            // Render to DOM (Batched for speed)
+            els.results.innerHTML = '';
+            els.countBadge.innerHTML = `<i class="fa-solid fa-list-ol"></i> ${uniqueList.length}+ Styles`;
+            
+            const fragment = document.createDocumentFragment();
+            uniqueList.forEach(styleObj => {
+                const card = document.createElement('div');
+                card.className = 'font-card';
+                card.innerHTML = `
+                    <div style="flex:1; min-width:0;">
+                        <span class="font-name-tag">${styleObj.name}</span>
+                        <div class="font-output">${styleObj.result}</div>
+                    </div>
+                    <button class="copy-btn" data-text="${styleObj.result.replace(/"/g, '&quot;')}" onclick="copyGeneratedText(this)" title="Copy Style">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                `;
+                fragment.appendChild(card);
+            });
+            els.results.appendChild(fragment);
+        }
+
+        // Live typing Debouncer (Fluid experience)
+        let typingTimer;
+        els.input.addEventListener('input', () => {
+            updateCounters();
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                generateAndRenderFonts(els.input.value);
+            }, 300);
+        });
+
+        // Initialize on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            generateAndRenderFonts("PDFly Tools");
+        });
+
+    </script>
+</body>
+</html>

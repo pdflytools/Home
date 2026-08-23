@@ -278,7 +278,7 @@
             box-shadow: var(--shadow-sm); border: 1px solid var(--border);
         }
 
-        /* === 4 Features Grid (Updated to Match Password Generator Style) === */
+        /* === 4 Features Grid === */
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -289,7 +289,7 @@
             .features-grid { grid-template-columns: 1fr; } 
         }
 
-        /* === SEO Friendly Card Section - STRICTLY FIXED OVERFLOW === */
+        /* === SEO Friendly Card Section === */
         .seo-text-section {
             background: var(--bg-glass);
             border: 1px solid var(--border);
@@ -336,11 +336,13 @@
         .dev-profile { text-align: center; }
         .dev-avatar {
             width: 110px; height: 110px; border-radius: 50%;
-            background: var(--gradient); margin: 0 auto 1.2rem;
+            background: var(--bg-card); margin: 0 auto 1.2rem;
             display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 3.5rem; box-shadow: var(--shadow-hover);
-            border: 4px solid var(--bg-card);
+            box-shadow: var(--shadow-hover);
+            border: 4px solid var(--primary);
+            overflow: hidden; padding: 0;
         }
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
         .dev-tags { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
         .dev-tag { background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(59,130,246,0.2); }
         
@@ -428,7 +430,7 @@
     <div id="scroll-progress"></div>
 
     <nav class="navbar">
-        <a href="https://pdflytools.github.io/Home/" class="nav-brand">
+        <a href="index.html" class="nav-brand">
             <i class="fa-solid fa-layer-group"></i>
             <span>PDFly Tools</span>
         </a>
@@ -597,7 +599,7 @@
             </div>
         </section>
 
-        <!-- 4 Features Grid (Updated Password Generator Style) -->
+        <!-- 4 Features Grid -->
         <div class="features-grid">
             <div class="card" style="padding:1.5rem;">
                 <i class="fa-solid fa-compress text-primary" style="font-size: 1.8rem; margin-bottom: 0.8rem; color: var(--primary);"></i>
@@ -642,21 +644,24 @@
         <div class="footer-grid">
             <div class="footer-col">
                 <h4>
-                    <a href="https://pdflytools.github.io/Home/" style="text-decoration: none; color: var(--text-main);">
+                    <a href="index.html" style="text-decoration: none; color: var(--text-main);">
                         <i class="fa-solid fa-layer-group" style="color:var(--primary)"></i> PDFly Tools
                     </a>
                 </h4>
                 <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Your ultimate suite for free, secure, and blazing-fast web utilities. Designed with modern fluid UI tech.</p>
             </div>
+            
+            <!-- FIXED: Using Relative Paths to avoid 404 Errors completely -->
             <div class="footer-col">
                 <h4>Top Tools</h4>
                 <ul class="footer-links">
-                    <li><a href="#"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Image Resizer Pro</a></li>
-                    <li><a href="#"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> PDF Compressor</a></li>
-                    <li><a href="#"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Secure Password Gen</a></li>
-                    <li><a href="#"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> QR Code Creator</a></li>
+                    <li><a href="resize-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Resize Image</a></li>
+                    <li><a href="compress-pdf.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Compress PDF</a></li>
+                    <li><a href="password-gen.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Password Gen</a></li>
+                    <li><a href="qr-code-maker.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> QR Code maker</a></li>
                 </ul>
             </div>
+            
             <div class="footer-col">
                 <h4>Legal & Info</h4>
                 <ul class="footer-links">
@@ -705,25 +710,39 @@
         <div class="modal-content" style="text-align: center;">
             <button class="modal-close" onclick="closeModal('contactModal')"><i class="fa-solid fa-xmark"></i></button>
             <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> Get in Touch</h2>
-            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">Have suggestions or found a bug? We'd love to hear from you. Email us directly or reach out via our developer portals.</p>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">Have suggestions or found a bug? We'd love to hear from you. Reach out to us directly:</p>
+            
+            <div style="background: var(--bg-input); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <p style="color: var(--text-main); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope" style="color: var(--primary);"></i> 
+                    <a href="mailto:pdflytools@gmail.com" style="text-decoration: none; color: inherit;">pdflytools@gmail.com</a>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> Azamgarh, Uttar Pradesh, India
+                </p>
+            </div>
+
             <button class="btn btn-primary" style="width:100%" onclick="closeModal('contactModal')">Close</button>
         </div>
     </div>
 
-    <!-- Premium Developer Profile Modal (Updated) -->
+    <!-- FIXED: Developer Profile Modal using Relative Path for Image -->
     <div class="modal-overlay" id="devProfileModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('devProfileModal')"><i class="fa-solid fa-xmark"></i></button>
             <div class="dev-profile">
+                
                 <div class="dev-avatar">
-                    <i class="fa-solid fa-user-astronaut"></i>
+                    <!-- Updated to use simple relative file name since it is in the same folder -->
+                    <img src="dev-profile.png" alt="GT Rao - Developer" class="profile-pic" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GT+Rao&background=3b82f6&color=fff&size=128&font-size=0.33&bold=true';">
                 </div>
+                
                 <h2 style="font-size: 2.2rem; margin-bottom: 0.2rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">GT Rao</h2>
-                <p style="color: var(--text-main); font-weight: 600; font-size: 1rem; margin-top: 0.2rem;">Student & Front-End Web Developer</p>
+                <p style="color: var(--text-main); font-weight: 600; font-size: 1rem; margin-top: 0.2rem;">Student & Web Developer</p>
                 <p style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Azamgarh, Uttar Pradesh, India</p>
                 
                 <div class="dev-tags">
-                    <span class="dev-tag"><i class="fa-brands fa-html5"></i> Front-End</span>
+                    <span class="dev-tag"><i class="fa-brands fa-html5"></i> Web Dev</span>
                     <span class="dev-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
                     <span class="dev-tag"><i class="fa-solid fa-wand-magic"></i> UI/UX Design</span>
                     <span class="dev-tag"><i class="fa-solid fa-layer-group"></i> Web Apps</span>
@@ -731,7 +750,7 @@
                 
                 <div style="margin-top: 1.5rem; text-align: center; padding: 1.25rem; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
                     <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">
-                        Passionate Front-End Developer dedicated to crafting lightning-fast, secure, and user-centric web applications. As the creator of <strong>PDFly Tools</strong>, I specialize in modern JavaScript, responsive UI/UX architecture, and client-side processing to deliver premium, pixel-perfect digital experiences.
+                        Passionate Web Developer dedicated to crafting lightning-fast, secure, and user-centric web applications. As the creator of <strong>PDFly Tools</strong>, I focus on writing clean code, building responsive interfaces, and ensuring client-side security to deliver premium, highly functional digital experiences that are accessible to everyone.
                     </p>
                 </div>
                 
@@ -877,7 +896,6 @@
         window.openModal = (id, e) => { if(e) e.preventDefault(); document.getElementById(id).classList.add('active'); };
         window.closeModal = (id) => document.getElementById(id).classList.remove('active');
         
-        // Removed Password System - Direct Developer Profile Access
         document.getElementById('devBadge').addEventListener('click', () => {
             openModal('devProfileModal');
         });

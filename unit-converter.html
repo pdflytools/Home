@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Measure Converter Pro - PDFly Tools</title>
+    <meta name="description" content="Accurate and ultra-fast Measure Converter by GT Rao. Convert length, area, and volume instantly. 100% Free and Secure.">
+    <meta name="keywords" content="Measure Converter, Unit Converter, Area Converter, Length Converter, Volume Converter, PDFly Tools, GT Rao">
+    <meta name="author" content="GT Rao">
+    
+    <!-- Google Fonts: Plus Jakarta Sans for Ultra-HD Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* === UI/UX Variables (PDFly Standard) === */
+        :root {
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --radius-card: 16px;
+            --radius-pill: 9999px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Light Theme */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.85);
+            --bg-input: #f1f5f9;
+            --bg-hover: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.25);
+            
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #0ea5e9;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #020617;
+            --bg-card: #0f172a;
+            --bg-glass: rgba(2, 6, 23, 0.75);
+            --bg-input: #1e293b;
+            --bg-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 10px 30px rgba(59, 130, 246, 0.35);
+        }
+
+        /* === Base Styles === */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-body); color: var(--text-main); transition: background-color 0.4s ease, color 0.4s ease; overflow-x: hidden; }
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--gradient); width: 0%; z-index: 9999; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* === Navbar (Static) === */
+        .navbar-wrapper { padding: 1.5rem 1rem 1rem; max-width: 1300px; margin: 0 auto; }
+        .navbar {
+            background: var(--bg-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 0.8rem 1.5rem; 
+            display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm);
+        }
+        .nav-brand { font-size: 1.3rem; font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; display: flex; align-items: center; gap: 8px;}
+        .nav-brand i { color: var(--primary); -webkit-text-fill-color: initial; }
+        .theme-toggle { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: var(--transition); font-size: 1.1rem; }
+        .theme-toggle:hover { background: var(--primary); color: white; transform: rotate(15deg); }
+
+        /* === Layout === */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1.2rem; }
+        .header-section { text-align: center; margin-bottom: 3rem; padding-top: 1rem; }
+        .header-section h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 0.8rem; line-height: 1.2; letter-spacing: -1px; }
+        .header-section h1 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-section p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.1rem); max-width: 700px; margin: 0 auto; line-height: 1.6; }
+
+        .tool-workspace { display: flex; flex-direction: column; gap: 2rem; margin-bottom: 3rem; }
+        @media (min-width: 992px) { 
+            .tool-workspace { flex-direction: row; align-items: flex-start; gap: 2.5rem; }
+            .left-panel { flex: 1.2; min-width: 0; }
+            .right-panel { flex: 1.8; min-width: 0; position: sticky; top: 20px; }
+        }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.5rem, 3vw, 2rem); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; transition: var(--transition);}
+        .card:hover { border-color: rgba(59,130,246,0.3); box-shadow: var(--shadow-hover); }
+        .card h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
+
+        /* === Form Elements === */
+        .form-group { margin-bottom: 1.25rem; display: flex; flex-direction: column; width: 100%; }
+        .form-group label { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;}
+        
+        input[type="number"], select { 
+            width: 100%; padding: 0.9rem 1.1rem; font-family: inherit; background: var(--bg-input); 
+            border: 1px solid var(--border); color: var(--text-main); border-radius: 10px; 
+            font-size: 1rem; transition: var(--transition); font-weight: 600; outline: none;
+            appearance: none; -moz-appearance: none; -webkit-appearance: none;
+        }
+        input[type="number"]:focus, select:focus { border-color: var(--primary); background: var(--bg-card); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
+        
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; padding-right: 2.5rem;
+        }
+        
+        .input-with-icon { position: relative; width: 100%; }
+        .input-with-icon i { position: absolute; left: 1.1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.95rem; pointer-events: none; }
+        .input-with-icon input, .input-with-icon select { padding-left: 2.8rem; }
+
+        #inchInput { display: none; animation: fadeInDown 0.3s ease; }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* === Buttons === */
+        .btn-group { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        .btn { padding: 1rem 1.5rem; border: none; font-weight: 700; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; transition: var(--transition); flex: 1; width: 100%; }
+        .btn-primary { background: var(--gradient); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5); transform: translateY(-2px); }
+        .btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--bg-hover); color: var(--danger); border-color: var(--danger); }
+
+        /* === Output Area / Results === */
+        .output-card { display: flex; flex-direction: column; position: relative; min-height: 400px;}
+        
+        .placeholder-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 350px; border: 2px dashed var(--border); border-radius: 14px; padding: 2rem; text-align: center; color: var(--text-muted); background: rgba(59,130,246,0.02); transition: opacity 0.3s; flex-grow: 1; }
+        .placeholder-state i { font-size: 4rem; margin-bottom: 1rem; color: var(--primary); opacity: 0.6; }
+        .placeholder-state h3 { font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 800;}
+
+        .loader-overlay { position: absolute; inset: 0; background: var(--bg-glass); backdrop-filter: blur(5px); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: var(--radius-card); z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .loader-overlay.active { opacity: 1; pointer-events: all; }
+        .spinner { width: 45px; height: 45px; border: 4px solid var(--bg-input); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .result-section { display: none; flex-direction: column; flex-grow: 1; animation: fadeIn 0.4s ease; }
+        .result-section.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .result-main { text-align: center; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+        .result-main h2 { color: var(--text-muted); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.8rem; font-weight: 700; border: none; justify-content: center;}
+        .result-main .equation { font-size: clamp(1rem, 3vw, 1.3rem); font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .result-main .combined { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; word-break: break-all;}
+
+        .detailed-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; }
+        .detail-item { display: flex; flex-direction: column; gap: 0.3rem; padding: 1.2rem; background: rgba(59, 130, 246, 0.03); border: 1px dashed var(--primary); border-radius: 12px; text-align: center; transition: var(--transition); }
+        .detail-item:hover { background: var(--bg-card); border-style: solid; box-shadow: var(--shadow-sm); transform: translateY(-3px); }
+        .detail-item .d-val { font-weight: 800; color: var(--text-main); font-size: 1.2rem; word-break: break-all;}
+        .detail-item .d-label { color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;}
+
+        /* === 4 Features Grid === */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(1rem, 3vw, 1.5rem); margin: 4rem 0; }
+        .feature-card { background: var(--bg-card); padding: 1.5rem; text-align: center; border-radius: var(--radius-card); border: 1px solid var(--border); box-shadow: var(--shadow-sm); transition: var(--transition); }
+        .feature-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: var(--shadow-hover); }
+        .feature-card i { font-size: 2rem; margin-bottom: 1rem; color: var(--primary); transition: var(--transition); }
+        .feature-card:hover i { transform: scale(1.1) rotate(5deg); }
+        .feature-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 700; color: var(--text-main); }
+        .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* === SEO Friendly Card Section === */
+        .seo-text-section { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 3rem); margin: 3rem 0; box-shadow: var(--shadow-sm); }
+        .seo-text-section h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 800; margin-bottom: 1.5rem; color: var(--text-main); }
+        .seo-text-section h3 { font-size: clamp(1.1rem, 2vw, 1.4rem); font-weight: 700; margin: 2rem 0 1rem; color: var(--text-main); }
+        .seo-text-section p, .seo-text-section li { font-size: clamp(0.95rem, 1.5vw, 1.05rem); color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; }
+        .seo-text-section ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--text-muted); }
+
+        /* === Footer === */
+        .footer { margin-top: 4rem; padding: clamp(3rem, 5vw, 4rem) 1rem 2rem; border-top: 1px solid var(--border); background: var(--bg-card); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2.5rem; max-width: 1300px; margin: 0 auto 2rem; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--text-main); font-weight: 800; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; transition: var(--transition); font-size: 0.95rem; font-weight: 500; cursor: pointer;}
+        .footer-links a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
+        .dev-badge { background: var(--bg-input); padding: 0.6rem 1.2rem; border-radius: var(--radius-pill); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 700; font-size: 0.9rem; border: 1px solid var(--border); transition: var(--transition); }
+        .dev-badge:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
+        /* === Modals === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); z-index: 2000; padding: 1rem; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 2.5rem); transform: scale(0.9) translateY(20px); transition: var(--transition); border: 1px solid var(--border); box-shadow: var(--shadow-hover); position: relative; max-height: 90vh; overflow-y: auto; text-align: left; }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-input); border: 1px solid var(--border); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--text-main); cursor: pointer; transition: var(--transition); }
+        .modal-close:hover { color: white; background: var(--danger); border-color: var(--danger); transform: rotate(90deg); }
+        
+        /* Developer Profile inside Modal */
+        .dev-profile { text-align: center; }
+        .dev-avatar { width: clamp(100px, 15vw, 120px); height: clamp(100px, 15vw, 120px); border-radius: 50%; background: var(--bg-card); margin: 0 auto 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); border: 4px solid var(--primary); padding: 0; }
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .dev-tags { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+        .dev-tag { background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(59,130,246,0.2); }
+        .dev-social { width: 45px; height: 45px; border-radius: 50%; background: var(--bg-input); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: var(--transition); border: 1px solid var(--border); text-decoration: none; }
+        .dev-social:hover { background: var(--primary); color: white; transform: translateY(-3px); border-color: var(--primary); box-shadow: var(--shadow-sm); }
+
+        /* === Toast Notification === */
+        #toast-container { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: max-content; max-width: 90vw; pointer-events: none;}
+        .toast { background: var(--text-main); color: var(--bg-body); padding: 1rem 1.5rem; border-radius: var(--radius-pill); box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px; animation: slideUp 0.4s forwards, fadeOut 0.4s forwards 2.5s; font-weight: 700; font-size: 0.95rem; border: 1px solid var(--border);}
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.info { border-left: 4px solid var(--info); }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(20px); opacity: 0; } }
+        
+        #backToTop { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: var(--shadow-hover); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 1000; font-size: 1.2rem; }
+        #backToTop.show { opacity: 1; visibility: visible; }
+        #backToTop:hover { transform: translateY(-5px) scale(1.05); }
+    </style>
+</head>
+<body>
+
+    <!-- Scroll Progress -->
+    <div id="scroll-progress"></div>
+
+    <!-- Static Navbar -->
+    <div class="navbar-wrapper">
+        <nav class="navbar">
+            <a href="index.html" class="nav-brand">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>PDFly Tools</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                <i class="fa-solid fa-sun" id="themeIcon"></i>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="container">
+        
+        <!-- Header -->
+        <div class="header-section">
+            <h1>Measure <span>Converter Pro</span></h1>
+            <p>Convert area, length, and volume instantly. Highly accurate and lightning-fast online unit converter.</p>
+        </div>
+
+        <!-- Main Tool Area -->
+        <div class="tool-workspace">
+            
+            <!-- Left Side: Inputs -->
+            <div class="left-panel">
+                <div class="card">
+                    <h2><i class="fa-solid fa-sliders text-primary"></i> Converter Setup</h2>
+                    
+                    <form id="converterForm" style="margin-top: 1rem;">
+                        <div class="form-group">
+                            <label for="type">Conversion Category</label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-ruler-combined" id="typeIcon"></i>
+                                <select id="type">
+                                    <option value="length">Length</option>
+                                    <option value="area">Area</option>
+                                    <option value="volume">Volume</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="from">From (Input Unit)</label>
+                            <select id="from"></select>
+                        </div>
+                        
+                        <div class="form-group" id="inchInput">
+                            <label for="inchValue">Enter Inches <span>(Optional)</span></label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-ruler"></i>
+                                <input type="number" id="inchValue" placeholder="e.g. 5" min="0">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="value">Value to Convert</label>
+                            <div class="input-with-icon">
+                                <i class="fa-solid fa-hashtag"></i>
+                                <input type="number" id="value" placeholder="Enter numeric value..." step="any" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="to">To (Output Unit)</label>
+                            <select id="to"></select>
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary" id="calcBtn" style="flex: 1.5;">
+                                <i class="fa-solid fa-bolt"></i> Convert Now
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Side: Results -->
+            <div class="right-panel">
+                <div class="card output-card">
+                    <h2 style="justify-content: center; border-bottom: none;"><i class="fa-solid fa-square-poll-horizontal text-primary"></i> Live Output</h2>
+                    
+                    <!-- Placeholder State -->
+                    <div id="placeholderState" class="placeholder-state">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                        <h3 id="placeholderTitle" style="color: var(--text-main); margin-bottom: 5px;">Ready to Convert</h3>
+                        <p id="placeholderDesc">Enter your values on the left to see precise instant conversions.</p>
+                    </div>
+
+                    <!-- Loader -->
+                    <div id="loader" class="loader-overlay">
+                        <div class="spinner"></div>
+                        <p style="margin-top: 1rem; font-weight: 700; color: var(--text-main);">Calculating...</p>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div id="resultContent" class="result-section">
+                        <div class="result-main">
+                            <h2>Primary Result</h2>
+                            <div class="equation" id="resEquation">-- = --</div>
+                            <div class="combined" id="mainResult">--</div>
+                        </div>
+
+                        <h3 style="font-size: 1rem; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;"><i class="fa-solid fa-list" style="color:var(--primary)"></i> All Conversions</h3>
+                        <div class="detailed-stats" id="additionalResults">
+                            <!-- Populated dynamically -->
+                        </div>
+
+                        <button type="button" class="btn btn-secondary" id="resetBtn" style="margin-top: 1.5rem;">
+                            <i class="fa-solid fa-rotate-right"></i> Reset Calculator
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 Features Grid -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fa-solid fa-vector-square" style="color: var(--primary);"></i>
+                <h3>Area Conversion</h3>
+                <p>Easily convert between hectares, acres, square meters, square feet, and more with exact precision.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-ruler" style="color: var(--warning);"></i>
+                <h3>Length Conversion</h3>
+                <p>Effortlessly switch between meters, feet, inches, yards, and kilometers instantly in one single click.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-flask" style="color: var(--info);"></i>
+                <h3>Volume Conversion</h3>
+                <p>Convert liters, gallons, cubic meters, and milliliters accurately. Designed for everyday technical use.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-shield-halved" style="color: var(--success);"></i>
+                <h3>100% Client-Side Privacy</h3>
+                <p>All math and calculations happen instantly inside your browser. No data is ever sent to external servers.</p>
+            </div>
+        </div>
+
+        <!-- SEO Content -->
+        <div class="seo-text-section">
+            <h2>Why Use PDFly Measure Converter?</h2>
+            <p>Whether you are a student solving a math problem, an engineer calculating area, or simply trying to figure out how many inches are in a foot, you need an accurate and fast tool. <strong>Measure Converter Pro</strong> is a completely free, highly precise utility that processes data entirely on your device.</p>
+            
+            <h3>Smart Features</h3>
+            <p>Our tool goes beyond simple 1-to-1 conversions. When you input a value, it doesn't just give you the single result you asked for; it automatically generates a detailed breakdown of <strong>all other associated units</strong> in that category simultaneously. Furthermore, when selecting "Foot (ft)" for length, a smart optional "Inches" field appears to make real-world height and length calculations effortless.</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>
+                    <a href="index.html" style="text-decoration: none; color: var(--text-main);">
+                        <i class="fa-solid fa-layer-group" style="color:var(--primary)"></i> PDFly Tools
+                    </a>
+                </h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Your ultimate suite for free, secure, and blazing-fast web utilities. Crafted with Ultra HD fluid UI tech.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Top Tools</h4>
+                <ul class="footer-links">
+                    <li><a href="resize-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Resize Image</a></li>
+                    <li><a href="compress-pdf.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Compress PDF</a></li>
+                    <li><a href="qr-code-maker.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> QR Code Maker</a></li>
+                    <li><a href="word-counter.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Word Counter Pro</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Legal & Info</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="openModal('privacyModal', event)"><i class="fa-solid fa-shield"></i> Privacy Policy</a></li>
+                    <li><a href="#" onclick="openModal('termsModal', event)"><i class="fa-solid fa-file-contract"></i> Terms of Service</a></li>
+                    <li><a href="#" onclick="openModal('contactModal', event)"><i class="fa-solid fa-headset"></i> Contact Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="dev-badge" onclick="openModal('devProfileModal', event)">
+                <i class="fa-solid fa-code"></i> Developed by GT Rao
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">&copy; 2026 PDFly Tools. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('privacyModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-shield" style="color: var(--primary);"></i> Privacy Policy</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.6;">Your privacy is strictly protected. This calculation tool operates 100% within your web browser utilizing client-side processing.</p>
+            <ul style="color: var(--text-muted); font-size: 0.95rem; padding-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                <li>Your inputs are never transmitted or uploaded to our servers.</li>
+                <li>All math happens within your device's memory.</li>
+                <li>We do not track, store, intercept, or log any of your entered data.</li>
+            </ul>
+            <button class="btn btn-primary" onclick="closeModal('privacyModal')">Acknowledge</button>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('termsModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-file-contract" style="color: var(--primary);"></i> Terms of Service</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">By using PDFly Tools, you agree to use our utilities responsibly. This tool is provided "as is" without warranty of exact precision for critical engineering tasks. Both commercial and personal use of the tool is entirely free.</p>
+            <button class="btn btn-primary" onclick="closeModal('termsModal')">I Agree</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('contactModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> Get in Touch</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">Have suggestions or found a bug? We'd love to hear from you. Reach out to us directly:</p>
+            <div style="background: var(--bg-input); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <p style="color: var(--text-main); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope" style="color: var(--primary);"></i> 
+                    <a href="mailto:pdflytools@gmail.com" style="text-decoration: none; color: inherit;">pdflytools@gmail.com</a>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> Azamgarh, Uttar Pradesh, India
+                </p>
+            </div>
+            <button class="btn btn-primary" onclick="closeModal('contactModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- Developer Modal -->
+    <div class="modal-overlay" id="devProfileModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('devProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="dev-profile">
+                <div class="dev-avatar">
+                    <img src="dev-profile.png" alt="GT Rao - Developer" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GT+Rao&background=3b82f6&color=fff&size=128&font-size=0.33&bold=true';">
+                </div>
+                <h2 style="font-size: clamp(1.8rem, 4vw, 2.2rem); margin-bottom: 0.2rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">GT Rao</h2>
+                <p style="color: var(--text-main); font-weight: 600; font-size: 1rem; margin-top: 0.2rem;">Student & Web Developer</p>
+                <p style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Azamgarh, Uttar Pradesh, India</p>
+                
+                <div class="dev-tags">
+                    <span class="dev-tag"><i class="fa-brands fa-html5"></i> Web Dev</span>
+                    <span class="dev-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
+                    <span class="dev-tag"><i class="fa-solid fa-wand-magic"></i> UI/UX Design</span>
+                    <span class="dev-tag"><i class="fa-solid fa-layer-group"></i> PDFly Tools</span>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center; padding: 1.25rem; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">
+                        Passionate Web Developer dedicated to crafting lightning-fast, secure, and user-centric web applications. I focus on writing clean code, building responsive interfaces, and ensuring absolute client-side privacy.
+                    </p>
+                </div>
+                
+                <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                     <a href="mailto:pdflytools@gmail.com" class="dev-social" title="Email Contact" target="_blank"><i class="fa-solid fa-envelope"></i></a>
+                     <a href="https://instagram.com/mr_gt_rao" class="dev-social" title="Personal Instagram" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                     <a href="https://instagram.com/educate_path" class="dev-social" title="Business / PDFly Tools" target="_blank"><i class="fa-solid fa-briefcase"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Overlays -->
+    <div id="toast-container"></div>
+    <button id="backToTop"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // === Core Data ===
+        const unitsData = {
+            length: {
+                "Millimeter (mm)": 0.001,
+                "Centimeter (cm)": 0.01,
+                "Meter (m)": 1,
+                "Kilometer (km)": 1000,
+                "Inch (in)": 0.0254,
+                "Foot (ft)": 0.3048,
+                "Yard (yd)": 0.9144,
+                "Mile (mi)": 1609.34
+            },
+            area: {
+                "Square Meter (m²)": 1,
+                "Square Kilometer (km²)": 1e6,
+                "Square Foot (ft²)": 0.092903,
+                "Square Yard (yd²)": 0.836127,
+                "Acre": 4046.86,
+                "Hectare": 10000
+            },
+            volume: {
+                "Liter (L)": 1,
+                "Milliliter (mL)": 0.001,
+                "Cubic Meter (m³)": 1000,
+                "Cubic Centimeter (cm³)": 0.001,
+                "Gallon (US)": 3.78541,
+                "Quart (US)": 0.946353
+            }
+        };
+
+        // === Core UI Management ===
+        const els = {
+            html: document.documentElement,
+            themeToggle: document.getElementById('themeToggle'),
+            themeIcon: document.getElementById('themeIcon'),
+            scrollProg: document.getElementById('scroll-progress'),
+            btt: document.getElementById('backToTop'),
+            
+            typeSel: document.getElementById('type'),
+            typeIcon: document.getElementById('typeIcon'),
+            fromSel: document.getElementById('from'),
+            toSel: document.getElementById('to'),
+            inchDiv: document.getElementById('inchInput'),
+            inchVal: document.getElementById('inchValue'),
+            valIn: document.getElementById('value'),
+            
+            calcBtn: document.getElementById('calcBtn'),
+            resetBtn: document.getElementById('resetBtn'),
+            
+            resultSec: document.getElementById('resultContent'),
+            placeholderSec: document.getElementById('placeholderState'),
+            calcLoader: document.getElementById('loader'),
+            
+            resEq: document.getElementById('resEquation'),
+            mainRes: document.getElementById('mainResult'),
+            addlRes: document.getElementById('additionalResults')
+        };
+
+        const initTheme = () => {
+            const saved = localStorage.getItem('pdfly-theme') || 'dark'; 
+            els.html.setAttribute('data-theme', saved);
+            els.themeIcon.className = saved === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        };
+        
+        els.themeToggle.addEventListener('click', () => {
+            const next = els.html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            els.html.setAttribute('data-theme', next);
+            localStorage.setItem('pdfly-theme', next);
+            els.themeIcon.className = next === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            showToast(`${next.charAt(0).toUpperCase() + next.slice(1)} Mode Activated`, 'success');
+        });
+        initTheme();
+
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            els.scrollProg.style.width = ((document.body.scrollTop || document.documentElement.scrollTop) / h) * 100 + "%";
+            els.btt.classList.toggle('show', (document.body.scrollTop || document.documentElement.scrollTop) > 300);
+        });
+        
+        els.btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const iconClass = type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info');
+            toast.innerHTML = `<i class="fa-solid ${iconClass}"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { if(container.contains(toast)) toast.remove(); }, 3500);
+        }
+
+        window.openModal = (id, e) => { 
+            if(e) e.preventDefault(); 
+            document.getElementById(id).classList.add('active'); 
+            document.body.style.overflow = 'hidden';
+        };
+        window.closeModal = (id) => {
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = '';
+        };
+        window.onclick = e => { 
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.classList.remove('active'); 
+                document.body.style.overflow = '';
+            }
+        };
+
+        // === Converter Logic ===
+        const populateUnits = () => {
+            const selectedType = els.typeSel.value;
+            els.fromSel.innerHTML = "";
+            els.toSel.innerHTML = "";
+            
+            // Icon mapping
+            els.typeIcon.className = selectedType === 'length' ? 'fa-solid fa-ruler-combined' : selectedType === 'area' ? 'fa-solid fa-vector-square' : 'fa-solid fa-flask';
+
+            Object.keys(unitsData[selectedType]).forEach(unit => {
+                els.fromSel.innerHTML += `<option value="${unit}">${unit}</option>`;
+                els.toSel.innerHTML += `<option value="${unit}">${unit}</option>`;
+            });
+            
+            if(els.toSel.options.length > 1) els.toSel.selectedIndex = 1; 
+            toggleInchInput();
+        };
+
+        const toggleInchInput = () => {
+            if (els.typeSel.value === 'length' && els.fromSel.value === "Foot (ft)") {
+                els.inchDiv.style.display = "block";
+            } else {
+                els.inchDiv.style.display = "none";
+                els.inchVal.value = '';
+            }
+        };
+
+        const processConversion = () => {
+            const type = els.typeSel.value;
+            const from = els.fromSel.value;
+            const to = els.toSel.value;
+            let value = parseFloat(els.valIn.value);
+            const inchValue = parseFloat(els.inchVal.value);
+
+            let hasInch = els.inchDiv.style.display === "block" && !isNaN(inchValue);
+            
+            if (isNaN(value) && !hasInch) {
+                return showToast('Please enter a value to convert.', 'error');
+            }
+            if (isNaN(value) && hasInch) value = 0;
+
+            els.placeholderSec.style.display = 'none';
+            els.resultSec.classList.remove('active');
+            els.calcLoader.classList.add('active');
+
+            setTimeout(() => {
+                let displayInputStr = `${value} ${from}`;
+                
+                if (from === "Foot (ft)" && hasInch) {
+                    value = value + (inchValue / 12);
+                    displayInputStr = `${Math.floor(value)} ft ${inchValue} in`;
+                }
+
+                const baseValue = value * unitsData[type][from];
+                const result = baseValue / unitsData[type][to];
+
+                els.resEq.innerText = `${displayInputStr} =`;
+                
+                let formattedResult = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
+                els.mainRes.innerHTML = `${formattedResult} <span style="font-size: 0.6em; color:var(--text-muted); font-weight: 700;">${to}</span>`;
+
+                els.addlRes.innerHTML = '';
+                for (let unit in unitsData[type]) {
+                    if (unit !== from && unit !== to) {
+                        let converted = baseValue / unitsData[type][unit];
+                        let formattedConv = Number.isInteger(converted) ? converted : parseFloat(converted.toFixed(5));
+                        
+                        let symbolMatch = unit.match(/\((.*?)\)/);
+                        let cleanUnitName = symbolMatch ? symbolMatch[1] : unit;
+
+                        els.addlRes.innerHTML += `
+                            <div class="detail-item">
+                                <span class="d-val">${formattedConv}</span>
+                                <span class="d-label">${unit.split(' (')[0]} (${cleanUnitName})</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                els.calcLoader.classList.remove('active');
+                els.resultSec.classList.add('active');
+                
+                if(window.innerWidth < 992) {
+                    els.resultSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                showToast('Conversion Successful', 'success');
+            }, 400); 
+        };
+
+        els.typeSel.addEventListener('change', populateUnits);
+        els.fromSel.addEventListener('change', toggleInchInput);
+        els.calcBtn.addEventListener('click', processConversion);
+        
+        els.resetBtn.addEventListener('click', () => {
+            els.valIn.value = '';
+            els.inchVal.value = '';
+            els.resultSec.classList.remove('active');
+            els.placeholderSec.style.display = 'flex';
+            showToast('Calculator Reset', 'info');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Initialize App
+        populateUnits();
+    </script>
+</body>
+</html>

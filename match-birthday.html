@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Birthday Matcher Pro - PDFly Tools</title>
+    
+    <!-- Advanced Meta Tags & SEO -->
+    <meta name="description" content="Discover your Birthday Twins, calculate your Vedic Rashi, Numerology, Chinese Zodiac, and generate a premium PDF report with images.">
+    <meta name="keywords" content="birthday matcher, rashi calculator, numerology, birthday twins, pdfly tools, gt rao, who was born on my birthday">
+    <meta name="author" content="GT Rao">
+    <meta name="language" content="English">
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- External Libraries (jsPDF & Confetti) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. THEME & COLOR VARIABLES (PDFly Tools Standard)
+           ========================================================================== */
+        :root {
+            --primary: #3b82f6; 
+            --secondary: #8b5cf6;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --radius-card: 16px; 
+            --radius-pill: 9999px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Light Theme */
+            --bg-body: #f8fafc; 
+            --bg-card: #ffffff; 
+            --bg-glass: rgba(255,255,255,0.75);
+            --bg-input: #f1f5f9; 
+            --bg-hover: #e2e8f0;
+            --text-main: #0f172a; 
+            --text-muted: #64748b;
+            --border: #e2e8f0; 
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.05); 
+            --shadow-hover: 0 10px 25px rgba(59,130,246,0.25);
+            
+            --success: #10b981; 
+            --danger: #ef4444; 
+            --warning: #f59e0b;
+            --info: #0ea5e9;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #020617; 
+            --bg-card: #0f172a; 
+            --bg-glass: rgba(2,6,23,0.75);
+            --bg-input: #1e293b; 
+            --bg-hover: #2dd4bf1a; 
+            --text-main: #f8fafc; 
+            --text-muted: #94a3b8;
+            --border: #1e293b; 
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.4); 
+            --shadow-hover: 0 10px 25px rgba(59,130,246,0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        html, body { width: 100vw; overflow-x: hidden; background-color: var(--bg-body); color: var(--text-main); scroll-behavior: smooth; }
+        a { text-decoration: none; color: var(--primary); transition: var(--transition); }
+        a:hover { color: var(--secondary); }
+        ul { list-style: none; }
+        button, input, select { font-family: inherit; outline: none; border: none; }
+
+        /* Scroll Progress Bar */
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--gradient); width: 0%; z-index: 999999; border-radius: 0 4px 4px 0; }
+
+        /* ==========================================================================
+           2. LAYOUT & UI COMPONENTS
+           ========================================================================== */
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 1.25rem; }
+
+        /* Sticky Navbar */
+        .navbar-wrapper { position: sticky; top: 1rem; z-index: 1000; padding: 0 1.25rem; max-width: 1300px; margin: 1rem auto 0; }
+        .navbar { background: var(--bg-glass); backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 0.75rem 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); }
+        .logo { font-weight: 800; font-size: 1.25rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 0.5rem; }
+        .theme-toggle { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: grid; place-items: center; transition: var(--transition); }
+        .theme-toggle:hover { background: var(--bg-hover); transform: scale(1.05); }
+
+        /* Hero Section */
+        .hero-section { text-align: center; margin: 4rem 0 3rem; padding: 0 1rem; }
+        h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.2; margin-bottom: 1rem; }
+        .hero-section p { font-size: clamp(1rem, 1.5vw, 1.15rem); color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+        .text-gradient { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* Tool Workspace */
+        .tool-grid { display: grid; grid-template-columns: 450px minmax(0, 1fr); gap: 2rem; margin-bottom: 4rem; align-items: stretch; }
+        @media (max-width: 992px) { .tool-grid { grid-template-columns: 1fr; } }
+        
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 2rem; box-shadow: var(--shadow-sm); transition: var(--transition); width: 100%; display: flex; flex-direction: column; overflow: hidden; }
+        .card.hoverable:hover { border-color: var(--primary); box-shadow: var(--shadow-hover); }
+        @media (max-width: 576px) { .card { padding: 1.25rem; } }
+
+        /* Form Inputs */
+        .input-group { position: relative; margin-bottom: 1.25rem; }
+        .input-group i { position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .input-group input { width: 100%; padding: 1rem 1rem 1rem 3rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; color: var(--text-main); font-size: 1rem; transition: var(--transition); }
+        .input-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(var(--dark-icon-filter, 0)); cursor: pointer; }
+        [data-theme="dark"] { --dark-icon-filter: 1; }
+
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 1rem; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: var(--transition); }
+        .btn-primary { background: var(--gradient); color: white; box-shadow: 0 4px 15px rgba(59,130,246,0.25); }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
+        .btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-secondary:hover:not(:disabled) { background: var(--bg-hover); transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        /* ==========================================================================
+           STATS & RESULT UI (Fixed and Highly Responsive)
+           ========================================================================== */
+        
+        /* Stats Grid (Top Cards) */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 12px; 
+            margin: 1.5rem 0; 
+            width: 100%;
+        }
+        
+        /* Auto Span Logic: Makes the 9th item full width on 2-col mobile screens */
+        @media (max-width: 576px) { 
+            .stats-grid { grid-template-columns: repeat(2, 1fr); } 
+            .stats-grid .stat-box:last-child:nth-child(odd) {
+                grid-column: 1 / -1; 
+                flex-direction: row; 
+                justify-content: center;
+                gap: 1.5rem;
+                padding: 1.5rem 1rem;
+            }
+            .stats-grid .stat-box:last-child:nth-child(odd) i { margin-bottom: 0; font-size: 2rem; }
+            .stats-grid .stat-box:last-child:nth-child(odd) .stat-val { font-size: 1.5rem; }
+        }
+        
+        .stat-box { 
+            background: var(--bg-card); 
+            padding: 1.25rem 0.5rem; 
+            border-radius: 14px; 
+            border: 1px solid var(--border); 
+            text-align: center; 
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 0.4rem;
+        }
+        .stat-box:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+        .stat-box i { font-size: 1.4rem; margin-bottom: 0.2rem; }
+        .stat-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); letter-spacing: 0.5px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .stat-val { font-size: clamp(0.95rem, 1.2vw, 1.1rem); font-weight: 800; color: var(--text-main); line-height: 1.2; word-break: break-word; }
+
+        /* Output Card & Loaders */
+        .output-card { position: relative; min-height: 550px; padding-bottom: 1.5rem; }
+        .placeholder-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 400px; border: 2px dashed var(--border); border-radius: 12px; padding: 2rem; text-align: center; color: var(--text-muted); flex-grow: 1; }
+        .placeholder-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+        
+        .loader-overlay { position: absolute; inset: 0; background: var(--bg-glass); backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: var(--radius-card); z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .loader-overlay.active { opacity: 1; pointer-events: all; }
+        .spinner { width: 50px; height: 50px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Tabs & Result Area */
+        .result-section { display: none; flex-direction: column; flex-grow: 1; width: 100%; }
+        .result-section.active { display: flex; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .custom-tabs { display: flex; gap: 0.5rem; background: var(--bg-input); padding: 0.4rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border); width: 100%; overflow-x: auto; }
+        .custom-tab { flex: 1; padding: 0.75rem; border: none; background: transparent; color: var(--text-muted); font-weight: 700; border-radius: 8px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.5rem; white-space: nowrap; }
+        .custom-tab:hover { color: var(--text-main); }
+        .custom-tab.active { background: var(--bg-card); color: var(--primary); box-shadow: var(--shadow-sm); }
+        .badge { background: var(--gradient); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; }
+
+        /* ==========================================================================
+           NEW CELEBRITY CARD GRID LAYOUT (2x Column)
+           ========================================================================== */
+        .list-container { 
+            max-height: 600px; 
+            overflow-y: auto; 
+            padding-right: 5px; 
+            display: none; 
+            grid-template-columns: repeat(2, 1fr); /* FORCED 2 COLUMNS */
+            gap: 15px; 
+            align-content: start;
+            width: 100%; 
+        }
+        .list-container.active { display: grid; }
+        
+        .list-container::-webkit-scrollbar { width: 6px; }
+        .list-container::-webkit-scrollbar-track { background: var(--bg-input); border-radius: 10px; }
+        .list-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        
+        /* Vertical Card Style */
+        .celeb-card { 
+            background: var(--bg-card); 
+            padding: 1.25rem 1rem; 
+            border-radius: 16px; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 0.5rem; 
+            border: 1px solid var(--border); 
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition); 
+            text-decoration: none; 
+            color: inherit; 
+            height: 100%;
+        }
+        .celeb-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+        
+        .celeb-img, .celeb-initial { 
+            width: 75px; 
+            height: 75px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            background: var(--bg-input); 
+            border: 3px solid var(--bg-card);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 0.25rem;
+        }
+        .celeb-initial { background: var(--gradient); color: white; display: grid; place-items: center; font-weight: 700; font-size: 1.8rem; }
+        
+        .celeb-info { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            width: 100%;
+        }
+        .celeb-info h4 { 
+            margin: 0; 
+            font-size: 1rem; 
+            color: var(--text-main); 
+            font-weight: 800; 
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.3;
+            margin-bottom: 0.4rem;
+        }
+        .year-badge { 
+            font-size: 0.75rem; 
+            background: var(--bg-input); 
+            border: 1px solid var(--border); 
+            padding: 4px 10px; 
+            border-radius: 20px; 
+            color: var(--text-main); 
+            font-weight: 800;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        .prof-text {
+            margin: 0; 
+            font-size: 0.8rem; 
+            color: var(--text-muted); 
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .admin-card { border: 2px solid var(--warning); background: rgba(245, 158, 11, 0.05); }
+        .admin-card:hover { border-color: var(--warning); background: rgba(245, 158, 11, 0.1); }
+        .admin-crown { color: var(--warning); font-size: 1rem; margin-left: 5px; }
+
+        @media (max-width: 450px) {
+            .list-container { gap: 10px; }
+            .celeb-card { padding: 1rem 0.5rem; }
+            .celeb-img, .celeb-initial { width: 65px; height: 65px; font-size: 1.4rem; }
+            .celeb-info h4 { font-size: 0.9rem; }
+            .prof-text { font-size: 0.75rem; }
+        }
+
+        /* Features Grid */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 4rem 0; }
+        .feature-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 2rem; text-align: center; transition: var(--transition); box-shadow: var(--shadow-sm); }
+        .feature-box:hover { border-color: var(--primary); transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+        .feature-box i { font-size: 2.5rem; margin-bottom: 1rem; }
+        .feature-box h3 { margin-bottom: 0.5rem; font-size: 1.25rem; }
+        .feature-box p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; }
+
+        /* SEO Section */
+        .seo-text-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 3rem 2rem; margin: 4rem 0; box-shadow: var(--shadow-sm); line-height: 1.7; }
+        .seo-text-section h2 { margin-bottom: 1rem; font-size: 1.8rem; }
+        .seo-text-section h3 { margin: 1.5rem 0 0.5rem; font-size: 1.3rem; }
+        .seo-text-section p, .seo-text-section ul { color: var(--text-muted); margin-bottom: 1rem; }
+        .seo-text-section ul { list-style: disc; margin-left: 1.5rem; }
+
+        /* ==========================================================================
+           FOOTER & MODALS (PDFly Tools Standard)
+           ========================================================================== */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border); padding: 4rem 1.5rem 2rem; margin-top: 4rem; }
+        .footer-grid { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 3rem; margin-bottom: 3rem; }
+        .footer-col h3 { margin-bottom: 1.5rem; font-size: 1.2rem; color: var(--text-main); }
+        .footer-col ul { display: flex; flex-direction: column; gap: 0.8rem; }
+        .footer-col ul li a { color: var(--text-muted); cursor: pointer; }
+        .footer-col ul li a:hover { color: var(--primary); padding-left: 5px; }
+
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+        .dev-badge { background: var(--bg-input); padding: 0.8rem 2rem; border-radius: var(--radius-pill); border: 2px solid var(--primary); cursor: pointer; font-weight: 800; color: var(--primary); display: inline-flex; align-items: center; gap: 0.5rem; transition: var(--transition); font-size: 1rem; }
+        .dev-badge:hover { background: var(--primary); color: white; transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+
+        /* Back to Top */
+        #backToTop { position: fixed; bottom: 30px; left: 30px; width: 50px; height: 50px; background: var(--gradient); color: white; border: none; border-radius: 50%; font-size: 1.2rem; cursor: pointer; box-shadow: var(--shadow-hover); transform: scale(0); transition: var(--transition); z-index: 999; }
+        #backToTop.show { transform: scale(1); }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 100000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: var(--transition); padding: 1rem; }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-content { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); width: 100%; max-width: 500px; padding: 2.5rem; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
+        .close-modal { position: absolute; top: 1.2rem; right: 1.2rem; background: var(--bg-input); border: none; width: 35px; height: 35px; border-radius: 50%; color: var(--text-main); cursor: pointer; font-size: 1.2rem; transition: var(--transition); }
+        .close-modal:hover { background: var(--danger); color: white; transform: rotate(90deg); }
+
+        .profile-img-wrap { width: 100px; height: 100px; margin: 0 auto 1.5rem; border-radius: 50%; overflow: hidden; border: 3px solid var(--primary); box-shadow: var(--shadow-hover); background: var(--bg-input); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--primary); }
+        .profile-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .icon-btn-group { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
+        .icon-btn { width: 45px; height: 45px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-main); font-size: 1.2rem; cursor: pointer; transition: var(--transition); display: grid; place-items: center; }
+        .icon-btn:hover { background: var(--primary); color: white; transform: translateY(-3px); border-color: transparent; box-shadow: var(--shadow-hover); }
+
+        /* Toasts */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 999999; }
+        .toast { background: var(--bg-card); border-left: 4px solid var(--primary); color: var(--text-main); padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.show { transform: translateX(0); }
+    </style>
+</head>
+<body>
+
+    <!-- Scroll Progress Bar -->
+    <div id="scroll-progress"></div>
+
+    <!-- Sticky Navbar -->
+    <div class="navbar-wrapper">
+        <nav class="navbar">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-bolt"></i> PDFly Tools
+            </a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                <i class="fa-solid fa-sun"></i> 
+            </button>
+        </nav>
+    </div>
+
+    <main class="container">
+        
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1>Birthday Matcher <span class="text-gradient">Pro</span></h1>
+            <p>Discover your global birthday twins, calculate Vedic Rashi, Numerology, Elements, and generate premium PDF reports.</p>
+        </div>
+
+        <!-- Tool Workspace -->
+        <div class="tool-grid">
+            
+            <!-- Left Card: Controls & Stats -->
+            <div class="card hoverable" style="height: fit-content;">
+                <h2 style="margin-bottom: 1.5rem; text-align: center; color: var(--text-main);"><i class="fa-solid fa-user-astronaut text-gradient" style="margin-right: 8px;"></i> Your Details</h2>
+                
+                <div class="input-group">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="userName" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="input-group">
+                    <i class="fa-solid fa-calendar-day"></i>
+                    <input type="date" id="userDob" required>
+                </div>
+
+                <button class="btn btn-primary" id="generateBtn" onclick="processData()">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Analyze Birthday
+                </button>
+
+                <!-- Responsive Top Cards (Stats Grid) -->
+                <div id="statsSection" style="display: none;">
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <i class="fa-solid fa-hourglass-half" style="color: var(--primary);"></i>
+                            <div class="stat-label">Exact Age</div>
+                            <div class="stat-val" id="statAge">-</div>
+                        </div>
+                        <div class="stat-box">
+                            <i class="fa-solid fa-calculator" style="color: var(--secondary);"></i>
+                            <div class="stat-label">Life Path</div>
+                            <div class="stat-val" id="statNum">-</div>
+                        </div>
+                        <div class="stat-box">
+                            <i class="fa-solid fa-sun" style="color: var(--warning);"></i>
+                            <div class="stat-label">Sun Sign</div>
+                            <div class="stat-val" id="statZodiac">-</div>
+                        </div>
+                        <div class="stat-box">
+                            <i class="fa-solid fa-moon" style="color: var(--info);"></i>
+                            <div class="stat-label">Vedic Rashi</div>
+                            <div class="stat-val" id="statRashi">-</div>
+                        </div>
+                        <div class="stat-box">
+                            <i class="fa-solid fa-dragon" style="color: var(--danger);"></i>
+                            <div class="stat-label">Chinese Zodiac</div>
+                            <div class="stat-val" id="statChinese">-</div>
+                        </div>
+                        <div class="stat-box">
+                            <i class="fa-solid fa-fire-flame-curved" style="color: var(--success);"></i>
+                            <div class="stat-label">Element</div>
+                            <div class="stat-val" id="statElement">-</div>
+                        </div>
+                        <div class="stat-box">
+                            <i class="fa-solid fa-meteor" style="color: var(--primary);"></i>
+                            <div class="stat-label">Ruling Planet</div>
+                            <div class="stat-val" id="statPlanet">-</div>
+                        </div>
+                        <div class="stat-box">
+                            <i class="fa-regular fa-gem" style="color: var(--secondary);"></i>
+                            <div class="stat-label">Birthstone</div>
+                            <div class="stat-val" id="statStone">-</div>
+                        </div>
+                        
+                        <!-- Next B-Day Box (Will auto-span on mobile via CSS) -->
+                        <div class="stat-box">
+                            <i class="fa-solid fa-cake-candles" style="color: var(--warning);"></i>
+                            <div class="stat-label">Next B-Day</div>
+                            <div class="stat-val" id="statNext">-</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-secondary" onclick="downloadPDF()" id="pdfBtn" style="border: 2px solid var(--danger);">
+                        <i class="fa-solid fa-file-pdf" style="color: var(--danger);"></i> <span id="pdfBtnText">Download Premium PDF</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Card: Output / Results -->
+            <div class="card output-card">
+                
+                <!-- Placeholder -->
+                <div id="placeholder" class="placeholder-state">
+                    <i class="fa-solid fa-cake-candles"></i>
+                    <h3>Awaiting Birth Date</h3>
+                    <p style="font-size: 0.95rem; margin-top: 0.5rem;">Enter your details and click analyze to fetch official Wikipedia profiles of your birthday twins.</p>
+                </div>
+
+                <!-- Loader -->
+                <div id="loader" class="loader-overlay">
+                    <div class="spinner"></div>
+                    <p style="font-weight: 700; color: var(--text-main); font-size: 1.1rem;">Scanning Global Databases...</p>
+                </div>
+
+                <!-- Result Content -->
+                <div id="resultContent" class="result-section">
+                    
+                    <div class="custom-tabs">
+                        <button class="custom-tab active" onclick="switchList('indian')">
+                            Indian Matches <span class="badge" id="indBadge">0</span>
+                        </button>
+                        <button class="custom-tab" onclick="switchList('global')">
+                            Global Matches <span class="badge" id="gloBadge">0</span>
+                        </button>
+                    </div>
+
+                    <!-- Clean & Fixed Grids (Now perfectly Card Style) -->
+                    <div id="list-indian" class="list-container active"></div>
+                    <div id="list-global" class="list-container"></div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 Features Grid -->
+        <div class="features-grid">
+            <div class="feature-box">
+                <i class="fa-solid fa-magnifying-glass-chart text-gradient"></i>
+                <h3>Strict Filtering Engine</h3>
+                <p>Advanced algorithms sort thousands of records to separate Indian and Global personalities accurately.</p>
+            </div>
+            <div class="feature-box">
+                <i class="fa-solid fa-file-pdf" style="color: var(--danger); margin-bottom: 1rem; display: block; font-size: 2.5rem;"></i>
+                <h3>Modern PDF Export</h3>
+                <p>Instantly generate a beautifully formatted, grid-style PDF report containing actual profile images.</p>
+            </div>
+            <div class="feature-box">
+                <i class="fa-solid fa-calculator text-gradient"></i>
+                <h3>Deep Astrology</h3>
+                <p>Automatically computes your Life Path Number, Vedic Rashi, Chinese Zodiac, Elements, and Birthstones.</p>
+            </div>
+            <div class="feature-box">
+                <i class="fa-solid fa-server" style="color: var(--success); margin-bottom: 1rem; display: block; font-size: 2.5rem;"></i>
+                <h3>100% Privacy Focus</h3>
+                <p>We process data directly through official public APIs in your browser. We never save your birth dates.</p>
+            </div>
+        </div>
+
+        <!-- SEO Article Section -->
+        <div class="seo-text-section">
+            <h2>Why find your Birthday Twins?</h2>
+            <p>Sharing a birthday with historical figures, scientists, actors, and leaders provides a unique connection to history. Our Birthday Matcher Pro doesn't just list names; it provides deep chronological insights using highly accurate filtering combined with complete astrological insights including elements and ruling planets.</p>
+            
+            <h3 style="margin-top: 1.5rem;">How our Engine Works:</h3>
+            <ul>
+                <li><strong>Comprehensive Data:</strong> We parse the complete Wikipedia "On This Day" birth records, ensuring no name is missed.</li>
+                <li><strong>Strict Regional Separation:</strong> We filter out colonial-era overlap and properly assign nationalities using robust negative and positive keyword mapping.</li>
+                <li><strong>Numerology Mapping:</strong> By reducing your date of birth down to a single digit, we reveal your core Life Path number alongside your Chinese Zodiac sign.</li>
+            </ul>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3 class="logo" style="margin-bottom: 1rem;"><i class="fa-solid fa-bolt"></i> PDFly Tools</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+                    Providing premium, lightning-fast web utilities and developer tools. 100% Free, privacy-first, and browser-powered.
+                </p>
+            </div>
+            <div class="footer-col">
+                <h3>Top Tools</h3>
+                <ul>
+                    <li><a href="#">Resize Image</a></li>
+                    <li><a href="#">Compress PDF</a></li>
+                    <li><a href="#">URL Shortener Pro</a></li>
+                    <li><a href="#">GT Chat Sync</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Legal & Info</h3>
+                <ul>
+                    <li><a onclick="openModal('privacyModal')">Privacy Policy</a></li>
+                    <li><a onclick="openModal('termsModal')">Terms of Service</a></li>
+                    <li><a onclick="openModal('contactModal')">Contact Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <button class="dev-badge" onclick="openModal('devProfileModal')">
+                <i class="fa-solid fa-code"></i> Developed by GT Rao
+            </button>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">&copy; 2026 PDFly Tools — All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" onclick="window.scrollTo(0,0)"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ==========================================================================
+         MODALS (PDFly Tools Standard)
+         ========================================================================== -->
+    
+    <!-- Developer Profile Modal -->
+    <div class="modal-overlay" id="devProfileModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="close-modal" onclick="closeModal('devProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+            
+            <h1 style="font-size: 1.8rem; margin-bottom: 0.2rem; color: var(--primary);">PDFly Tools</h1>
+            <h2 style="font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--text-muted); font-weight: 500;">Birthday Matcher Pro</h2>
+
+            <div class="profile-img-wrap">
+                <!-- Ensure Developer image displays correctly with external fallback -->
+                <img src="dev-profile.png" alt="GT Rao" onerror="this.src='https://files.catbox.moe/pl4x6y.jpg'; this.onerror=null;">
+            </div>
+            
+            <h2 style="margin-bottom: 0.2rem;">GT Rao</h2>
+            <p style="color: var(--text-main); font-weight: 600;">Student & Web Developer</p>
+            <p style="font-size: 0.95rem; margin-top: 0.8rem; color: var(--text-muted);">
+                <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> Azamgarh, Uttar Pradesh, India
+            </p>
+            
+            <div class="icon-btn-group">
+                <a href="mailto:pdflytools@gmail.com" target="_blank" class="icon-btn"><i class="fa-solid fa-envelope"></i></a>
+                <a href="https://instagram.com/mr_gt_rao" target="_blank" class="icon-btn"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://github.com/gt-rao" target="_blank" class="icon-btn"><i class="fa-brands fa-github"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('privacyModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--primary);">Privacy Policy</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+                Your privacy is our priority. PDFly Tools operates entirely client-side. We do not collect, store, or transmit your birth dates, names, or any generated data to our servers.
+            </p>
+        </div>
+    </div>
+
+    <!-- Terms Modal -->
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('termsModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--primary);">Terms of Service</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+                By using PDFly Tools, you agree to use the tools responsibly. API data is fetched directly and securely from Wikipedia's public endpoints.
+            </p>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="close-modal" onclick="closeModal('contactModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--primary);">Contact Support</h2>
+            <i class="fa-solid fa-headset" style="font-size: 3rem; color: var(--primary); margin: 1rem 0;"></i>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;">Experiencing issues or want to report a bug? Reach out directly.</p>
+            <p><strong>Email:</strong> <a href="mailto:pdflytools@gmail.com">pdflytools@gmail.com</a></p>
+            <p style="margin-top: 0.5rem;"><strong>Location:</strong> Azamgarh, UP, India</p>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         JAVASCRIPT LOGIC
+         ========================================================================== -->
+    <script>
+        // --- 1. Theme & UI Framework ---
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlTag = document.documentElement;
+        const savedTheme = localStorage.getItem('pdfly-theme') || 'dark';
+        
+        function setTheme(theme) {
+            htmlTag.setAttribute('data-theme', theme);
+            localStorage.setItem('pdfly-theme', theme);
+            themeToggle.innerHTML = theme === 'light' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
+        }
+        setTheme(savedTheme);
+        themeToggle.addEventListener('click', () => setTheme(htmlTag.getAttribute('data-theme') === 'light' ? 'dark' : 'light'));
+
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            document.getElementById("scroll-progress").style.width = (winScroll / height) * 100 + "%";
+            
+            const btt = document.getElementById('backToTop');
+            if (winScroll > 300) btt.classList.add('show'); else btt.classList.remove('show');
+        };
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow = 'hidden'; }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow = ''; }
+        window.onclick = function(e) { if(e.target.classList.contains('modal-overlay')) { e.target.classList.remove('active'); document.body.style.overflow = ''; } }
+        
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = type === 'success' 
+                ? `<i class="fa-solid fa-circle-check" style="color:var(--success); font-size:1.2rem;"></i> <span>${message}</span>`
+                : `<i class="fa-solid fa-circle-exclamation" style="color:var(--danger); font-size:1.2rem;"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3000);
+        }
+
+        // --- 2. Core Matcher Engine ---
+        let indianMatches = [];
+        let globalMatches = [];
+        let userInfo = {};
+
+        function isStrictlyIndian(person) {
+            const text = (person.text || "").toLowerCase();
+            const desc = (person.description || "").toLowerCase();
+            const extract = (person.pages?.[0]?.extract || "").toLowerCase();
+            const fullTxt = text + " " + desc + " " + extract;
+
+            const foreign = /\b(american|british|english|french|german|australian|canadian|russian|italian|spanish|scottish|irish|welsh|dutch|swedish|swiss)\b/i;
+            if (foreign.test(desc) && !/\b(indian-american|british-indian|indian-born)\b/i.test(desc)) return false;
+
+            const strongIndian = /\b(indian|bollywood|tollywood|kollywood|hindi cinema|telugu cinema|tamil cinema)\b/i;
+            if (strongIndian.test(desc) || strongIndian.test(extract.substring(0, 150))) return true;
+
+            const places = /\b(mumbai|delhi|kolkata|chennai|bangalore|bengaluru|hyderabad|pune|ahmedabad|kerala|punjab|rajasthan|gujarat|bihar|uttar pradesh|maharashtra|madras|bombay|calcutta|india)\b/i;
+            if (places.test(fullTxt) && !foreign.test(fullTxt)) return true;
+
+            const indianNames = /\b(gandhi|nehru|modi|singh|sharma|patel|gupta|khan|kumar|yadav|mishra|reddy|nair|rao|prasad|chatterjee|banerjee|bose|tendulkar|kohli|kapoor|bachchan|jain|agarwal|iyer|iyengar)\b/i;
+            if (indianNames.test(text)) return true;
+
+            return false;
+        }
+
+        // Astrological Calculators
+        const getZodiac = (d, m) => {
+            const signs = ["Capricorn", "Aquarius", "Pisces", "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius"];
+            const dates = [20, 19, 20, 20, 21, 21, 22, 23, 23, 23, 22, 21];
+            return (d > dates[m - 1]) ? signs[m - 1] : signs[(m - 2 + 12) % 12];
+        };
+
+        const getRashi = (zodiac) => {
+            const rashiMap = { "Aries": "Mesh (मेष)", "Taurus": "Vrishabh (वृषभ)", "Gemini": "Mithun (मिथुन)", "Cancer": "Kark (कर्क)", "Leo": "Simha (सिंह)", "Virgo": "Kanya (कन्या)", "Libra": "Tula (तुला)", "Scorpio": "Vrishchik (वृश्चिक)", "Sagittarius": "Dhanu (धनु)", "Capricorn": "Makar (मकर)", "Aquarius": "Kumbh (कुंभ)", "Pisces": "Meen (मीन)" };
+            return rashiMap[zodiac] || zodiac;
+        };
+
+        const getElement = (zodiac) => {
+            const elements = {
+                "Fire": ["Aries", "Leo", "Sagittarius"],
+                "Earth": ["Taurus", "Virgo", "Capricorn"],
+                "Air": ["Gemini", "Libra", "Aquarius"],
+                "Water": ["Cancer", "Scorpio", "Pisces"]
+            };
+            for(let e in elements) { if(elements[e].includes(zodiac)) return e; } return "-";
+        }
+
+        const getPlanet = (zodiac) => {
+            const planets = {
+                "Aries": "Mars", "Taurus": "Venus", "Gemini": "Mercury", "Cancer": "Moon",
+                "Leo": "Sun", "Virgo": "Mercury", "Libra": "Venus", "Scorpio": "Pluto / Mars",
+                "Sagittarius": "Jupiter", "Capricorn": "Saturn", "Aquarius": "Uranus", "Pisces": "Neptune"
+            };
+            return planets[zodiac] || "-";
+        }
+
+        const getChineseZodiac = (year) => { return ["Monkey", "Rooster", "Dog", "Pig", "Rat", "Ox", "Tiger", "Rabbit", "Dragon", "Snake", "Horse", "Goat"][year % 12]; };
+        const getBirthstone = (month) => { return ["Garnet", "Amethyst", "Aquamarine", "Diamond", "Emerald", "Pearl", "Ruby", "Peridot", "Sapphire", "Opal", "Topaz", "Turquoise"][month - 1] || "Unknown"; };
+
+        const calcExactAge = (dobString) => {
+            const dob = new Date(dobString); const now = new Date();
+            let years = now.getFullYear() - dob.getFullYear(); 
+            let months = now.getMonth() - dob.getMonth(); 
+            let days = now.getDate() - dob.getDate();
+            if (days < 0) { months--; days += new Date(now.getFullYear(), now.getMonth(), 0).getDate(); }
+            if (months < 0) { years--; months += 12; }
+            return `${years} Yrs, ${months} Mos`;
+        };
+
+        const daysToNextBday = (dobString) => {
+            const dob = new Date(dobString); const now = new Date();
+            let nextBday = new Date(now.getFullYear(), dob.getMonth(), dob.getDate());
+            if (now > nextBday) nextBday.setFullYear(now.getFullYear() + 1);
+            const diffTime = Math.abs(nextBday - now);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays === 0 ? "Today!" : `${diffDays} Days`;
+        };
+
+        const calcLifePath = (dobString) => {
+            const str = dobString.replace(/-/g, '');
+            let sum = 0; for(let char of str) sum += parseInt(char);
+            while(sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) { let t=0; for(let c of sum.toString()) t+=parseInt(c); sum=t; }
+            return sum;
+        };
+
+        async function processData() {
+            const name = document.getElementById('userName').value.trim();
+            const dobStr = document.getElementById('userDob').value;
+
+            if (!name || !dobStr) return showToast("Please enter Name and DOB", "error");
+
+            const btn = document.getElementById('generateBtn');
+            const loader = document.getElementById('loader');
+            const placeholder = document.getElementById('placeholder');
+            const resultContent = document.getElementById('resultContent');
+            const statsSection = document.getElementById('statsSection');
+
+            btn.disabled = true;
+            placeholder.style.display = 'none';
+            resultContent.classList.remove('active');
+            statsSection.style.display = 'none';
+            loader.classList.add('active');
+
+            const d = new Date(dobStr);
+            const z = getZodiac(d.getDate(), d.getMonth() + 1);
+            
+            userInfo = {
+                name: name, dobRaw: dobStr, age: calcExactAge(dobStr), nextBday: daysToNextBday(dobStr),
+                lifePath: calcLifePath(dobStr), zodiac: z, rashi: getRashi(z), 
+                element: getElement(z), planet: getPlanet(z), chinese: getChineseZodiac(d.getFullYear()), 
+                stone: getBirthstone(d.getMonth() + 1), dayStr: d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+                month: d.getMonth() + 1, dayNum: d.getDate(), year: d.getFullYear()
+            };
+
+            // Inject Stats into HTML
+            document.getElementById('statAge').innerText = userInfo.age.split(',')[0]; 
+            document.getElementById('statNum').innerText = `Path ${userInfo.lifePath}`;
+            document.getElementById('statZodiac').innerText = userInfo.zodiac;
+            document.getElementById('statRashi').innerText = userInfo.rashi.split(' ')[0];
+            document.getElementById('statChinese').innerText = userInfo.chinese;
+            document.getElementById('statElement').innerText = userInfo.element;
+            document.getElementById('statPlanet').innerText = userInfo.planet;
+            document.getElementById('statStone').innerText = userInfo.stone;
+            document.getElementById('statNext').innerText = userInfo.nextBday;
+
+            try {
+                const res = await fetch(`https://en.wikipedia.org/api/rest_v1/feed/onthisday/births/${userInfo.month}/${userInfo.dayNum}`);
+                const data = await res.json();
+                
+                indianMatches = []; globalMatches = [];
+                (data.births || []).forEach(p => {
+                    let profession = p.description || "Famous Personality";
+                    if (!p.description && p.text.includes(',')) profession = p.text.split(',').pop().trim();
+
+                    const item = { name: p.text || "Unknown", prof: profession, year: p.year, img: p.pages?.[0]?.thumbnail?.source || null, title: p.pages?.[0]?.title || p.text };
+                    if (isStrictlyIndian(p)) indianMatches.push(item); else globalMatches.push(item);
+                });
+
+                // ADMIN EASTER EGG (Fixed profile image logic per strict request)
+                if (userInfo.month === 3 && userInfo.dayNum === 16) {
+                    confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 } });
+                    showToast("Happy Birthday Founder! 🎉");
+                    indianMatches.unshift({ 
+                        name: "GT Rao", 
+                        prof: "Developer & Visionary Creator of PDFly Tools", 
+                        year: new Date().getFullYear() - parseInt(userInfo.age), 
+                        img: "dev-profile.png", 
+                        title: "GT_Rao", 
+                        isAdmin: true 
+                    });
+                }
+
+                document.getElementById('indBadge').innerText = indianMatches.length;
+                document.getElementById('gloBadge').innerText = globalMatches.length;
+
+                renderGrids();
+
+                showToast("Analysis Complete!");
+                loader.classList.remove('active');
+                statsSection.style.display = 'block';
+                resultContent.classList.add('active');
+
+            } catch (e) {
+                showToast("Connection Error. Check internet.", "error");
+                placeholder.style.display = 'flex';
+                loader.classList.remove('active');
+            } finally { btn.disabled = false; }
+        }
+
+        // --- Updated Render Function for PERFECT 2-Column Card Layout ---
+        function renderGrids() {
+            const indContainer = document.getElementById('list-indian');
+            const gloContainer = document.getElementById('list-global');
+            
+            const buildHtml = (list) => {
+                if(list.length === 0) return `<div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-muted);">No records found.</div>`;
+                let html = '';
+                list.forEach(p => {
+                    const wikiUrl = p.isAdmin ? '#' : `https://en.wikipedia.org/wiki/${encodeURIComponent(p.title.replace(/ /g, '_'))}`;
+                    const target = p.isAdmin ? '' : 'target="_blank"';
+                    const onclick = p.isAdmin ? 'onclick="openModal(\'devProfileModal\')"' : '';
+                    const adminClass = p.isAdmin ? 'admin-card' : '';
+                    
+                    // Correctly formats image for the top of the card
+                    const imgHtml = p.img 
+                        ? `<img src="${p.img}" class="celeb-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';"><div class="celeb-initial" style="display:none;">${p.name.charAt(0)}</div>` 
+                        : `<div class="celeb-initial">${p.name.charAt(0)}</div>`;
+                    
+                    html += `
+                    <a href="${wikiUrl}" ${target} ${onclick} class="celeb-card ${adminClass}">
+                        ${imgHtml}
+                        <div class="celeb-info">
+                            <h4>${p.name} ${p.isAdmin ? '<i class="fa-solid fa-crown admin-crown"></i>' : ''}</h4>
+                            <div class="year-badge">Born: ${p.year || 'N/A'}</div>
+                            <p class="prof-text">${p.prof}</p>
+                        </div>
+                    </a>`;
+                });
+                return html;
+            };
+
+            indContainer.innerHTML = buildHtml(indianMatches);
+            gloContainer.innerHTML = buildHtml(globalMatches);
+        }
+
+        function switchList(type) {
+            const tabs = document.querySelectorAll('.custom-tab');
+            const lists = document.querySelectorAll('.list-container');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            lists.forEach(l => l.classList.remove('active'));
+
+            if(type === 'indian') {
+                tabs[0].classList.add('active');
+                document.getElementById('list-indian').classList.add('active');
+            } else {
+                tabs[1].classList.add('active');
+                document.getElementById('list-global').classList.add('active');
+            }
+        }
+
+        // --- 3. Grid-Style PDF Engine ---
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const btnText = document.getElementById('pdfBtnText');
+            btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating Grid PDF...';
+            document.getElementById('pdfBtn').disabled = true;
+
+            try {
+                const doc = new jsPDF('p', 'mm', 'a4');
+                const W = doc.internal.pageSize.getWidth();
+                const H = doc.internal.pageSize.getHeight();
+
+                const cBrand = [59, 130, 246]; const cDark = [15, 23, 42]; const cGray = [100, 116, 139]; const cBg = [248, 250, 252];
+
+                doc.setFillColor(...cBg); doc.rect(0, 0, W, H, 'F');
+                doc.setFillColor(...cBrand); doc.rect(0, 0, W, 12, 'F');
+
+                doc.setFontSize(22); doc.setTextColor(...cDark); doc.setFont("helvetica", "bold");
+                doc.text("BIRTHDAY INTELLIGENCE DOSSIER", 20, 32);
+                doc.setDrawColor(...cBrand); doc.setLineWidth(1); doc.line(20, 36, 130, 36);
+
+                doc.setFontSize(10); doc.setTextColor(...cGray); doc.text("PREPARED EXCLUSIVELY FOR:", 20, 48);
+                doc.setFontSize(26); doc.setTextColor(...cBrand); doc.text(userInfo.name.toUpperCase(), 20, 60);
+
+                let sx = 20, sy = 75;
+                const drawStat = (label, val, x, y) => {
+                    doc.setFontSize(8); doc.setTextColor(...cGray); doc.setFont("helvetica", "normal"); doc.text(label, x, y);
+                    doc.setFontSize(11); doc.setTextColor(...cDark); doc.setFont("helvetica", "bold"); doc.text(val, x, y+5);
+                };
+                
+                drawStat("DATE OF BIRTH", userInfo.dayStr, sx, sy); 
+                drawStat("EXACT AGE", userInfo.age, sx+90, sy); 
+                drawStat("NUMEROLOGY", `Life Path ${userInfo.lifePath}`, sx+140, sy);
+                sy += 16;
+                drawStat("SUN SIGN", userInfo.zodiac, sx, sy); 
+                drawStat("VEDIC RASHI", userInfo.rashi, sx+45, sy); 
+                drawStat("CHINESE ZODIAC", userInfo.chinese, sx+90, sy); 
+                drawStat("BIRTHSTONE", userInfo.stone, sx+140, sy);
+
+                doc.setDrawColor(226, 232, 240); doc.line(20, sy+12, W-20, sy+12);
+
+                const fetchImageB64 = async (url) => {
+                    if(!url) return null;
+                    try {
+                        const res = await fetch(url);
+                        if(!res.ok) return null;
+                        const blob = await res.blob();
+                        return new Promise(resolve => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result); reader.readAsDataURL(blob); });
+                    } catch(e) { return null; }
+                };
+
+                let curY = sy + 25;
+                
+                const drawCardGrid = async (list, title) => {
+                    doc.setFontSize(14); doc.setTextColor(...cDark); doc.setFont("helvetica", "bold"); doc.text(title, 20, curY); curY += 8;
+
+                    const cols = 2, cardW = 82, cardH = 24, gapX = 6, gapY = 6;
+                    const limitList = list.slice(0, 40);
+                    
+                    for(let i=0; i<limitList.length; i++) {
+                        const p = limitList[i];
+                        btnText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing ${title.split(' ')[0]} ${i+1}/${limitList.length}...`;
+                        
+                        if(curY + cardH > H - 20) { doc.addPage(); doc.setFillColor(...cBg); doc.rect(0, 0, W, H, 'F'); curY = 20; }
+                        
+                        const colIndex = i % cols; let x = 20 + (colIndex * (cardW + gapX));
+                        doc.setDrawColor(226, 232, 240); doc.setFillColor(255, 255, 255); doc.roundedRect(x, curY, cardW, cardH, 2, 2, 'FD');
+
+                        let b64 = null; if(p.img) b64 = await fetchImageB64(p.img);
+                        
+                        if(b64) { try { doc.addImage(b64, 'JPEG', x+3, curY+3, 18, 18); } catch(e){}
+                        } else { doc.setFillColor(226, 232, 240); doc.circle(x+12, curY+12, 9, 'F'); doc.setFontSize(12); doc.setTextColor(...cBrand); doc.text(p.name.charAt(0), x+10, curY+14); }
+
+                        doc.setFontSize(9); doc.setTextColor(...cDark); doc.setFont("helvetica", "bold");
+                        let nStr = p.name; if(nStr.length > 20) nStr = nStr.substring(0,18)+"..."; doc.text(nStr, x+24, curY+8);
+                        
+                        doc.setFontSize(7); doc.setTextColor(...cBrand); doc.setFont("helvetica", "normal"); doc.text(`Born: ${p.year || 'N/A'}`, x+24, curY+12);
+                        doc.setFontSize(7); doc.setTextColor(...cGray); let profStr = p.prof; if(profStr.length > 45) profStr = profStr.substring(0,42)+"...";
+                        const lines = doc.splitTextToSize(profStr, cardW - 26); doc.text(lines, x+24, curY+16);
+
+                        if (colIndex === cols - 1 || i === limitList.length - 1) curY += cardH + gapY;
+                    }
+                    curY += 8; 
+                };
+
+                if(indianMatches.length > 0) await drawCardGrid(indianMatches, `INDIAN MATCHES (${indianMatches.length})`);
+                if(globalMatches.length > 0) {
+                    if(curY > H - 60) { doc.addPage(); doc.setFillColor(...cBg); doc.rect(0, 0, W, H, 'F'); curY = 20; }
+                    await drawCardGrid(globalMatches, `GLOBAL MATCHES (${globalMatches.length})`);
+                }
+
+                const pages = doc.internal.getNumberOfPages();
+                for(let i=1; i<=pages; i++) { doc.setPage(i); doc.setFontSize(8); doc.setTextColor(150); doc.text(`Page ${i} of ${pages}  |  Generated securely by PDFly Tools (GT Rao)`, W/2, H-10, {align:'center'}); }
+
+                doc.save(`Premium_Birthday_Dossier_${userInfo.name.replace(/ /g,'_')}.pdf`);
+                showToast("PDF Downloaded Successfully!");
+
+            } catch (err) {
+                showToast("PDF Error: " + err.message, "error");
+            } finally {
+                btnText.innerHTML = 'Download Premium PDF';
+                document.getElementById('pdfBtn').disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

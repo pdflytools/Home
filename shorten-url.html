@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>URL Shortener Pro - PDFly Tools</title>
+    
+    <meta name="description" content="Generate 100% real, permanent, and working short links with custom aliases, instant QR code generator, and one-click social sharing. Free client-side link management.">
+    <meta name="keywords" content="url shortener, real link shortener, permanent short link, custom alias url, qr code generator, tinyurl, link management, pdfly tools, gt rao">
+    <meta name="author" content="GT Rao">
+    
+    <!-- Google Fonts: Plus Jakarta Sans for Ultra-HD Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* === UI/UX Variables (PDFly Standard) === */
+        :root {
+            --primary: #3b82f6; 
+            --secondary: #8b5cf6;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --radius-card: 16px; 
+            --radius-pill: 9999px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Light Theme */
+            --bg-body: #f8fafc; 
+            --bg-card: #ffffff; 
+            --bg-glass: rgba(255, 255, 255, 0.85);
+            --bg-input: #f1f5f9; 
+            --bg-hover: #e2e8f0;
+            --text-main: #0f172a; 
+            --text-muted: #64748b;
+            --border: #e2e8f0; 
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05); 
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.25);
+            
+            --success: #10b981; 
+            --danger: #ef4444; 
+            --warning: #f59e0b;
+            --info: #0ea5e9;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #020617; 
+            --bg-card: #0f172a; 
+            --bg-glass: rgba(2, 6, 23, 0.75);
+            --bg-input: #1e293b; 
+            --bg-hover: #334155; 
+            --text-main: #f8fafc; 
+            --text-muted: #94a3b8;
+            --border: #1e293b; 
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4); 
+            --shadow-hover: 0 10px 30px rgba(59, 130, 246, 0.35);
+        }
+
+        /* === Base Styles === */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-body); color: var(--text-main); transition: background-color 0.4s ease, color 0.4s ease; overflow-x: hidden; scroll-behavior: smooth; }
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--gradient); width: 0%; z-index: 9999; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* === Global Loader === */
+        #loader-overlay { position: fixed; inset: 0; background: var(--bg-glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 9999999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: var(--transition); }
+        #loader-overlay.active { opacity: 1; pointer-events: all; }
+        .spinner { width: 50px; height: 50px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* === Navbar (Static) === */
+        .navbar-wrapper { padding: 1.5rem 1rem 1rem; max-width: 1300px; margin: 0 auto; position: sticky; top: 0; z-index: 1000; }
+        .navbar {
+            background: var(--bg-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 0.8rem 1.5rem; 
+            display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm);
+        }
+        .nav-brand { font-size: 1.3rem; font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; display: flex; align-items: center; gap: 8px;}
+        .nav-brand i { color: var(--primary); -webkit-text-fill-color: initial; }
+        .theme-toggle { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: var(--transition); font-size: 1.1rem; }
+        .theme-toggle:hover { background: var(--primary); color: white; transform: rotate(15deg); }
+
+        /* === Layout === */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.2rem; }
+        .header-section { text-align: center; margin-bottom: 3rem; padding-top: 1rem; }
+        .header-section h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 0.8rem; line-height: 1.2; letter-spacing: -1px; }
+        .header-section h1 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-section p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.1rem); max-width: 700px; margin: 0 auto; line-height: 1.6; }
+
+        /* Workspace Grid */
+        .tool-workspace { display: flex; flex-direction: column; gap: 2rem; margin-bottom: 3rem; }
+        @media (min-width: 992px) { 
+            .tool-workspace { flex-direction: row; align-items: flex-start; gap: 2.5rem; }
+            .left-panel { flex: 1.1; min-width: 0; }
+            .right-panel { flex: 1.9; min-width: 0; position: sticky; top: 100px; }
+        }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.2rem, 3vw, 1.8rem); box-shadow: var(--shadow-sm); transition: var(--transition); display: flex; flex-direction: column; height: 100%;}
+        .card.hoverable:hover { border-color: rgba(59,130,246,0.3); box-shadow: var(--shadow-hover); }
+
+        /* === Custom Tabs === */
+        .sub-tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; background: var(--bg-input); padding: 0.4rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border); }
+        .sub-tab { flex: 1; padding: 0.8rem 0.2rem; border: none; background: transparent; color: var(--text-muted); font-weight: 700; border-radius: 8px; cursor: pointer; transition: var(--transition); font-size: 0.95rem; display: flex; justify-content: center; align-items: center; gap: 8px;}
+        .sub-tab:hover { color: var(--text-main); }
+        .sub-tab.active { background: var(--bg-card); color: var(--primary); box-shadow: var(--shadow-sm); }
+
+        /* === Inputs === */
+        .input-group { position: relative; margin-bottom: 1.25rem; width: 100%; }
+        .input-group i.input-icon { position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.1rem; }
+        .input-group input, .input-group select { width: 100%; padding: 1.1rem 1rem 1.1rem 3.2rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; color: var(--text-main); font-size: 0.95rem; font-weight: 500; transition: var(--transition); outline: none; appearance: none; -webkit-appearance: none; }
+        .input-group input:focus, .input-group select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+        
+        .select-wrapper::after { content: '\f107'; font-family: 'FontAwesome'; position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+        
+        .info-box { background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); padding: 1rem; border-radius: 12px; font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 10px; align-items: flex-start; margin-top: auto; line-height: 1.5; }
+        .info-box i { color: var(--success); font-size: 1.2rem; margin-top: 2px; }
+
+        /* Buttons */
+        .btn-group { display: flex; gap: 1rem; margin-top: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;}
+        .btn { padding: 1.1rem 1.5rem; border: none; font-weight: 700; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; transition: var(--transition); flex: 1; min-width: 140px; }
+        .btn-primary { background: var(--gradient); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover { box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5); transform: translateY(-2px); }
+        .btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--bg-hover); color: var(--primary); border-color: var(--primary); transform: translateY(-2px); }
+        .btn-copy-tiny { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 8px; padding: 0.5rem 0.8rem; cursor: pointer; font-weight: 700; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.9rem;}
+        .btn-copy-tiny:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* === Output Area / Results === */
+        .placeholder-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 350px; border: 2px dashed var(--border); border-radius: 12px; padding: 2rem; text-align: center; color: var(--text-muted); background: var(--bg-input); transition: var(--transition); }
+        .placeholder-state i { font-size: 3.5rem; margin-bottom: 1rem; color: var(--text-muted); opacity: 0.5; }
+        .placeholder-state h3 { font-size: 1.2rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; }
+        
+        .result-section { display: none; flex-direction: column; gap: 1.25rem; height: 100%; animation: fadeIn 0.4s ease; }
+        .result-section.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Generated Link Hero Box */
+        .short-link-hero { background: var(--bg-input); border: 2px solid var(--primary); border-radius: 14px; padding: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; box-shadow: 0 4px 15px rgba(59,130,246,0.15); flex-wrap: wrap; }
+        .short-link-url { font-size: clamp(1.1rem, 2.5vw, 1.4rem); font-weight: 800; color: var(--primary); word-break: break-all; display: flex; align-items: center; gap: 0.6rem; flex: 1; }
+        .short-link-url i { font-size: 1.1rem; color: var(--text-main); }
+        
+        .icon-btn-group { display: flex; gap: 0.6rem; flex-shrink: 0; }
+        .icon-btn { width: 45px; height: 45px; border-radius: 10px; border: none; background: var(--gradient); color: white; font-size: 1.2rem; cursor: pointer; transition: var(--transition); display: grid; place-items: center; text-decoration: none;}
+        .icon-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: var(--shadow-hover); }
+        .icon-btn.btn-outline { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border); }
+        .icon-btn.btn-outline:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Stats Grid */
+        .metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+        .metric-card { background: var(--bg-input); border: 1px dashed var(--border); border-radius: 12px; padding: 1.2rem 0.5rem; text-align: center; transition: var(--transition); }
+        .metric-card:hover { border-color: var(--primary); border-style: solid; background: var(--bg-card); box-shadow: var(--shadow-sm); }
+        .metric-card p { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.4rem;}
+        .metric-card span { font-size: 1.3rem; font-weight: 800; color: var(--text-main); font-family: monospace;}
+        .metric-card span.highlight { color: var(--success); }
+
+        /* QR Code & Share */
+        .qr-share-container { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 1.5rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; align-items: center; }
+        @media (max-width: 500px) { .qr-share-container { grid-template-columns: 1fr; justify-items: center; text-align: center; } }
+        
+        .qr-image-wrapper { background: #ffffff; padding: 0.5rem; border-radius: 12px; box-shadow: var(--shadow-sm); display: flex; border: 1px solid var(--border); }
+        .qr-image-wrapper img { width: 100%; max-width: 120px; height: auto; border-radius: 8px;}
+        
+        .social-buttons { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.5rem; margin-bottom: 1rem; }
+        .btn-social { width: 42px; height: 42px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-main); display: grid; place-items: center; font-size: 1.1rem; cursor: pointer; transition: var(--transition); }
+        .btn-social:hover { transform: translateY(-4px); color: white; border-color: transparent; box-shadow: var(--shadow-sm); }
+        .btn-social.wa:hover { background: #25D366; } .btn-social.tg:hover { background: #229ED9; }
+        .btn-social.tw:hover { background: #1DA1F2; } .btn-social.in:hover { background: #0a66c2; }
+        
+        /* History */
+        .history-panel { margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1.5rem; }
+        .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .history-header h4 { font-weight: 800; color: var(--text-main); font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+        
+        .history-list { display: flex; flex-direction: column; gap: 0.6rem; max-height: 180px; overflow-y: auto; padding-right: 5px; }
+        .history-list::-webkit-scrollbar { width: 6px; }
+        .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        
+        .history-item { background: var(--bg-input); border: 1px dashed var(--border); border-radius: 10px; padding: 0.8rem 1rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; transition: var(--transition); }
+        .history-item:hover { border-color: var(--primary); border-style: solid; background: var(--bg-card); box-shadow: var(--shadow-sm);}
+        .history-info { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .history-short { font-weight: 800; color: var(--primary); font-size: 0.95rem; }
+        .history-orig { font-size: 0.8rem; color: var(--text-muted); margin-top: 3px; font-family: monospace; }
+        .history-actions { display: flex; gap: 5px;}
+        .history-actions button, .history-actions a { background: transparent; color: var(--text-muted); cursor: pointer; padding: 6px; transition: var(--transition); font-size: 1.1rem; border: none; text-decoration: none;}
+        .history-actions button:hover, .history-actions a:hover { color: var(--primary); transform: scale(1.1);}
+
+        /* === 4 Features Grid === */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(1rem, 3vw, 1.5rem); margin: 4rem 0; }
+        .feature-card { background: var(--bg-card); padding: 2rem 1.5rem; text-align: center; border-radius: var(--radius-card); border: 1px solid var(--border); box-shadow: var(--shadow-sm); transition: var(--transition); }
+        .feature-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: var(--shadow-hover); }
+        .feature-card i { font-size: 2.5rem; margin-bottom: 1.2rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; transition: var(--transition); display: inline-block; }
+        .feature-card:hover i { transform: scale(1.1) rotate(5deg); }
+        .feature-card h3 { font-size: 1.15rem; margin-bottom: 0.8rem; font-weight: 800; color: var(--text-main); }
+        .feature-card p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* === SEO Friendly Card Section === */
+        .seo-text-section { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 3rem); margin: 3rem 0; box-shadow: var(--shadow-sm); }
+        .seo-text-section h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 800; margin-bottom: 1.5rem; color: var(--text-main); }
+        .seo-text-section h3 { font-size: clamp(1.1rem, 2vw, 1.4rem); font-weight: 700; margin: 2rem 0 1rem; color: var(--text-main); }
+        .seo-text-section p, .seo-text-section li { font-size: clamp(0.95rem, 1.5vw, 1.05rem); color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; }
+        .seo-text-section ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--text-muted); }
+
+        /* === Footer === */
+        .footer { margin-top: 4rem; padding: clamp(3rem, 5vw, 4rem) 1rem 2rem; border-top: 1px solid var(--border); background: var(--bg-card); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2.5rem; max-width: 1300px; margin: 0 auto 2rem; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--text-main); font-weight: 800; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; transition: var(--transition); font-size: 0.95rem; font-weight: 500; cursor: pointer;}
+        .footer-links a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
+        .dev-badge { background: var(--bg-input); padding: 0.6rem 1.2rem; border-radius: var(--radius-pill); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 700; font-size: 0.9rem; border: 1px solid var(--border); transition: var(--transition); }
+        .dev-badge:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
+        /* === Modals === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); z-index: 2000; padding: 1rem; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 2.5rem); transform: scale(0.9) translateY(20px); transition: var(--transition); border: 1px solid var(--border); box-shadow: var(--shadow-hover); position: relative; max-height: 90vh; overflow-y: auto; text-align: left; }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-input); border: 1px solid var(--border); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--text-main); cursor: pointer; transition: var(--transition); }
+        .modal-close:hover { color: white; background: var(--danger); border-color: var(--danger); transform: rotate(90deg); }
+        
+        /* Developer Profile inside Modal */
+        .dev-profile { text-align: center; }
+        .dev-avatar { width: clamp(100px, 15vw, 120px); height: clamp(100px, 15vw, 120px); border-radius: 50%; background: var(--bg-card); margin: 0 auto 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); border: 4px solid var(--primary); padding: 0; }
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .dev-tags { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+        .dev-tag { background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(59,130,246,0.2); }
+        .dev-social { width: 45px; height: 45px; border-radius: 50%; background: var(--bg-input); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: var(--transition); border: 1px solid var(--border); text-decoration: none; }
+        .dev-social:hover { background: var(--primary); color: white; transform: translateY(-3px); border-color: var(--primary); box-shadow: var(--shadow-sm); }
+
+        /* === Toast Notification === */
+        #toast-container { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: max-content; max-width: 90vw; pointer-events: none;}
+        .toast { background: var(--text-main); color: var(--bg-body); padding: 1rem 1.5rem; border-radius: var(--radius-pill); box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px; animation: slideUp 0.4s forwards, fadeOut 0.4s forwards 2.5s; font-weight: 700; font-size: 0.95rem; border: 1px solid var(--border);}
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.info { border-left: 4px solid var(--info); }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(20px); opacity: 0; } }
+        
+        #backToTop { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: var(--shadow-hover); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 1000; font-size: 1.2rem; }
+        #backToTop.show { opacity: 1; visibility: visible; }
+        #backToTop:hover { transform: translateY(-5px) scale(1.05); }
+    </style>
+</head>
+<body>
+
+    <!-- Scroll Progress -->
+    <div id="scroll-progress"></div>
+
+    <!-- Global API Loader -->
+    <div id="loader-overlay">
+        <div class="spinner"></div>
+        <p style="font-weight: 800; color: var(--text-main); font-size: 1.1rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Generating Link...</p>
+    </div>
+
+    <!-- Static Navbar -->
+    <div class="navbar-wrapper">
+        <nav class="navbar">
+            <a href="index.html" class="nav-brand">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>PDFly Tools</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                <i class="fa-solid fa-sun" id="themeIcon"></i>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="container">
+        
+        <!-- Header -->
+        <div class="header-section">
+            <h1>URL Shortener <span>Pro</span></h1>
+            <p id="headlineSub">Generate 100% Real, Permanent & Working Short Links Instantly.</p>
+        </div>
+
+        <!-- Tool Grid (2 Columns on Desktop) -->
+        <div class="tool-workspace">
+            
+            <!-- Left Side: Controls -->
+            <div class="left-panel">
+                <div class="card hoverable">
+                    
+                    <!-- Custom Tabs -->
+                    <div class="sub-tabs">
+                        <button class="sub-tab active" id="tabQuickBtn" onclick="switchMode('quick')">
+                            <i class="fa-solid fa-bolt"></i> Quick Link
+                        </button>
+                        <button class="sub-tab" id="tabAliasBtn" onclick="switchMode('custom')">
+                            <i class="fa-solid fa-signature"></i> Custom Alias
+                        </button>
+                    </div>
+
+                    <!-- Input Form -->
+                    <div class="input-group">
+                        <i class="fa-solid fa-link input-icon"></i>
+                        <input type="url" id="targetUrlInput" placeholder="Paste your long URL here... (https://)" required>
+                    </div>
+
+                    <div class="input-group" id="aliasGroup" style="display: none;">
+                        <i class="fa-solid fa-tag input-icon"></i>
+                        <input type="text" id="customAliasInput" placeholder="Custom Alias (e.g., pdfly-sale)">
+                    </div>
+
+                    <div class="input-group select-wrapper">
+                        <i class="fa-solid fa-server input-icon"></i>
+                        <select id="shortenerProvider">
+                            <option value="tinyurl">TinyURL Engine (Permanent & Fast)</option>
+                            <option value="isgd">is.gd Engine (Compact & Reliable)</option>
+                            <option value="vgd">v.gd Engine (Safe Preview Mode)</option>
+                        </select>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="handleShortenSubmit()">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Shorten URL
+                        </button>
+                        <button class="btn btn-secondary" onclick="resetForm()">
+                            <i class="fa-solid fa-arrow-rotate-left"></i> Reset
+                        </button>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="fa-solid fa-shield-check"></i> 
+                        <p><strong>100% Global Resolution:</strong> All generated links work securely worldwide across all browsers and devices without expiration.</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Right Side: Output/Results -->
+            <div class="right-panel">
+                <div class="card">
+                    
+                    <!-- Placeholder State -->
+                    <div id="placeholderState" class="placeholder-state">
+                        <i class="fa-solid fa-link-slash"></i>
+                        <h3>Ready to Shorten</h3>
+                        <p style="font-size: 0.95rem; margin-top: 0.5rem; max-width: 250px; line-height: 1.5;">Enter any long link to generate your permanent short URL, QR code, and metrics.</p>
+                    </div>
+
+                    <!-- Result Content (Hidden initially) -->
+                    <div id="resultContent" class="result-section">
+                        
+                        <!-- Hero Generated Link -->
+                        <div class="short-link-hero">
+                            <div class="short-link-url" id="shortUrlDisplay">
+                                <i class="fa-solid fa-link"></i>
+                                <span id="shortUrlText">https://tinyurl.com/...</span>
+                            </div>
+                            <div class="icon-btn-group">
+                                <button class="icon-btn" onclick="copyShortLink()" title="Copy Link">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                                <a href="#" target="_blank" rel="noopener noreferrer" id="openLinkBtn" class="icon-btn btn-outline" title="Open Link">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Metrics Grid -->
+                        <div class="metrics-row">
+                            <div class="metric-card">
+                                <p>Original Len</p>
+                                <span id="statOriginalLen">0</span>
+                            </div>
+                            <div class="metric-card">
+                                <p>Shortened Len</p>
+                                <span id="statShortLen">0</span>
+                            </div>
+                            <div class="metric-card">
+                                <p>Space Saved</p>
+                                <span id="statPercentSaved" class="highlight">0%</span>
+                            </div>
+                        </div>
+
+                        <!-- QR Code & Social Share -->
+                        <div class="qr-share-container">
+                            <div class="qr-image-wrapper">
+                                <img id="qrCodeImg" src="" alt="QR Code">
+                            </div>
+                            <div>
+                                <h4 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text-main);">Quick Share & QR</h4>
+                                <div class="social-buttons">
+                                    <button class="btn-social wa" onclick="shareSocial('whatsapp')" title="Share on WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>
+                                    <button class="btn-social tg" onclick="shareSocial('telegram')" title="Share on Telegram"><i class="fa-brands fa-telegram"></i></button>
+                                    <button class="btn-social tw" onclick="shareSocial('twitter')" title="Share on X (Twitter)"><i class="fa-brands fa-x-twitter"></i></button>
+                                    <button class="btn-social in" onclick="shareSocial('linkedin')" title="Share on LinkedIn"><i class="fa-brands fa-linkedin-in"></i></button>
+                                </div>
+                                <button class="btn btn-secondary" onclick="downloadQRCode()" style="padding: 0.6rem; font-size: 0.85rem; width: 100%;">
+                                    <i class="fa-solid fa-download"></i> Download QR
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Link History -->
+                        <div class="history-panel">
+                            <div class="history-header">
+                                <h4><i class="fa-solid fa-clock-rotate-left" style="color: var(--primary);"></i> Recent Links</h4>
+                                <button class="btn-copy-tiny" onclick="clearLinkHistory()" title="Clear History" style="color: var(--danger); padding: 0.3rem 0.6rem; font-size: 0.8rem; border: none;">
+                                    <i class="fa-solid fa-trash-can"></i> Clear
+                                </button>
+                            </div>
+                            <div class="history-list" id="historyList">
+                                <!-- Populated dynamically via JS -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 Features Grid -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fa-solid fa-globe"></i>
+                <h3>Real Redirection</h3>
+                <p>Generates real, permanent short URLs backed by global DNS engines that resolve anywhere without expiration.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-qrcode"></i>
+                <h3>Instant QR Codes</h3>
+                <p>Auto-generates downloadable high-resolution QR codes for every shortened URL for easy print and mobile scanning.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-signature"></i>
+                <h3>Custom Alias</h3>
+                <p>Customize your links with memorable brand keywords and personalized suffixes for higher click-through rates.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-user-shield"></i>
+                <h3>Privacy First</h3>
+                <p>No account or sign-in needed. Your history is stored securely in your browser and never sold or monetized.</p>
+            </div>
+        </div>
+
+        <!-- SEO Content -->
+        <div class="seo-text-section">
+            <h2>The Free, Permanent & Secure URL Shortener</h2>
+            <p><strong>URL Shortener Pro</strong> by PDFly Tools provides seamless link transformation for digital marketers, content creators, educators, and developers. Long, clunky URLs with complex UTM tracking parameters can look suspicious and break across email or social media feeds. This tool instantly converts them into sleek, trustworthy, and actionable short links.</p>
+            
+            <h3 style="margin-top: 1.5rem;">Key Benefits of URL Shortener Pro:</h3>
+            <ul>
+                <li><strong>Universal Device Compatibility:</strong> Shortened links work immediately across iOS, Android, macOS, Windows, and Linux.</li>
+                <li><strong>Custom Aliases:</strong> Replace random hashes with friendly names like <em>tinyurl.com/pdfly-sale</em>.</li>
+                <li><strong>Built-in QR Generator:</strong> Instantly download scannable barcodes for flyers, presentations, resumes, and business cards.</li>
+                <li><strong>Multi-Engine Redundancy:</strong> Connects to multiple global shortening providers so link creation never fails.</li>
+            </ul>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>
+                    <a href="index.html" style="text-decoration: none; color: var(--text-main);">
+                        <i class="fa-solid fa-layer-group" style="color:var(--primary)"></i> PDFly Tools
+                    </a>
+                </h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Your ultimate suite for free, secure, and blazing-fast web utilities. Crafted with Ultra HD fluid UI tech.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Top Tools</h4>
+                <ul class="footer-links">
+                    <li><a href="color-code-finder.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Color Code Finder</a></li>
+                    <li><a href="resize-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Resize Image</a></li>
+                    <li><a href="compress-pdf.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Compress PDF</a></li>
+                    <li><a href="word-counter.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Word Counter Pro</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Legal & Info</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="openModal('privacyModal', event)"><i class="fa-solid fa-shield"></i> Privacy Policy</a></li>
+                    <li><a href="#" onclick="openModal('termsModal', event)"><i class="fa-solid fa-file-contract"></i> Terms of Service</a></li>
+                    <li><a href="#" onclick="openModal('contactModal', event)"><i class="fa-solid fa-headset"></i> Contact Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="dev-badge" onclick="openModal('devProfileModal', event)">
+                <i class="fa-solid fa-code"></i> Developed by GT Rao
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">&copy; 2026 PDFly Tools. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('privacyModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-shield" style="color: var(--primary);"></i> Privacy Policy</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.6;">Your privacy is strictly protected. At PDFly Tools, we do not log, track, or sell the links you shorten.</p>
+            <ul style="color: var(--text-muted); font-size: 0.95rem; padding-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                <li>URL shortening requests are forwarded securely to certified public shortening engines (TinyURL, is.gd).</li>
+                <li>Your link history is saved locally in your browser's storage, not on our servers.</li>
+                <li>We do not inject ads into your shortened links.</li>
+            </ul>
+            <button class="btn btn-primary" onclick="closeModal('privacyModal')">Acknowledge</button>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('termsModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-file-contract" style="color: var(--primary);"></i> Terms of Service</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">By using URL Shortener Pro, you agree not to shorten links leading to malicious software, phishing pages, illegal content, or spam. Misuse may result in your links being blocked or blacklisted by the upstream API providers.</p>
+            <button class="btn btn-primary" onclick="closeModal('termsModal')">I Agree</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('contactModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> Get in Touch</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">Have suggestions or found a bug? We'd love to hear from you. Reach out to us directly:</p>
+            <div style="background: var(--bg-input); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <p style="color: var(--text-main); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope" style="color: var(--primary);"></i> 
+                    <a href="mailto:pdflytools@gmail.com" style="text-decoration: none; color: inherit;">pdflytools@gmail.com</a>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> Azamgarh, Uttar Pradesh, India
+                </p>
+            </div>
+            <button class="btn btn-primary" onclick="closeModal('contactModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- Developer Profile Modal -->
+    <div class="modal-overlay" id="devProfileModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('devProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="dev-profile">
+                <div class="dev-avatar">
+                    <img src="dev-profile.png" alt="GT Rao - Developer" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GT+Rao&background=3b82f6&color=fff&size=128&font-size=0.33&bold=true';">
+                </div>
+                <h2 style="font-size: clamp(1.8rem, 4vw, 2.2rem); margin-bottom: 0.2rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">GT Rao</h2>
+                <p style="color: var(--text-main); font-weight: 600; font-size: 1rem; margin-top: 0.2rem;">Student & Web Developer</p>
+                <p style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Azamgarh, Uttar Pradesh, India</p>
+                
+                <div class="dev-tags">
+                    <span class="dev-tag"><i class="fa-brands fa-html5"></i> Web Dev</span>
+                    <span class="dev-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
+                    <span class="dev-tag"><i class="fa-solid fa-wand-magic"></i> UI/UX Design</span>
+                    <span class="dev-tag"><i class="fa-solid fa-layer-group"></i> PDFly Tools</span>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center; padding: 1.25rem; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">
+                        Passionate Web Developer dedicated to crafting lightning-fast, secure, and user-centric web applications. I focus on writing clean code, building responsive interfaces, and ensuring absolute client-side privacy.
+                    </p>
+                </div>
+                
+                <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                     <a href="mailto:pdflytools@gmail.com" class="dev-social" title="Email Contact" target="_blank"><i class="fa-solid fa-envelope"></i></a>
+                     <a href="https://instagram.com/mr_gt_rao" class="dev-social" title="Personal Instagram" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                     <a href="https://github.com/gt-rao" class="dev-social" title="GitHub Profile" target="_blank"><i class="fa-brands fa-github"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Overlays -->
+    <div id="toast-container"></div>
+    <button id="backToTop"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // === Core UI Management ===
+        const els = {
+            html: document.documentElement,
+            themeToggle: document.getElementById('themeToggle'),
+            themeIcon: document.getElementById('themeIcon'),
+            scrollProg: document.getElementById('scroll-progress'),
+            btt: document.getElementById('backToTop')
+        };
+
+        const initTheme = () => {
+            const saved = localStorage.getItem('pdfly-theme') || 'dark'; 
+            els.html.setAttribute('data-theme', saved);
+            els.themeIcon.className = saved === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        };
+        
+        els.themeToggle.addEventListener('click', () => {
+            const next = els.html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            els.html.setAttribute('data-theme', next);
+            localStorage.setItem('pdfly-theme', next);
+            els.themeIcon.className = next === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            showToast(`${next.charAt(0).toUpperCase() + next.slice(1)} Mode Activated`, 'success');
+        });
+        initTheme();
+
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            els.scrollProg.style.width = ((document.body.scrollTop || document.documentElement.scrollTop) / h) * 100 + "%";
+            els.btt.classList.toggle('show', (document.body.scrollTop || document.documentElement.scrollTop) > 300);
+        });
+        
+        els.btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const iconClass = type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info');
+            toast.innerHTML = `<i class="fa-solid ${iconClass}"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { if(container.contains(toast)) toast.remove(); }, 3500);
+        }
+
+        window.openModal = (id, e) => { 
+            if(e) e.preventDefault(); 
+            document.getElementById(id).classList.add('active'); 
+            document.body.style.overflow = 'hidden';
+        };
+        window.closeModal = (id) => {
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = '';
+        };
+        window.onclick = e => { 
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.classList.remove('active'); 
+                document.body.style.overflow = '';
+            }
+        };
+
+        // === State Variables ===
+        let currentMode = 'quick';
+        let currentShortUrl = '';
+        let linkHistory = JSON.parse(localStorage.getItem('pdfly_url_history') || '[]');
+        
+        // === DOM Elements ===
+        const targetUrlInput = document.getElementById('targetUrlInput');
+        const customAliasInput = document.getElementById('customAliasInput');
+        const providerSelect = document.getElementById('shortenerProvider');
+        const placeholderState = document.getElementById('placeholderState');
+        const resultContent = document.getElementById('resultContent');
+        const loaderOverlay = document.getElementById('loader-overlay');
+        const historyList = document.getElementById('historyList');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderHistory();
+            targetUrlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleShortenSubmit(); });
+            customAliasInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleShortenSubmit(); });
+        });
+
+        // --- Tab Switcher ---
+        function switchMode(mode) {
+            currentMode = mode;
+            if (mode === 'quick') {
+                document.getElementById('tabQuickBtn').classList.add('active');
+                document.getElementById('tabAliasBtn').classList.remove('active');
+                document.getElementById('aliasGroup').style.display = 'none';
+                customAliasInput.value = '';
+            } else {
+                document.getElementById('tabAliasBtn').classList.add('active');
+                document.getElementById('tabQuickBtn').classList.remove('active');
+                document.getElementById('aliasGroup').style.display = 'block';
+            }
+        }
+
+        function cleanUrl(input) {
+            let url = input.trim();
+            if (!url) return '';
+            if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+            try { return new URL(url).href; } catch (e) { return null; }
+        }
+
+        // --- Core Shortening API ---
+        async function fetchShortUrl(longUrl, alias, provider) {
+            const encodedUrl = encodeURIComponent(longUrl);
+            const aliasParam = alias ? encodeURIComponent(alias) : '';
+            // Using allorigins to bypass CORS for client-side API requests
+            const proxy = 'https://api.allorigins.win/raw?url=';
+
+            try {
+                if (provider === 'tinyurl') {
+                    let directUrl = `https://tinyurl.com/api-create.php?url=${encodedUrl}`;
+                    if (aliasParam) directUrl += `&alias=${aliasParam}`;
+                    
+                    const res = await fetch(proxy + encodeURIComponent(directUrl));
+                    if (res.ok) {
+                        const text = (await res.text()).trim();
+                        if (text.startsWith('http')) return text;
+                    }
+                }
+                else if (provider === 'isgd' || provider === 'vgd') {
+                    const domain = provider === 'isgd' ? 'is.gd' : 'v.gd';
+                    let target = `https://${domain}/create.php?format=simple&url=${encodedUrl}`;
+                    if (aliasParam) target += `&shorturl=${aliasParam}`;
+                    
+                    const res = await fetch(proxy + encodeURIComponent(target));
+                    if (res.ok) {
+                        const text = (await res.text()).trim();
+                        if (text.startsWith('http')) return text;
+                        if (text.toLowerCase().includes('error')) throw new Error(text);
+                    }
+                }
+                
+                // Fallback to basic tinyurl if anything fails
+                const fbRes = await fetch(proxy + encodeURIComponent('https://tinyurl.com/api-create.php?url=' + encodedUrl));
+                if (fbRes.ok) {
+                    const fbText = (await fbRes.text()).trim();
+                    if (fbText.startsWith('http')) return fbText;
+                }
+            } catch(e) {
+                console.error("API Error: ", e);
+            }
+            throw new Error('Engine unreachable or custom alias is already taken.');
+        }
+
+        async function handleShortenSubmit() {
+            const rawUrl = targetUrlInput.value;
+            const alias = customAliasInput.value.trim();
+            const provider = providerSelect.value;
+
+            if (!rawUrl) return showToast('Please enter a valid URL to shorten.', 'error');
+            
+            const validatedUrl = cleanUrl(rawUrl);
+            if (!validatedUrl) return showToast('Invalid URL format. Include http:// or https://', 'error');
+
+            placeholderState.style.display = 'none';
+            resultContent.classList.remove('active');
+            loaderOverlay.classList.add('active');
+
+            try {
+                const shortResult = await fetchShortUrl(validatedUrl, alias, provider);
+                currentShortUrl = shortResult;
+
+                // Update UI Links
+                document.getElementById('shortUrlText').textContent = shortResult;
+                document.getElementById('openLinkBtn').href = shortResult;
+
+                // Update Metrics
+                const origLen = validatedUrl.length;
+                const shortLen = shortResult.length;
+                document.getElementById('statOriginalLen').textContent = `${origLen}`;
+                document.getElementById('statShortLen').textContent = `${shortLen}`;
+                
+                const percent = Math.max(0, Math.round(((origLen - shortLen) / origLen) * 100));
+                document.getElementById('statPercentSaved').textContent = `${percent}%`;
+
+                // Generate QR Code
+                document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(shortResult)}&margin=6`;
+
+                addToHistory(shortResult, validatedUrl);
+
+                loaderOverlay.classList.remove('active');
+                resultContent.classList.add('active');
+                showToast('Short link generated successfully!', 'success');
+
+            } catch (err) {
+                loaderOverlay.classList.remove('active');
+                placeholderState.style.display = 'flex';
+                showToast(err.message, 'error');
+            }
+        }
+
+        function resetForm() {
+            targetUrlInput.value = '';
+            customAliasInput.value = '';
+            placeholderState.style.display = 'flex';
+            resultContent.classList.remove('active');
+            currentShortUrl = '';
+            targetUrlInput.focus();
+            showToast('Workspace cleared', 'info');
+        }
+
+        // --- Copy & Share Helpers ---
+        window.copyShortLink = function() {
+            if (!currentShortUrl) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(currentShortUrl).then(() => {
+                    showToast(`Copied: ${currentShortUrl}`, 'success');
+                }).catch(() => fallbackCopy(currentShortUrl));
+            } else { fallbackCopy(currentShortUrl); }
+        };
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try { document.execCommand('copy'); showToast(`Copied to clipboard!`, 'success'); } 
+            catch (e) { showToast('Failed to copy', 'error'); }
+            document.body.removeChild(textarea);
+        }
+
+        async function downloadQRCode() {
+            const img = document.getElementById('qrCodeImg');
+            if (!img.src) return;
+            try {
+                const response = await fetch(img.src);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = `PDFly_QR_${Date.now()}.png`;
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
+                showToast('QR Code downloaded!', 'success');
+            } catch (e) {
+                window.open(img.src, '_blank');
+            }
+        }
+
+        function shareSocial(network) {
+            if (!currentShortUrl) return;
+            const text = encodeURIComponent(`Check out this link: ${currentShortUrl}`);
+            const url = encodeURIComponent(currentShortUrl);
+            const links = {
+                'whatsapp': `https://api.whatsapp.com/send?text=${text}`,
+                'telegram': `https://t.me/share/url?url=${url}&text=Check this out`,
+                'twitter': `https://twitter.com/intent/tweet?text=${text}`,
+                'linkedin': `https://www.linkedin.com/sharing/share-offsite/?url=${url}`
+            };
+            if (links[network]) window.open(links[network], '_blank');
+        }
+
+        // --- History Management ---
+        function addToHistory(shortUrl, originalUrl) {
+            linkHistory = linkHistory.filter(item => item.short !== shortUrl);
+            linkHistory.unshift({ short: shortUrl, orig: originalUrl });
+            if (linkHistory.length > 15) linkHistory.pop();
+            localStorage.setItem('pdfly_url_history', JSON.stringify(linkHistory));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            historyList.innerHTML = '';
+            if (linkHistory.length === 0) {
+                historyList.innerHTML = '<span style="font-size: 0.85rem; color: var(--text-muted); padding-top: 5px;">No links generated yet.</span>';
+                return;
+            }
+            linkHistory.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <div class="history-info">
+                        <div class="history-short">${item.short}</div>
+                        <div class="history-orig" title="${item.orig}">${item.orig}</div>
+                    </div>
+                    <div class="history-actions">
+                        <button onclick="navigator.clipboard.writeText('${item.short}').then(()=>showToast('Copied!', 'success'))" title="Copy"><i class="fa-regular fa-copy"></i></button>
+                        <a href="${item.short}" target="_blank" title="Open Link"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                    </div>
+                `;
+                historyList.appendChild(div);
+            });
+        }
+
+        function clearLinkHistory() {
+            linkHistory = [];
+            localStorage.removeItem('pdfly_url_history');
+            renderHistory();
+            showToast('History cleared', 'info');
+        }
+
+    </script>
+</body>
+</html>

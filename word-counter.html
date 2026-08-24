@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Word Counter Pro - PDFly Tools</title>
+    <meta name="description" content="Free online word, character, emoji, and space counter with detailed text analysis. Calculate reading time and paragraphs instantly. 100% Free and Secure.">
+    <meta name="keywords" content="Word Counter, Emoji Counter, Character Counter, Reading Time, Text Analyzer, PDFly Tools, GT Rao">
+    <meta name="author" content="GT Rao">
+    
+    <!-- Google Fonts: Plus Jakarta Sans for Ultra-HD Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* === UI/UX Variables (PDFly Standard) === */
+        :root {
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --radius-card: 16px;
+            --radius-pill: 9999px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Light Theme */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.85);
+            --bg-input: #f1f5f9;
+            --bg-hover: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.25);
+            
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #0ea5e9;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #020617;
+            --bg-card: #0f172a;
+            --bg-glass: rgba(2, 6, 23, 0.75);
+            --bg-input: #1e293b;
+            --bg-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 10px 30px rgba(59, 130, 246, 0.35);
+        }
+
+        /* === Base Styles === */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-body); color: var(--text-main); transition: background-color 0.4s ease, color 0.4s ease; overflow-x: hidden; }
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--gradient); width: 0%; z-index: 9999; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* === Navbar (Static) === */
+        .navbar-wrapper { padding: 1.5rem 1rem 1rem; max-width: 1300px; margin: 0 auto; }
+        .navbar {
+            background: var(--bg-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 0.8rem 1.5rem; 
+            display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm);
+        }
+        .nav-brand { font-size: 1.3rem; font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; display: flex; align-items: center; gap: 8px;}
+        .nav-brand i { color: var(--primary); -webkit-text-fill-color: initial; }
+        .theme-toggle { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: var(--transition); font-size: 1.1rem; }
+        .theme-toggle:hover { background: var(--primary); color: white; transform: rotate(15deg); }
+
+        /* === Layout === */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1.2rem; }
+        .header-section { text-align: center; margin-bottom: 3rem; padding-top: 1rem; }
+        .header-section h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 0.8rem; line-height: 1.2; letter-spacing: -1px; }
+        .header-section h1 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-section p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.1rem); max-width: 700px; margin: 0 auto; line-height: 1.6; }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.2rem, 3vw, 1.8rem); box-shadow: var(--shadow-sm); margin-bottom: 2rem; transition: var(--transition);}
+        .card:hover { border-color: rgba(59,130,246,0.3); box-shadow: var(--shadow-hover); }
+
+        /* === Tool Specific Styles (Word Counter) === */
+        .editor-wrapper { position: relative; width: 100%; margin-bottom: 1.5rem; }
+        #textInput {
+            width: 100%; min-height: 250px; padding: 1.5rem; font-size: 1.1rem; line-height: 1.6;
+            background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main);
+            border-radius: 12px; resize: vertical; transition: var(--transition); outline: none;
+            font-family: inherit;
+        }
+        #textInput:focus { border-color: var(--primary); background: var(--bg-card); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
+        #textInput::placeholder { color: var(--text-muted); opacity: 0.8; }
+
+        /* Buttons */
+        .action-btns { display: flex; justify-content: flex-end; gap: 1rem; flex-wrap: wrap; }
+        .btn { padding: 0.9rem 1.5rem; border: none; font-weight: 700; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; transition: var(--transition); }
+        .btn-primary { background: var(--gradient); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover { box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5); transform: translateY(-2px); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover { background: var(--danger); color: white; transform: translateY(-2px); }
+
+        /* === Stats Grid === */
+        .stats-grid-main { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; margin-bottom: 1.2rem; }
+        .stat-box { background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; transition: var(--transition); }
+        .stat-box:hover { background: var(--bg-card); border-color: var(--primary); box-shadow: var(--shadow-sm); transform: translateY(-3px); }
+        .stat-box h3 { color: var(--text-muted); font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .stat-box .val { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+
+        .stats-grid-detailed { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .detail-box { background: rgba(59, 130, 246, 0.03); border: 1px dashed var(--primary); border-radius: 10px; padding: 1rem; text-align: center; transition: var(--transition); }
+        .detail-box:hover { background: var(--bg-card); border-style: solid; box-shadow: var(--shadow-sm); }
+        .detail-box .d-val { font-weight: 800; color: var(--text-main); font-size: 1.5rem; display: block; margin-bottom: 0.2rem;}
+        .detail-box .d-label { color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;}
+
+        .time-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; }
+        .time-card { background: var(--bg-input); border: 1px solid var(--border); padding: 1.2rem; border-radius: 12px; display: flex; align-items: center; gap: 15px; transition: var(--transition); }
+        .time-card:hover { border-color: var(--primary); background: var(--bg-card); transform: translateX(5px); }
+        .time-icon { width: 50px; height: 50px; background: rgba(59,130,246,0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 1.3rem; }
+        .time-text h4 { color: var(--text-muted); font-size: 0.9rem; font-weight: 700; margin-bottom: 2px;}
+        .time-text p { color: var(--text-main); font-size: 1.3rem; font-weight: 800; line-height: 1; }
+
+        /* === 4 Features Grid === */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(1rem, 3vw, 1.5rem); margin: 4rem 0; }
+        .feature-card { background: var(--bg-card); padding: 1.5rem; text-align: center; border-radius: var(--radius-card); border: 1px solid var(--border); box-shadow: var(--shadow-sm); transition: var(--transition); }
+        .feature-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: var(--shadow-hover); }
+        .feature-card i { font-size: 2rem; margin-bottom: 1rem; color: var(--primary); transition: var(--transition); }
+        .feature-card:hover i { transform: scale(1.1) rotate(5deg); }
+        .feature-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 700; color: var(--text-main); }
+        .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* === SEO Friendly Card Section === */
+        .seo-text-section { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 3rem); margin: 3rem 0; box-shadow: var(--shadow-sm); }
+        .seo-text-section h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 800; margin-bottom: 1.5rem; color: var(--text-main); }
+        .seo-text-section h3 { font-size: clamp(1.1rem, 2vw, 1.4rem); font-weight: 700; margin: 2rem 0 1rem; color: var(--text-main); }
+        .seo-text-section p, .seo-text-section li { font-size: clamp(0.95rem, 1.5vw, 1.05rem); color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; }
+        .seo-text-section ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--text-muted); }
+
+        /* === Footer === */
+        .footer { margin-top: 4rem; padding: clamp(3rem, 5vw, 4rem) 1rem 2rem; border-top: 1px solid var(--border); background: var(--bg-card); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2.5rem; max-width: 1300px; margin: 0 auto 2rem; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--text-main); font-weight: 800; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; transition: var(--transition); font-size: 0.95rem; font-weight: 500; cursor: pointer;}
+        .footer-links a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
+        .dev-badge { background: var(--bg-input); padding: 0.6rem 1.2rem; border-radius: var(--radius-pill); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 700; font-size: 0.9rem; border: 1px solid var(--border); transition: var(--transition); }
+        .dev-badge:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
+        /* === Modals === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); z-index: 2000; padding: 1rem; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 2.5rem); transform: scale(0.9) translateY(20px); transition: var(--transition); border: 1px solid var(--border); box-shadow: var(--shadow-hover); position: relative; max-height: 90vh; overflow-y: auto; text-align: left; }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-input); border: 1px solid var(--border); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--text-main); cursor: pointer; transition: var(--transition); }
+        .modal-close:hover { color: white; background: var(--danger); border-color: var(--danger); transform: rotate(90deg); }
+        
+        /* Developer Profile inside Modal */
+        .dev-profile { text-align: center; }
+        .dev-avatar { width: clamp(100px, 15vw, 120px); height: clamp(100px, 15vw, 120px); border-radius: 50%; background: var(--bg-card); margin: 0 auto 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); border: 4px solid var(--primary); padding: 0; }
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .dev-tags { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+        .dev-tag { background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(59,130,246,0.2); }
+        .dev-social { width: 45px; height: 45px; border-radius: 50%; background: var(--bg-input); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: var(--transition); border: 1px solid var(--border); text-decoration: none; }
+        .dev-social:hover { background: var(--primary); color: white; transform: translateY(-3px); border-color: var(--primary); box-shadow: var(--shadow-sm); }
+
+        /* === Toast Notification === */
+        #toast-container { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: max-content; max-width: 90vw; pointer-events: none;}
+        .toast { background: var(--text-main); color: var(--bg-body); padding: 1rem 1.5rem; border-radius: var(--radius-pill); box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px; animation: slideUp 0.4s forwards, fadeOut 0.4s forwards 2.5s; font-weight: 700; font-size: 0.95rem; border: 1px solid var(--border);}
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.info { border-left: 4px solid var(--info); }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(20px); opacity: 0; } }
+        
+        #backToTop { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: var(--shadow-hover); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 1000; font-size: 1.2rem; }
+        #backToTop.show { opacity: 1; visibility: visible; }
+        #backToTop:hover { transform: translateY(-5px) scale(1.05); }
+    </style>
+</head>
+<body>
+
+    <!-- Scroll Progress -->
+    <div id="scroll-progress"></div>
+
+    <!-- Static Navbar -->
+    <div class="navbar-wrapper">
+        <nav class="navbar">
+            <a href="index.html" class="nav-brand">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>PDFly Tools</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                <i class="fa-solid fa-sun" id="themeIcon"></i>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="container">
+        
+        <!-- Header -->
+        <div class="header-section">
+            <h1>Word Counter <span>Pro</span></h1>
+            <p>Instantly count words, characters, emojis, and paragraphs. Analyze reading time directly in your browser without data limits.</p>
+        </div>
+
+        <!-- Main Tool Area -->
+        <div class="card">
+            <div class="editor-wrapper">
+                <textarea id="textInput" placeholder="Paste or start typing your text here to begin analysis..."></textarea>
+            </div>
+            
+            <div class="action-btns">
+                <button id="clearBtn" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i> Clear Text</button>
+                <button id="copyBtn" class="btn btn-primary"><i class="fa-regular fa-copy"></i> Copy to Clipboard</button>
+            </div>
+        </div>
+
+        <!-- Top Analysis Results -->
+        <div class="stats-grid-main">
+            <div class="stat-box">
+                <h3><i class="fa-solid fa-file-word" style="color:var(--primary);"></i> Words</h3>
+                <div id="wordCount" class="val" data-value="0">0</div>
+            </div>
+            <div class="stat-box">
+                <h3><i class="fa-solid fa-font" style="color:var(--primary);"></i> Characters</h3>
+                <div id="charCount" class="val" data-value="0">0</div>
+            </div>
+            <div class="stat-box">
+                <h3><i class="fa-solid fa-align-left" style="color:var(--primary);"></i> Sentences</h3>
+                <div id="sentenceCount" class="val" data-value="0">0</div>
+            </div>
+            <div class="stat-box">
+                <h3><i class="fa-solid fa-paragraph" style="color:var(--primary);"></i> Paragraphs</h3>
+                <div id="paragraphCount" class="val" data-value="0">0</div>
+            </div>
+        </div>
+
+        <!-- Detailed Breakdowns -->
+        <div class="stats-grid-detailed">
+            <div class="detail-box">
+                <span id="capitalCount" class="d-val" data-value="0">0</span>
+                <span class="d-label">Capitals</span>
+            </div>
+            <div class="detail-box">
+                <span id="smallCount" class="d-val" data-value="0">0</span>
+                <span class="d-label">Smalls</span>
+            </div>
+            <div class="detail-box">
+                <span id="numberCount" class="d-val" data-value="0">0</span>
+                <span class="d-label">Numbers</span>
+            </div>
+            <div class="detail-box">
+                <span id="specialCount" class="d-val" data-value="0">0</span>
+                <span class="d-label">Symbols</span>
+            </div>
+            <div class="detail-box">
+                <span id="spaceCount" class="d-val" data-value="0">0</span>
+                <span class="d-label">Spaces</span>
+            </div>
+            <div class="detail-box" style="border-color: var(--warning); background: rgba(245, 158, 11, 0.03);">
+                <span id="emojiCount" class="d-val" data-value="0" style="color: var(--warning);">0</span>
+                <span class="d-label">Emojis 😀</span>
+            </div>
+        </div>
+
+        <!-- Advanced Estimates -->
+        <div class="time-stats">
+            <div class="time-card">
+                <div class="time-icon"><i class="fa-solid fa-book-open-reader"></i></div>
+                <div class="time-text">
+                    <h4>Est. Reading Time</h4>
+                    <p id="readTime">0 min</p>
+                </div>
+            </div>
+            <div class="time-card">
+                <div class="time-icon"><i class="fa-solid fa-microphone-lines"></i></div>
+                <div class="time-text">
+                    <h4>Est. Speaking Time</h4>
+                    <p id="speakTime">0 min</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 Features Grid -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fa-solid fa-face-smile" style="color: var(--warning);"></i>
+                <h3>Advanced Emoji Detection</h3>
+                <p>Accurately scans and counts Unicode emojis used in your text separately from normal characters or symbols.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-stopwatch" style="color: var(--primary);"></i>
+                <h3>Real-Time Estimator</h3>
+                <p>Instantly calculates the average reading time (200 wpm) and speaking time (130 wpm) for your essays and scripts.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-bolt" style="color: var(--info);"></i>
+                <h3>Lightning Fast</h3>
+                <p>No waiting, no reloading. As soon as you type or paste your content, the counters update seamlessly in real-time.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-server" style="color: var(--success);"></i>
+                <h3>100% Client-Side Privacy</h3>
+                <p>Your text is never saved or sent to any server. Everything is calculated securely inside your local browser.</p>
+            </div>
+        </div>
+
+        <!-- SEO Content -->
+        <div class="seo-text-section">
+            <h2>Why Use PDFly Word Counter Pro?</h2>
+            <p>Whether you are writing an essay, crafting the perfect tweet, or optimizing an SEO meta description, knowing your exact text metrics is crucial. <strong>Word Counter Pro</strong> is a free, blazing-fast, and comprehensive text analysis tool designed for professionals, students, and content creators.</p>
+            
+            <h3>Beyond Simple Counting</h3>
+            <p>Most word counters simply split text by spaces. Our advanced algorithm digs deeper. It separates standard characters from numbers, identifies special symbols, and specifically tracks the usage of Unicode Emojis. It also calculates accurate sentence and paragraph structures.</p>
+            
+            <h3>Reading & Speaking Time Estimates</h3>
+            <p>Preparing for a speech or a presentation? Our tool automatically estimates how long it will take to read your text silently (based on an average of 200 words per minute) or to speak it out loud (based on 130 words per minute). This is an essential feature for podcasters, public speakers, and video creators.</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>
+                    <a href="index.html" style="text-decoration: none; color: var(--text-main);">
+                        <i class="fa-solid fa-layer-group" style="color:var(--primary)"></i> PDFly Tools
+                    </a>
+                </h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Your ultimate suite for free, secure, and blazing-fast web utilities. Crafted with Ultra HD fluid UI tech.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Top Tools</h4>
+                <ul class="footer-links">
+                    <li><a href="resize-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Resize Image</a></li>
+                    <li><a href="compress-pdf.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Compress PDF</a></li>
+                    <li><a href="qr-code-maker.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> QR Code Maker</a></li>
+                    <li><a href="gmail-variant.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Gmail Variant Gen</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Legal & Info</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="openModal('privacyModal', event)"><i class="fa-solid fa-shield"></i> Privacy Policy</a></li>
+                    <li><a href="#" onclick="openModal('termsModal', event)"><i class="fa-solid fa-file-contract"></i> Terms of Service</a></li>
+                    <li><a href="#" onclick="openModal('contactModal', event)"><i class="fa-solid fa-headset"></i> Contact Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="dev-badge" onclick="openModal('devProfileModal', event)">
+                <i class="fa-solid fa-code"></i> Developed by GT Rao
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">&copy; 2026 PDFly Tools. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('privacyModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-shield" style="color: var(--primary);"></i> Privacy Policy</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.6;">Your privacy is strictly protected. This text analysis tool operates 100% within your web browser utilizing client-side processing.</p>
+            <ul style="color: var(--text-muted); font-size: 0.95rem; padding-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                <li>Your text is never transmitted or uploaded to our servers.</li>
+                <li>All calculations happen within your device's memory.</li>
+                <li>We do not track, store, intercept, or log any of your entered data.</li>
+            </ul>
+            <button class="btn btn-primary" onclick="closeModal('privacyModal')">Acknowledge</button>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('termsModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-file-contract" style="color: var(--primary);"></i> Terms of Service</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">By using PDFly Tools, you agree to use our utilities responsibly. This tool is provided "as is" without warranty of any kind. Both commercial and personal use of the tool is entirely free.</p>
+            <button class="btn btn-primary" onclick="closeModal('termsModal')">I Agree</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('contactModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> Get in Touch</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">Have suggestions or found a bug? We'd love to hear from you. Reach out to us directly:</p>
+            <div style="background: var(--bg-input); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <p style="color: var(--text-main); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope" style="color: var(--primary);"></i> 
+                    <a href="mailto:pdflytools@gmail.com" style="text-decoration: none; color: inherit;">pdflytools@gmail.com</a>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> Azamgarh, Uttar Pradesh, India
+                </p>
+            </div>
+            <button class="btn btn-primary" onclick="closeModal('contactModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- Developer Modal -->
+    <div class="modal-overlay" id="devProfileModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('devProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="dev-profile">
+                <div class="dev-avatar">
+                    <img src="dev-profile.png" alt="GT Rao - Developer" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GT+Rao&background=3b82f6&color=fff&size=128&font-size=0.33&bold=true';">
+                </div>
+                <h2 style="font-size: clamp(1.8rem, 4vw, 2.2rem); margin-bottom: 0.2rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">GT Rao</h2>
+                <p style="color: var(--text-main); font-weight: 600; font-size: 1rem; margin-top: 0.2rem;">Student & Web Developer</p>
+                <p style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Azamgarh, Uttar Pradesh, India</p>
+                
+                <div class="dev-tags">
+                    <span class="dev-tag"><i class="fa-brands fa-html5"></i> Web Dev</span>
+                    <span class="dev-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
+                    <span class="dev-tag"><i class="fa-solid fa-wand-magic"></i> UI/UX Design</span>
+                    <span class="dev-tag"><i class="fa-solid fa-layer-group"></i> PDFly Tools</span>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center; padding: 1.25rem; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">
+                        Passionate Web Developer dedicated to crafting lightning-fast, secure, and user-centric web applications. I focus on writing clean code, building responsive interfaces, and ensuring absolute client-side privacy.
+                    </p>
+                </div>
+                
+                <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                     <a href="mailto:pdflytools@gmail.com" class="dev-social" title="Email Contact" target="_blank"><i class="fa-solid fa-envelope"></i></a>
+                     <a href="https://instagram.com/mr_gt_rao" class="dev-social" title="Personal Instagram" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                     <a href="https://instagram.com/educate_path" class="dev-social" title="Business / PDFly Tools" target="_blank"><i class="fa-solid fa-briefcase"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Overlays -->
+    <div id="toast-container"></div>
+    <button id="backToTop"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // === Core UI Management ===
+        const els = {
+            html: document.documentElement,
+            themeToggle: document.getElementById('themeToggle'),
+            themeIcon: document.getElementById('themeIcon'),
+            scrollProg: document.getElementById('scroll-progress'),
+            btt: document.getElementById('backToTop')
+        };
+
+        const initTheme = () => {
+            const saved = localStorage.getItem('pdfly-theme') || 'dark'; 
+            els.html.setAttribute('data-theme', saved);
+            els.themeIcon.className = saved === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        };
+        
+        els.themeToggle.addEventListener('click', () => {
+            const next = els.html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            els.html.setAttribute('data-theme', next);
+            localStorage.setItem('pdfly-theme', next);
+            els.themeIcon.className = next === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            showToast(`${next.charAt(0).toUpperCase() + next.slice(1)} Mode Activated`, 'success');
+        });
+        initTheme();
+
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            els.scrollProg.style.width = ((document.body.scrollTop || document.documentElement.scrollTop) / h) * 100 + "%";
+            els.btt.classList.toggle('show', (document.body.scrollTop || document.documentElement.scrollTop) > 300);
+        });
+        
+        els.btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const iconClass = type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info');
+            toast.innerHTML = `<i class="fa-solid ${iconClass}"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { if(container.contains(toast)) toast.remove(); }, 3500);
+        }
+
+        // PERFECT MODAL LOGIC 
+        window.openModal = (id, e) => { 
+            if(e) e.preventDefault(); 
+            document.getElementById(id).classList.add('active'); 
+            document.body.style.overflow = 'hidden';
+        };
+        window.closeModal = (id) => {
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = '';
+        };
+        window.onclick = e => { 
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.classList.remove('active'); 
+                document.body.style.overflow = '';
+            }
+        };
+
+        // === Text Counter Logic ===
+        const textInput = document.getElementById('textInput');
+        const counterElements = {
+            words: document.getElementById('wordCount'),
+            chars: document.getElementById('charCount'),
+            sentences: document.getElementById('sentenceCount'),
+            paragraphs: document.getElementById('paragraphCount'),
+            capitals: document.getElementById('capitalCount'),
+            smalls: document.getElementById('smallCount'),
+            numbers: document.getElementById('numberCount'),
+            specials: document.getElementById('specialCount'),
+            spaces: document.getElementById('spaceCount'),
+            emojis: document.getElementById('emojiCount')
+        };
+        const readTime = document.getElementById('readTime');
+        const speakTime = document.getElementById('speakTime');
+
+        // Animation function for counting numbers
+        function animateValue(element, start, end, duration) {
+            if (start === end) {
+                element.textContent = end;
+                return;
+            }
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                element.textContent = Math.floor(progress * (end - start) + start);
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function updateCounts() {
+            const text = textInput.value;
+            const cleanText = text.trim();
+            
+            // Calculate Core Metrics
+            const wordCountVal = cleanText === '' ? 0 : cleanText.split(/\s+/).length;
+
+            const newValues = {
+                words: wordCountVal,
+                chars: text.length,
+                sentences: cleanText === '' ? 0 : cleanText.split(/[.!?]+/).filter(s => s.trim().length > 0).length,
+                paragraphs: cleanText === '' ? 0 : cleanText.split(/\n+/).filter(p => p.trim().length > 0).length,
+                capitals: (text.match(/[A-Z]/g) || []).length,
+                smalls: (text.match(/[a-z]/g) || []).length,
+                numbers: (text.match(/[0-9]/g) || []).length,
+                specials: (text.match(/[^A-Za-z0-9\s\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu) || []).length, 
+                spaces: (text.match(/ /g) || []).length,
+                emojis: (text.match(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu) || []).length
+            };
+
+            // Apply Animations
+            for (const key in counterElements) {
+                const el = counterElements[key];
+                const startValue = parseInt(el.dataset.value || '0', 10);
+                const endValue = newValues[key];
+                animateValue(el, startValue, endValue, 250);
+                el.dataset.value = String(endValue);
+            }
+
+            // Calculate Reading & Speaking Time
+            if (wordCountVal === 0) {
+                readTime.innerText = "0 min";
+                speakTime.innerText = "0 min";
+            } else {
+                const readMin = Math.ceil(wordCountVal / 200); // Avg reading speed: 200 wpm
+                const speakMin = Math.ceil(wordCountVal / 130); // Avg speaking speed: 130 wpm
+                readTime.innerText = `~${readMin} min`;
+                speakTime.innerText = `~${speakMin} min`;
+            }
+        }
+
+        // Event Listeners for actions
+        textInput.addEventListener('input', updateCounts);
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            if (textInput.value.length === 0) return;
+            textInput.value = '';
+            updateCounts();
+            textInput.focus();
+            showToast('Text Cleared', 'info');
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            if (textInput.value.trim().length === 0) {
+                showToast('Nothing to copy!', 'error');
+                return;
+            }
+            navigator.clipboard.writeText(textInput.value).then(() => {
+                showToast('Text copied to clipboard!', 'success');
+            }).catch(() => {
+                showToast('Failed to copy text', 'error');
+            });
+        });
+
+        // Initialize state on load
+        updateCounts();
+
+    </script>
+</body>
+</html>

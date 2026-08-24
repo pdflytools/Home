@@ -101,20 +101,24 @@
         .theme-btn:hover { background: var(--primary); border-color: var(--primary); color: #fff; transform: rotate(15deg) scale(1.05); }
 
         /* ================= HERO SECTION ================= */
-        .hero { padding: clamp(140px, 15vh, 180px) 5% clamp(40px, 5vh, 60px); text-align: center; position: relative; }
+        .hero { padding: clamp(130px, 15vh, 160px) 5% clamp(30px, 4vh, 40px); text-align: center; position: relative; }
         .greeting-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 6px 18px; border-radius: 30px; font-size: clamp(0.85rem, 1.5vw, 0.95rem); font-weight: 700; margin-bottom: 20px; border: 1px solid rgba(59, 130, 246, 0.25); letter-spacing: 0.5px; }
-        .hero h1 { font-size: clamp(2.2rem, 6vw, 4.2rem); font-weight: 800; line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px; }
+        .hero h1 { font-size: clamp(2.4rem, 6vw, 4.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 18px; letter-spacing: -1px; }
         .hero h1 span { background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.15rem); max-width: 750px; margin: 0 auto; line-height: 1.7; }
+        .hero p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.15rem); max-width: 700px; margin: 0 auto; line-height: 1.6; }
 
-        /* ================= TABS STRUCTURE (1 Top, 3 Bottom) ================= */
-        .tabs-layout { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: clamp(30px, 5vh, 50px); padding: 0 5%; }
-        .tab-top { display: flex; justify-content: center; width: 100%; }
-        .tab-bottom { display: flex; justify-content: center; gap: clamp(8px, 2vw, 15px); flex-wrap: wrap; }
+        /* ================= TABS STRUCTURE (Matched to Uploaded Image) ================= */
+        .tabs-layout { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-bottom: clamp(35px, 6vh, 55px); padding: 0 5%; position: relative; }
         
-        .tab-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); padding: clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 25px); border-radius: 30px; font-size: clamp(0.85rem, 1.5vw, 0.95rem); font-weight: 600; cursor: pointer; transition: var(--transition); }
-        .tab-btn:hover { background: var(--bg-card-hover); border-color: var(--primary); }
-        .tab-btn.active { background: var(--primary); border-color: var(--primary); color: white; box-shadow: var(--shadow-glow); }
+        /* Subtle Glow Behind Tabs */
+        .tabs-layout::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 180px; height: 100px; background: rgba(59, 130, 246, 0.2); filter: blur(40px); z-index: -1; pointer-events: none; }
+        
+        .tab-top { display: flex; justify-content: center; width: 100%; }
+        .tab-bottom { display: flex; justify-content: center; gap: clamp(10px, 2vw, 18px); flex-wrap: wrap; }
+        
+        .tab-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.15); color: var(--text-main); padding: clamp(10px, 1.5vw, 14px) clamp(22px, 3vw, 30px); border-radius: 30px; font-size: clamp(0.9rem, 1.5vw, 1rem); font-weight: 600; cursor: pointer; transition: var(--transition); letter-spacing: 0.3px; }
+        .tab-btn:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.3); }
+        .tab-btn.active { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5); }
 
         /* ================= RESPONSIVE GRID SYSTEM ================= */
         .container { max-width: 1350px; margin: 0 auto; padding: 0 5% 80px; }
@@ -122,7 +126,6 @@
         .section-title { font-size: clamp(1.2rem, 2.5vw, 1.5rem); font-weight: 800; margin-bottom: clamp(20px, 3vh, 30px); display: flex; align-items: center; gap: 12px; color: var(--text-main); }
         .section-title i { color: var(--primary); }
 
-        /* Perfect Scaling Grid */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: clamp(15px, 2vw, 25px); }
 
         .card { 
@@ -147,10 +150,7 @@
         .card h3 { font-size: clamp(0.95rem, 1.5vw, 1.1rem); font-weight: 700; color: var(--text-main); margin-bottom: 8px; letter-spacing: 0.3px; }
         .card p { font-size: clamp(0.75rem, 1.2vw, 0.85rem); color: var(--text-muted); line-height: 1.5; opacity: 0.9; padding: 0 10px; }
 
-        @keyframes fadeUp {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
 
         /* ================= PROFESSIONAL FOOTER ================= */
         footer { background: var(--bg-footer); border-top: 1px solid var(--border-color); padding: clamp(40px, 8vh, 80px) 5% 20px; }
@@ -167,17 +167,6 @@
         .footer-links ul li a { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: var(--transition); cursor: pointer; display: inline-block; }
         .footer-links ul li a:hover { color: var(--primary); transform: translateX(5px); }
 
-        /* Enhanced Contact & Location Boxes */
-        .contact-box { background: var(--bg-card); border: 1px solid var(--border-color); padding: 12px 18px; border-radius: 12px; display: inline-flex; align-items: center; gap: 15px; transition: var(--transition); text-decoration: none; width: 100%; max-width: 250px; cursor: default; }
-        a.contact-box { cursor: pointer; }
-        .contact-box i { font-size: 1.2rem; color: var(--primary); width: 20px; text-align: center; }
-        .contact-box div { display: flex; flex-direction: column; }
-        .contact-box span.title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 2px; }
-        .contact-box span.detail { font-size: 0.9rem; font-weight: 600; color: var(--text-main); }
-        
-        a.contact-box:hover { background: var(--bg-card-hover); border-color: var(--primary); box-shadow: var(--shadow-glow); transform: translateY(-3px); }
-        div.contact-box:hover { background: var(--bg-card-hover); border-color: rgba(255, 255, 255, 0.2); }
-
         .footer-bottom { max-width: 1350px; margin: 0 auto; padding-top: 30px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
         .copyright { color: var(--text-muted); font-size: 0.9rem; }
         
@@ -192,31 +181,49 @@
         .modal-box { background: var(--bg-card); border: 1px solid var(--border-color); padding: clamp(25px, 4vw, 40px); border-radius: 24px; width: 100%; max-width: 450px; max-height: 90vh; box-shadow: var(--shadow-glow); text-align: center; transform: translateY(30px) scale(0.95); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s; position: relative; overflow-y: auto; }
         .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
         
-        .modal-close { position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-main); font-size: 1.1rem; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+        .modal-close { position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-main); font-size: 1.1rem; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; z-index: 2; }
         .modal-close:hover { background: #ef4444; color: white; border-color: #ef4444; transform: rotate(90deg); }
 
+        /* Enhanced Dev Image (Increased Height & Blue Border) */
         .dev-img-container { 
-            width: clamp(100px, 15vw, 120px); height: clamp(100px, 15vw, 120px); margin: 0 auto 20px; 
-            background: var(--gradient-primary); padding: 4px; position: relative; border-radius: 35px; 
+            width: clamp(130px, 20vw, 150px); 
+            height: clamp(130px, 20vw, 150px); 
+            margin: 0 auto 20px; 
+            padding: 4px; position: relative; border-radius: 40px; 
         }
-        .dev-img-container img { width: 100%; height: 100%; border-radius: 31px; object-fit: cover; background: var(--bg-body); border: 4px solid var(--bg-card); }
+        .dev-img-container img { 
+            width: 100%; height: 100%; border-radius: 36px; object-fit: cover; 
+            background: var(--bg-body); border: 4px solid var(--primary); /* Blue Border */
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
         
-        .dev-name { font-size: clamp(1.5rem, 2.5vw, 1.8rem); font-weight: 800; color: var(--text-main); margin-bottom: 2px; }
-        .dev-subtitle { color: var(--primary); font-size: 0.9rem; font-weight: 700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1.5px; }
-        .dev-bio { color: var(--text-muted); font-size: clamp(0.9rem, 1.5vw, 1rem); line-height: 1.7; margin-bottom: 25px; }
+        /* Gradient Name */
+        .dev-name { font-size: clamp(1.6rem, 3vw, 2rem); font-weight: 800; margin-bottom: 2px; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .dev-subtitle { color: var(--text-main); opacity: 0.9; font-size: 0.95rem; font-weight: 700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1.5px; }
+        .dev-bio { color: var(--text-muted); font-size: clamp(0.95rem, 1.5vw, 1.05rem); line-height: 1.7; margin-bottom: 25px; }
         
         .dev-social-icons { display: flex; justify-content: center; gap: 15px; }
         .dev-social-icons a { 
-            width: 45px; height: 45px; border-radius: 50%; background: var(--bg-body); border: 1px solid var(--border-color);
-            display: flex; align-items: center; justify-content: center; color: var(--text-main); font-size: 1.2rem; 
+            width: 48px; height: 48px; border-radius: 50%; background: var(--bg-body); border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center; color: var(--text-main); font-size: 1.25rem; 
             transition: var(--transition); text-decoration: none; 
         }
         .dev-social-icons a:hover { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: var(--shadow-glow); transform: translateY(-3px); }
 
-        .legal-box { max-width: 650px; display: flex; flex-direction: column; }
-        .legal-box h3 { font-size: clamp(1.4rem, 2vw, 1.8rem); color: var(--text-main); margin-bottom: 20px; text-align: left; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        .legal-box { max-width: 650px; display: flex; flex-direction: column; text-align: left; }
+        .legal-box h3 { font-size: clamp(1.4rem, 2vw, 1.8rem); color: var(--text-main); margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
         .legal-content { overflow-y: auto; text-align: left; font-size: clamp(0.9rem, 1.5vw, 1rem); color: var(--text-muted); line-height: 1.8; padding-right: 15px; }
         .legal-content h4 { color: var(--text-main); margin: 20px 0 10px; font-size: 1.1rem; }
+
+        /* Contact Details Box in Modal */
+        .contact-box { background: var(--bg-body); border: 1px solid var(--border-color); padding: 15px 20px; border-radius: 16px; display: inline-flex; align-items: center; gap: 15px; transition: var(--transition); text-decoration: none; width: 100%; cursor: default; }
+        a.contact-box { cursor: pointer; }
+        .contact-box i { font-size: 1.5rem; color: var(--primary); width: 25px; text-align: center; }
+        .contact-box div { display: flex; flex-direction: column; text-align: left; }
+        .contact-box span.title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 2px; }
+        .contact-box span.detail { font-size: 1rem; font-weight: 600; color: var(--text-main); }
+        
+        a.contact-box:hover { border-color: var(--primary); box-shadow: var(--shadow-glow); transform: translateY(-3px); }
 
         /* ================= SMART UI COMPONENTS ================= */
         #backToTop { position: fixed; bottom: -60px; right: 25px; z-index: 999; width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: var(--shadow-glow); cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; transition: var(--transition); opacity: 0; pointer-events: none; }
@@ -235,9 +242,7 @@
             .footer-grid { grid-template-columns: 1fr 1fr; gap: 35px; }
             .footer-brand { grid-column: span 2; text-align: center; }
             .footer-brand p { margin: 0 auto 20px; }
-            .contact-box { max-width: 100%; }
             .footer-bottom { flex-direction: column; text-align: center; }
-            .legal-box { width: 95%; max-height: 85vh; padding: 25px 20px; }
         }
 
         @media (max-width: 480px) {
@@ -274,11 +279,11 @@
     <section class="hero">
         <div class="greeting-badge" id="greetingBadge"><i class="fa-regular fa-sun"></i> Good Morning</div>
         <h1><span id="heroTitle">PDFly</span> Digital Suite.</h1>
-        <!-- Updated 2-3 Line Description -->
-        <p>Your all-in-one browser suite for seamless PDF manipulation, advanced image editing, and smart daily utilities. Experience lightning-fast processing, format conversions, and secure text tools with 100% on-device privacy.</p>
+        <!-- Condensed 2 Line Description Covering All Core Features -->
+        <p>An ultra-fast, privacy-first digital suite. Seamlessly edit PDFs, enhance images, and utilize smart daily tools instantly on your device—zero server uploads required.</p>
     </section>
 
-    <!-- TABS STRUCTURE UPDATED (All Tools top center, 3 tools perfectly below) -->
+    <!-- UI TABS MATCHING UPLOADED DESIGN -->
     <div class="tabs-layout">
         <div class="tab-top">
             <button class="tab-btn active" onclick="filterCategory('all')">All Tools</button>
@@ -291,7 +296,6 @@
     </div>
 
     <main class="container">
-
         <!-- 1. IMAGE TOOLS -->
         <div class="category-wrapper" data-category="image">
             <h2 class="section-title"><i class="fa-solid fa-image"></i> Image Utilities</h2>
@@ -495,24 +499,25 @@
     <button id="backToTop" onclick="window.scrollTo(0,0)" title="Go to top"><i class="fa-solid fa-arrow-up"></i></button>
     <div class="toast-box" id="globalToast"><i class="fa-solid fa-circle-check"></i> <span id="toastMsg">Action Successful</span></div>
 
-    <!-- Developer Profile Modal -->
+    <!-- 1. Developer Profile Modal -->
     <div class="modal-overlay" id="profileModal">
         <div class="modal-box">
             <button class="modal-close" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></button>
             
+            <!-- Increased Image Height & Blue Border Applied -->
             <div class="dev-img-container">
                 <img src="dev-profile.png" alt="Developer Profile">
             </div>
             
+            <!-- Name with gradient style -->
             <div class="dev-name">GT Rao</div>
             <div class="dev-subtitle">Creator & Developer</div>
             
-            <!-- Updated Developer Bio mentioning student & passion -->
+            <!-- Bio mentioning student & coding passion -->
             <div class="dev-bio">
-                Hello! I am a student and a passionate web developer. Building responsive web applications, writing clean code, and engineering smart utilities like PDFly Tools are my core passions.
+                Hello! I am a student and a passionate web developer. Coding responsive web applications and building smart digital utilities like PDFly Tools are my core passions.
             </div>
 
-            <!-- Icon-Only Contact Options -->
             <div class="dev-social-icons">
                 <a href="mailto:pdflytools@gmail.com" title="Email Me"><i class="fa-solid fa-envelope"></i></a>
                 <a href="https://instagram.com/mr_gt_rao" target="_blank" title="Personal Instagram"><i class="fa-brands fa-instagram"></i></a>
@@ -521,7 +526,34 @@
         </div>
     </div>
 
-    <!-- Legal Modal -->
+    <!-- 2. Contact Us Modal (Opens on Click) -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></button>
+            
+            <h3 style="font-size: 1.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 25px;">Get in Touch</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <a href="mailto:pdflytools@gmail.com" class="contact-box">
+                    <i class="fa-solid fa-envelope"></i>
+                    <div>
+                        <span class="title">Email Support</span>
+                        <span class="detail">pdflytools@gmail.com</span>
+                    </div>
+                </a>
+                
+                <div class="contact-box">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <div>
+                        <span class="title">Our Location</span>
+                        <span class="detail">Azamgarh, Uttar Pradesh, India</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Legal Modal -->
     <div class="modal-overlay" id="legalModal">
         <div class="modal-box legal-box">
             <button class="modal-close" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></button>
@@ -556,26 +588,12 @@
                 </ul>
             </div>
 
-            <!-- Contact Us: Showing Email & Address Visually -->
+            <!-- Support & Contact Us Link -->
             <div class="footer-links">
-                <h4>Contact Us</h4>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <a href="mailto:pdflytools@gmail.com" class="contact-box">
-                        <i class="fa-solid fa-envelope"></i>
-                        <div>
-                            <span class="title">Email Support</span>
-                            <span class="detail">pdflytools@gmail.com</span>
-                        </div>
-                    </a>
-                    
-                    <div class="contact-box">
-                        <i class="fa-solid fa-location-dot"></i>
-                        <div>
-                            <span class="title">Our Location</span>
-                            <span class="detail">Azamgarh, UP, India</span>
-                        </div>
-                    </div>
-                </div>
+                <h4>Support</h4>
+                <ul>
+                    <li><a onclick="openContactModal()"><i class="fa-solid fa-headset" style="margin-right: 5px;"></i> Contact Us</a></li>
+                </ul>
             </div>
         </div>
         
@@ -717,7 +735,9 @@
             window.scrollTo(0, document.querySelector('.tabs-layout').offsetTop - 80);
         }
 
+        // Modal Handlers
         const profileModal = document.getElementById('profileModal');
+        const contactModal = document.getElementById('contactModal');
         const legalModal = document.getElementById('legalModal');
 
         function openProfileModal() {
@@ -725,28 +745,22 @@
             profileModal.classList.add('active');
         }
 
+        function openContactModal() {
+            closeModals();
+            contactModal.classList.add('active');
+        }
+
         function closeModals() {
             profileModal.classList.remove('active');
+            contactModal.classList.remove('active');
             legalModal.classList.remove('active');
         }
 
         const legalData = {
-            'privacy': { 
-                title: "Privacy Policy", 
-                content: `<h4>1. Information Gathering and Usage</h4><p>At PDFly Tools, your privacy is our highest priority. We do not require registration or personal data to use our utility tools. Any file uploaded for processing (Images, PDFs) is temporarily held in secure server memory strictly for execution.</p><h4>2. Data Security & Deletion</h4><p>We employ enterprise-grade security protocols. <strong>All user files are instantly and irreversibly deleted</strong> from our servers immediately after processing. We do not store, view, or distribute your files under any circumstances.</p><h4>3. Analytics & Third Parties</h4><p>We use essential analytics to monitor website traffic and improve user experience. This data is fully anonymized and never shared with or sold to third-party marketing agencies.</p>` 
-            },
-            'terms': { 
-                title: "Terms of Service", 
-                content: `<h4>1. Acceptance of Terms</h4><p>By accessing and utilizing PDFly Tools, you accept and agree to be bound by the terms and provision of this agreement. Furthermore, when using these specific services, you shall be subject to any posted guidelines or rules applicable to such services.</p><h4>2. Appropriate Usage</h4><p>You agree to use PDFly Tools only for lawful purposes. You are strictly prohibited from using our services to facilitate the creation, distribution, or manipulation of illegal, malicious, or highly sensitive confidential material without authorization.</p><h4>3. Intellectual Property</h4><p>The PDFly Tools brand, UI styling, functionality, and written content are the exclusive intellectual property of the developer.</p>` 
-            },
-            'cookies': { 
-                title: "Cookies Policy", 
-                content: `<h4>1. Strictly Necessary Cookies</h4><p>PDFly Tools utilizes local storage and essential browser cookies solely to provide a seamless user experience. This includes saving your UI preferences, such as retaining Dark Mode or Light Mode across your visits.</p><h4>2. Performance Cookies</h4><p>These cookies allow us to count visits and traffic sources so we can measure and improve the performance of our site. They help us to know which pages are the most and least popular.</p><h4>3. User Consent</h4><p>By continuing to use our digital suite, you acknowledge and consent to our utilization of these non-intrusive essential cookies.</p>` 
-            },
-            'disclaimer': { 
-                title: "Disclaimer", 
-                content: `<h4>1. Service Reliability</h4><p>The tools and utilities provided on PDFly Tools are offered on an "as is" and "as available" basis. While we strive for 100% accuracy and uptime, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, or availability of the digital tools.</p><h4>2. Limitation of Liability</h4><p>In no event will PDFly Tools be liable for any loss or damage including without limitation, indirect or consequential loss or damage, or any data loss or corruption arising out of, or in connection with, the use of this website.</p>` 
-            }
+            'privacy': { title: "Privacy Policy", content: `<h4>1. Information Gathering and Usage</h4><p>At PDFly Tools, your privacy is our highest priority. We do not require registration or personal data to use our utility tools. Any file uploaded for processing (Images, PDFs) is temporarily held in secure server memory strictly for execution.</p><h4>2. Data Security & Deletion</h4><p>We employ enterprise-grade security protocols. <strong>All user files are instantly and irreversibly deleted</strong> from our servers immediately after processing. We do not store, view, or distribute your files under any circumstances.</p>` },
+            'terms': { title: "Terms of Service", content: `<h4>1. Acceptance of Terms</h4><p>By accessing and utilizing PDFly Tools, you accept and agree to be bound by the terms and provision of this agreement.</p><h4>2. Appropriate Usage</h4><p>You agree to use PDFly Tools only for lawful purposes. You are strictly prohibited from using our services to facilitate the creation, distribution, or manipulation of illegal material without authorization.</p>` },
+            'cookies': { title: "Cookies Policy", content: `<h4>1. Strictly Necessary Cookies</h4><p>PDFly Tools utilizes local storage and essential browser cookies solely to provide a seamless user experience. This includes saving your UI preferences, such as retaining Dark Mode or Light Mode across your visits.</p>` },
+            'disclaimer': { title: "Disclaimer", content: `<h4>1. Service Reliability</h4><p>The tools and utilities provided on PDFly Tools are offered on an "as is" and "as available" basis. While we strive for 100% accuracy and uptime, we make no representations or warranties of any kind about the completeness, accuracy, reliability, or availability of the digital tools.</p>` }
         };
 
         function openLegal(type) {
@@ -759,8 +773,9 @@
             }
         }
 
+        // Close on clicking outside
         window.onclick = function(event) {
-            if (event.target == profileModal || event.target == legalModal) {
+            if (event.target == profileModal || event.target == contactModal || event.target == legalModal) {
                 closeModals();
             }
         }

@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Text Encryptor Pro - PDFly Tools</title>
+    <meta name="description" content="Securely encrypt and decrypt text messages into unique emoji sequences. Share secret messages, URLs, and more with strong password protection.">
+    <meta name="keywords" content="text encryptor, emoji cipher, secure message, secret text, pdfly tools, text to emoji, encrypt decrypt tool">
+    <meta name="author" content="GT Rao">
+    
+    <!-- Google Fonts: Plus Jakarta Sans for Ultra-HD Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* === UI/UX Variables (PDFly Standard) === */
+        :root {
+            --primary: #3b82f6; 
+            --secondary: #8b5cf6;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --radius-card: 16px; 
+            --radius-pill: 9999px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Light Theme */
+            --bg-body: #f8fafc; 
+            --bg-card: #ffffff; 
+            --bg-glass: rgba(255,255,255,0.85);
+            --bg-input: #f1f5f9; 
+            --bg-hover: #e2e8f0;
+            --text-main: #0f172a; 
+            --text-muted: #64748b;
+            --border: #e2e8f0; 
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.05); 
+            --shadow-hover: 0 10px 25px rgba(59,130,246,0.25);
+            
+            --success: #10b981; 
+            --danger: #ef4444; 
+            --warning: #f59e0b;
+            --info: #0ea5e9;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #020617; 
+            --bg-card: #0f172a; 
+            --bg-glass: rgba(2,6,23,0.75);
+            --bg-input: #1e293b; 
+            --bg-hover: #334155; 
+            --text-main: #f8fafc; 
+            --text-muted: #94a3b8;
+            --border: #1e293b; 
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.4); 
+            --shadow-hover: 0 10px 30px rgba(59,130,246,0.35);
+        }
+
+        /* === Base Styles === */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+        html, body { max-width: 100vw; overflow-x: hidden; scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; transition: background-color 0.3s ease, color 0.3s ease; }
+        a { text-decoration: none; color: var(--primary); }
+        button, input, textarea { font-family: inherit; }
+
+        /* === Scroll & Navbar === */
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--gradient); width: 0%; z-index: 9999; transition: width 0.1s ease; }
+
+        .navbar-wrapper { padding: 1.5rem 1.25rem 0; max-width: 1300px; margin: 0 auto; }
+        .navbar { background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 0.8rem 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); z-index: 100; position: relative;}
+        .nav-brand { font-weight: 800; font-size: 1.3rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 0.5rem; }
+        .nav-brand i { color: var(--primary); -webkit-text-fill-color: initial; }
+        .theme-toggle { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: grid; place-items: center; transition: var(--transition); font-size: 1.1rem;}
+        .theme-toggle:hover { background: var(--primary); color: white; transform: scale(1.05) rotate(15deg); box-shadow: var(--shadow-hover); border-color: var(--primary); }
+
+        /* === Layout === */
+        .container { width: 100%; max-width: 1300px; margin: 0 auto; padding: 0 1.25rem; }
+        .header-section { text-align: center; margin: 2.5rem 0 3rem; }
+        .header-section h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.2; margin-bottom: 0.8rem; letter-spacing: -1px; }
+        .header-section p { font-size: clamp(0.95rem, 2vw, 1.15rem); color: var(--text-muted); max-width: 700px; margin: 0 auto; }
+
+        .tool-grid { display: grid; grid-template-columns: 450px minmax(0, 1fr); gap: 2rem; margin: 2rem 0 4rem; align-items: start; }
+        @media (max-width: 992px) { .tool-grid { grid-template-columns: minmax(0, 1fr); } }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.5rem, 3vw, 2rem); box-shadow: var(--shadow-sm); transition: var(--transition); width: 100%; }
+        .card:hover { border-color: rgba(59,130,246,0.3); box-shadow: var(--shadow-hover); }
+
+        /* === UI Components (Tabs, Inputs, Buttons) === */
+        .custom-tabs { display: flex; gap: 0.5rem; background: var(--bg-input); padding: 0.4rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border); }
+        .custom-tab { flex: 1; padding: 0.8rem; border: none; background: transparent; color: var(--text-muted); font-weight: 700; font-size: 0.95rem; border-radius: 8px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .custom-tab:hover { color: var(--text-main); }
+        .custom-tab.active { background: var(--bg-card); color: var(--primary); box-shadow: var(--shadow-sm); }
+
+        .input-group { position: relative; margin-bottom: 1.25rem; display: flex; flex-direction: column; }
+        .input-group label { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-wrapper { position: relative; width: 100%; }
+        .input-wrapper i { position: absolute; left: 1.1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1rem; pointer-events: none; }
+        .input-wrapper.textarea-wrap i { top: 1.2rem; transform: none; }
+        
+        .input-wrapper input, .input-wrapper textarea { width: 100%; padding: 1rem 1.2rem 1rem 3rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; color: var(--text-main); font-size: 1rem; transition: var(--transition); outline: none; font-weight: 500;}
+        .input-wrapper textarea { resize: vertical; min-height: 120px; line-height: 1.5; }
+        .input-wrapper input:focus, .input-wrapper textarea:focus { border-color: var(--primary); background: var(--bg-card); box-shadow: 0 0 0 4px rgba(59,130,246,0.15); }
+
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; width: 100%; padding: 1rem 1.5rem; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: var(--transition); }
+        .btn-primary { background: var(--gradient); color: white; box-shadow: 0 4px 15px rgba(59,130,246,0.25); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(59,130,246,0.4); }
+        .btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--bg-hover); color: var(--primary); border-color: var(--primary); }
+        .btn-copy-small { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 0 1.2rem; cursor: pointer; font-weight: 700; transition: var(--transition); display: inline-flex; align-items: center; gap: 5px; }
+        .btn-copy-small:hover { background: var(--secondary); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+
+        /* === Output Area / Results === */
+        .output-card { display: flex; flex-direction: column; position: relative; min-height: 420px;}
+        
+        .placeholder-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 350px; border: 2px dashed var(--border); border-radius: 14px; padding: 2rem; text-align: center; color: var(--text-muted); background: rgba(59,130,246,0.02); transition: opacity 0.3s; flex-grow: 1; }
+        .placeholder-state i { font-size: 3.5rem; margin-bottom: 1rem; color: var(--border); }
+        [data-theme="dark"] .placeholder-state i { color: #1e293b; }
+        .placeholder-state h3 { font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text-main); font-weight: 800;}
+
+        .result-section { display: none; flex-direction: column; gap: 1.5rem; flex-grow: 1; animation: fadeIn 0.4s ease; }
+        .result-section.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .result-display-wrapper { background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; transition: var(--transition); width: 100%; min-height: 150px; display: flex; flex-direction: column; gap: 1.2rem;}
+        
+        .result-text { font-size: clamp(1.1rem, 2vw, 1.4rem); font-family: 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif; font-weight: 500; color: var(--text-main); word-break: break-all; overflow-wrap: anywhere; white-space: pre-wrap; line-height: 1.6; }
+        .result-text.error { color: var(--danger); font-weight: 700; font-family: inherit; font-size: 1.1rem; }
+
+        .share-link-box { background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; }
+        .share-link-box p { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.8rem; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        .share-link-inner { display: flex; gap: 0.5rem; }
+        .share-link-inner input { flex: 1; min-width: 0; padding: 0.8rem 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 0.95rem; outline: none; }
+
+        /* === 4 Features Grid === */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(1rem, 3vw, 1.5rem); margin: 4rem 0; }
+        .feature-card { background: var(--bg-card); padding: 1.5rem; text-align: center; border-radius: var(--radius-card); border: 1px solid var(--border); box-shadow: var(--shadow-sm); transition: var(--transition); }
+        .feature-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: var(--shadow-hover); }
+        .feature-card i { font-size: 2rem; margin-bottom: 1rem; color: var(--primary); transition: var(--transition); }
+        .feature-card:hover i { transform: scale(1.1) rotate(5deg); }
+        .feature-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 700; color: var(--text-main); }
+        .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* === SEO Friendly Card Section === */
+        .seo-text-section { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 3rem); margin: 3rem 0; box-shadow: var(--shadow-sm); }
+        .seo-text-section h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 800; margin-bottom: 1.5rem; color: var(--text-main); }
+        .seo-text-section h3 { font-size: clamp(1.1rem, 2vw, 1.4rem); font-weight: 700; margin: 2rem 0 1rem; color: var(--text-main); }
+        .seo-text-section p, .seo-text-section li { font-size: clamp(0.95rem, 1.5vw, 1.05rem); color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; }
+        .seo-text-section ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--text-muted); }
+
+        /* === Footer === */
+        .footer { margin-top: 4rem; padding: clamp(3rem, 5vw, 4rem) 1rem 2rem; border-top: 1px solid var(--border); background: var(--bg-card); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2.5rem; max-width: 1300px; margin: 0 auto 2rem; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--text-main); font-weight: 800; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; transition: var(--transition); font-size: 0.95rem; font-weight: 500; cursor: pointer;}
+        .footer-links a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
+        .dev-badge { background: var(--bg-input); padding: 0.6rem 1.2rem; border-radius: var(--radius-pill); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 700; font-size: 0.9rem; border: 1px solid var(--border); transition: var(--transition); }
+        .dev-badge:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
+        /* === Modals === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); z-index: 2000; padding: 1rem; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 2.5rem); transform: scale(0.9) translateY(20px); transition: var(--transition); border: 1px solid var(--border); box-shadow: var(--shadow-hover); position: relative; max-height: 90vh; overflow-y: auto; text-align: left; }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-input); border: 1px solid var(--border); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--text-main); cursor: pointer; transition: var(--transition); }
+        .modal-close:hover { color: white; background: var(--danger); border-color: var(--danger); transform: rotate(90deg); }
+        
+        /* Developer Profile inside Modal */
+        .dev-profile { text-align: center; }
+        .dev-avatar { width: clamp(100px, 15vw, 120px); height: clamp(100px, 15vw, 120px); border-radius: 50%; background: var(--bg-card); margin: 0 auto 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); border: 4px solid var(--primary); padding: 0; }
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .dev-tags { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+        .dev-tag { background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(59,130,246,0.2); }
+        .dev-social { width: 45px; height: 45px; border-radius: 50%; background: var(--bg-input); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: var(--transition); border: 1px solid var(--border); text-decoration: none; }
+        .dev-social:hover { background: var(--primary); color: white; transform: translateY(-3px); border-color: var(--primary); box-shadow: var(--shadow-sm); }
+
+        /* === Toast Notification & Back to Top === */
+        #toast-container { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: max-content; max-width: 90vw; pointer-events: none;}
+        .toast { background: var(--text-main); color: var(--bg-body); padding: 1rem 1.5rem; border-radius: var(--radius-pill); box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px; animation: slideUp 0.4s forwards, fadeOut 0.4s forwards 2.5s; font-weight: 700; font-size: 0.95rem; border: 1px solid var(--border);}
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(20px); opacity: 0; } }
+        
+        #backToTop { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: var(--shadow-hover); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 1000; font-size: 1.2rem; }
+        #backToTop.show { opacity: 1; visibility: visible; }
+        #backToTop:hover { transform: translateY(-5px) scale(1.05); }
+    </style>
+</head>
+<body>
+
+    <!-- Scroll Progress -->
+    <div id="scroll-progress"></div>
+
+    <!-- Static Navbar -->
+    <div class="navbar-wrapper">
+        <nav class="navbar">
+            <a href="index.html" class="nav-brand">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>PDFly Tools</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                <i class="fa-solid fa-sun" id="themeIcon"></i>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="container">
+        
+        <!-- Header -->
+        <div class="header-section">
+            <h1>Text Encryptor <span>Pro</span></h1>
+            <p id="headlineSub">Securely mask your text into a fun, unreadable emoji cipher.</p>
+        </div>
+
+        <!-- Tool Grid -->
+        <div class="tool-grid">
+            
+            <!-- Left Side: Controls -->
+            <div class="card">
+                <h2><i class="fa-solid fa-shield-halved text-primary"></i> Cryptography Setup</h2>
+                
+                <!-- Custom Tabs -->
+                <div class="custom-tabs">
+                    <button class="custom-tab active" id="tabEncrypt" onclick="switchMode('encrypt')">
+                        <i class="fa-solid fa-lock"></i> Encrypt Data
+                    </button>
+                    <button class="custom-tab" id="tabDecrypt" onclick="switchMode('decrypt')">
+                        <i class="fa-solid fa-unlock-keyhole"></i> Decrypt Data
+                    </button>
+                </div>
+
+                <!-- Encrypt Form -->
+                <div id="encryptControls">
+                    <div class="form-group">
+                        <label>Secret Message</label>
+                        <div class="input-wrapper textarea-wrap">
+                            <i class="fa-solid fa-comment-dots"></i>
+                            <textarea id="plainText" class="large" placeholder="Enter the classified message here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Encryption Password</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-key"></i>
+                            <input type="password" id="encryptPass" placeholder="Set a secure password to lock it">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Optional URL Attachment</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-link"></i>
+                            <input type="url" id="encryptLink" placeholder="e.g. https://google.com">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="processEncryption()" style="margin-top: 1rem;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Emoji Code
+                    </button>
+                </div>
+
+                <!-- Decrypt Form -->
+                <div id="decryptControls" style="display: none;">
+                    <div class="form-group">
+                        <label>Encrypted Emoji Code</label>
+                        <div class="input-wrapper textarea-wrap">
+                            <i class="fa-solid fa-face-smile"></i>
+                            <textarea id="emojiText" class="large" placeholder="Paste the exact emoji sequence here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Decryption Password</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-key"></i>
+                            <input type="password" id="decryptPass" placeholder="Enter the exact password used">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="processDecryption()" style="margin-top: 1rem;">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i> Reveal Hidden Message
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Side: Live Output -->
+            <div class="card output-card">
+                <h2 style="justify-content: center; border-bottom: none;"><i class="fa-solid fa-terminal text-primary"></i> Live Output</h2>
+                
+                <!-- Placeholder State -->
+                <div id="placeholderState" class="placeholder-state">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <h3 id="placeholderTitle">Ready to Encrypt</h3>
+                    <p id="placeholderDesc">Enter your details on the left to generate your secure emoji cipher.</p>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultContent" class="result-section">
+                    
+                    <!-- Result Box -->
+                    <div class="result-display-wrapper">
+                        <div class="result-text" id="resultOutput"></div>
+                        <button class="btn btn-primary" onclick="copyMainResult()" style="width: auto;">
+                            <i class="fa-regular fa-copy"></i> Copy Emoji Code
+                        </button>
+                    </div>
+
+                    <!-- Share Link Box (Encrypt Only) -->
+                    <div class="share-link-box" id="shareLinkBox" style="display:none;">
+                        <p><i class="fa-solid fa-share-nodes text-primary"></i> Shareable Decryption Link</p>
+                        <div class="share-link-inner">
+                            <input type="text" id="shareUrlInput" readonly>
+                            <button class="btn-copy-small" onclick="copyShareUrl()"><i class="fa-solid fa-copy"></i> Copy</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Extracted Link Box (Decrypt Only) -->
+                    <div class="share-link-box" id="extractedLinkBox" style="display:none;">
+                        <p><i class="fa-solid fa-paperclip text-primary"></i> Attached Hidden Link</p>
+                        <div class="share-link-inner">
+                            <input type="text" id="extractedUrlInput" readonly>
+                            <a href="#" target="_blank" id="extractedUrlBtn" class="btn-copy-small"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open</a>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="resetApp()">
+                        <i class="fa-solid fa-rotate-right"></i> Reset Configuration
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 Features Grid -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fa-solid fa-shield-halved"></i>
+                <h3>Robust XOR Encryption</h3>
+                <p>Utilizes a strong local XOR cipher, mapping your private data securely to a custom 256-emoji set.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-face-smile-wink" style="color: var(--warning);"></i>
+                <h3>Fun & Shareable</h3>
+                <p>Convert any secret message or sensitive password into a playful string of emojis. Perfect for social messaging.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-link" style="color: var(--info);"></i>
+                <h3>URL Friendly</h3>
+                <p>Automatically generates auto-loading shareable links for your encrypted messages, making sharing effortless.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-server" style="color: var(--success);"></i>
+                <h3>100% Client-Side Privacy</h3>
+                <p>All cryptography happens instantly inside your browser. Your plain text and passwords never touch our servers.</p>
+            </div>
+        </div>
+
+        <!-- SEO / Info Content Section -->
+        <div class="seo-text-section">
+            <h2>A Secure & Fun Way to Communicate</h2>
+            <p>Welcome to <strong>PDFly Tools</strong>. The Text Encryptor Pro provides a unique and highly secure way to mask your private conversations. Instead of sending raw text that anyone can read or intercept, this tool converts your messages into a fun, completely random-looking sequence of Unicode emojis.</p>
+            
+            <h3>How PDFly Text Encryptor Works</h3>
+            <ul>
+                <li><strong>Step 1: Input Data.</strong> Enter your private text, attach an optional URL, and create a strong password to lock it.</li>
+                <li><strong>Step 2: Processing.</strong> Our system uses a local XOR cipher algorithm in your browser memory to encode the data.</li>
+                <li><strong>Step 3: Emoji Mapping.</strong> The encrypted binary is mapped directly to a massive set of 256 standard emojis.</li>
+                <li><strong>Step 4: Decryption.</strong> Share the emojis or the direct URL link. The recipient simply pastes it, enters the agreed password, and reveals the data!</li>
+            </ul>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>
+                    <a href="index.html" style="text-decoration: none; color: var(--text-main);">
+                        <i class="fa-solid fa-layer-group" style="color:var(--primary)"></i> PDFly Tools
+                    </a>
+                </h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Your ultimate suite for free, secure, and blazing-fast web utilities. Crafted with Ultra HD fluid UI tech.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Top Tools</h4>
+                <ul class="footer-links">
+                    <li><a href="resize-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Resize Image</a></li>
+                    <li><a href="compress-pdf.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Compress PDF</a></li>
+                    <li><a href="qr-code-maker.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> QR Code Maker</a></li>
+                    <li><a href="ghost-text.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Ghost Text</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Legal & Info</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="openModal('privacyModal', event)"><i class="fa-solid fa-shield"></i> Privacy Policy</a></li>
+                    <li><a href="#" onclick="openModal('termsModal', event)"><i class="fa-solid fa-file-contract"></i> Terms of Service</a></li>
+                    <li><a href="#" onclick="openModal('contactModal', event)"><i class="fa-solid fa-headset"></i> Contact Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="dev-badge" onclick="openModal('devProfileModal', event)">
+                <i class="fa-solid fa-code"></i> Developed by GT Rao
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">&copy; 2026 PDFly Tools. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('privacyModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-shield" style="color: var(--primary);"></i> Privacy Policy</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.6;">Your privacy is strictly protected. This encryption tool operates 100% within your web browser utilizing client-side processing.</p>
+            <ul style="color: var(--text-muted); font-size: 0.95rem; padding-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                <li>No text, links, or passwords are ever transmitted to our servers.</li>
+                <li>Processing happens utilizing your device's memory safely.</li>
+                <li>We do not track, store, intercept, or log your generated cipher data.</li>
+            </ul>
+            <button class="btn btn-primary" onclick="closeModal('privacyModal')">Acknowledge</button>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('termsModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-file-contract" style="color: var(--primary);"></i> Terms of Service</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">By using PDFly Tools, you agree to use our utilities responsibly. We provide secure generation logic but are not liable for data loss or breaches stemming from poor password handling. Commercial and personal use is entirely free.</p>
+            <button class="btn btn-primary" onclick="closeModal('termsModal')">I Agree</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('contactModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> Get in Touch</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">Have suggestions or found a bug? We'd love to hear from you. Reach out to us directly:</p>
+            <div style="background: var(--bg-input); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <p style="color: var(--text-main); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope" style="color: var(--primary);"></i> 
+                    <a href="mailto:pdflytools@gmail.com" style="text-decoration: none; color: inherit;">pdflytools@gmail.com</a>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> Azamgarh, Uttar Pradesh, India
+                </p>
+            </div>
+            <button class="btn btn-primary" onclick="closeModal('contactModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- Developer Modal -->
+    <div class="modal-overlay" id="devProfileModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('devProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="dev-profile">
+                <div class="dev-avatar">
+                    <img src="dev-profile.png" alt="GT Rao - Developer" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GT+Rao&background=3b82f6&color=fff&size=128&font-size=0.33&bold=true';">
+                </div>
+                <h2 style="font-size: clamp(1.8rem, 4vw, 2.2rem); margin-bottom: 0.2rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">GT Rao</h2>
+                <p style="color: var(--text-main); font-weight: 600; font-size: 1rem; margin-top: 0.2rem;">Student & Web Developer</p>
+                <p style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Azamgarh, Uttar Pradesh, India</p>
+                
+                <div class="dev-tags">
+                    <span class="dev-tag"><i class="fa-brands fa-html5"></i> Web Dev</span>
+                    <span class="dev-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
+                    <span class="dev-tag"><i class="fa-solid fa-shield"></i> Security Auth</span>
+                    <span class="dev-tag"><i class="fa-solid fa-layer-group"></i> PDFly Tools</span>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center; padding: 1.25rem; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">
+                        Passionate Web Developer dedicated to crafting lightning-fast, secure, and user-centric web applications. I focus on writing clean code, building responsive interfaces, and ensuring absolute client-side privacy.
+                    </p>
+                </div>
+                
+                <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                     <a href="mailto:pdflytools@gmail.com" class="dev-social" title="Email Contact" target="_blank"><i class="fa-solid fa-envelope"></i></a>
+                     <a href="https://instagram.com/mr_gt_rao" class="dev-social" title="Personal Instagram" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                     <a href="https://instagram.com/educate_path" class="dev-social" title="Business / PDFly Tools" target="_blank"><i class="fa-solid fa-briefcase"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Overlays -->
+    <div id="toast-container"></div>
+    <button id="backToTop"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // === Core UI Management ===
+        const els = {
+            html: document.documentElement,
+            themeToggle: document.getElementById('themeToggle'),
+            themeIcon: document.getElementById('themeIcon'),
+            scrollProg: document.getElementById('scroll-progress'),
+            btt: document.getElementById('backToTop')
+        };
+
+        const initTheme = () => {
+            const saved = localStorage.getItem('pdfly-theme') || 'dark'; 
+            els.html.setAttribute('data-theme', saved);
+            els.themeIcon.className = saved === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        };
+        els.themeToggle.addEventListener('click', () => {
+            const next = els.html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            els.html.setAttribute('data-theme', next);
+            localStorage.setItem('pdfly-theme', next);
+            els.themeIcon.className = next === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        });
+        initTheme();
+
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            els.scrollProg.style.width = ((document.body.scrollTop || document.documentElement.scrollTop) / h) * 100 + "%";
+            els.btt.classList.toggle('show', (document.body.scrollTop || document.documentElement.scrollTop) > 300);
+        });
+        els.btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const iconClass = type === 'success' ? 'fa-circle-check' : 'fa-triangle-exclamation';
+            toast.innerHTML = `<i class="fa-solid ${iconClass}"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { if(container.contains(toast)) toast.remove(); }, 3500);
+        }
+
+        // PERFECT MODAL LOGIC - With event.preventDefault() to stop page jumping
+        window.openModal = (id, e) => { 
+            if(e) e.preventDefault(); 
+            document.getElementById(id).classList.add('active'); 
+        };
+        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+        window.onclick = e => { if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('active'); };
+
+        // === Check URL for shared encrypted messages ===
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(location.search);
+            if (params.has('e')) {
+                switchMode('decrypt');
+                document.getElementById('emojiText').value = decodeURIComponent(params.get('e'));
+                showToast("Encrypted message loaded!", "success");
+            }
+        });
+
+        // === Encryptor App State ===
+        let currentMode = 'encrypt';
+        
+        function switchMode(mode) {
+            currentMode = mode;
+            const tabEncrypt = document.getElementById('tabEncrypt');
+            const tabDecrypt = document.getElementById('tabDecrypt');
+            const encryptControls = document.getElementById('encryptControls');
+            const decryptControls = document.getElementById('decryptControls');
+            
+            const placeholderState = document.getElementById('placeholderState');
+            const resultContent = document.getElementById('resultContent');
+            const headlineSub = document.getElementById('headlineSub');
+            
+            const pTitle = document.getElementById('placeholderTitle');
+            const pDesc = document.getElementById('placeholderDesc');
+            const pIcon = placeholderState.querySelector('i');
+
+            placeholderState.style.display = 'flex';
+            resultContent.classList.remove('active');
+            
+            if (mode === 'encrypt') {
+                tabEncrypt.classList.add('active');
+                tabDecrypt.classList.remove('active');
+                encryptControls.style.display = 'block';
+                decryptControls.style.display = 'none';
+                
+                headlineSub.textContent = 'Securely mask your text into a fun, unreadable emoji cipher.';
+                pTitle.textContent = 'Ready to Encrypt';
+                pDesc.textContent = 'Enter your details on the left to generate your secure emoji cipher.';
+                pIcon.className = 'fa-solid fa-shield-halved';
+            } else {
+                tabDecrypt.classList.add('active');
+                tabEncrypt.classList.remove('active');
+                decryptControls.style.display = 'block';
+                encryptControls.style.display = 'none';
+                
+                headlineSub.textContent = 'Decode an emoji cipher back to its original hidden message.';
+                pTitle.textContent = 'Ready to Decrypt';
+                pDesc.textContent = 'Paste the emoji code and password to reveal the hidden data.';
+                pIcon.className = 'fa-solid fa-unlock-keyhole';
+            }
+        }
+
+        // === Instant Cryptography Logic ===
+        const emojiBase = 0x1F600; // 😀 Standard Emoji Set
+        const emojiMap = {};
+        const reverseMap = {};
+
+        for (let i = 0; i < 256; i++) {
+            const emoji = String.fromCodePoint(emojiBase + i);
+            emojiMap[i] = emoji;
+            reverseMap[emoji] = i;
+        }
+
+        function getKey(pass) {
+            let sum = 0;
+            for (let ch of pass) sum = (sum + ch.charCodeAt(0)) % 256; 
+            return sum; 
+        }
+
+        function xorEncrypt(str, key) {
+            let res = '';
+            for (let i = 0; i < str.length; i++) res += String.fromCharCode(str.charCodeAt(i) ^ key);
+            return res;
+        }
+
+        function encodeEmoji(text, pass) {
+            const key = getKey(pass);
+            const utf8String = unescape(encodeURIComponent(text));
+            const xored = xorEncrypt(utf8String, key);
+            
+            let em = '';
+            for (let i = 0; i < xored.length; i++) em += emojiMap[xored.charCodeAt(i)];
+            return em;
+        }
+
+        function decodeEmoji(emojis, pass) {
+            let bytes = [];
+            for (let ch of emojis) if (reverseMap[ch] !== undefined) bytes.push(reverseMap[ch]);
+
+            try {
+                const xored = String.fromCharCode(...bytes);
+                const key = getKey(pass);
+                const decryptedRaw = xorEncrypt(xored, key);
+                return decodeURIComponent(escape(decryptedRaw));
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // === Instant Action Processing ===
+        function processEncryption() {
+            const msg = document.getElementById('plainText').value.trim();
+            const pass = document.getElementById('encryptPass').value;
+            const link = document.getElementById('encryptLink').value.trim();
+            
+            if (!msg || !pass) {
+                showToast('Message and password are required!', 'error');
+                return;
+            }
+
+            const placeholder = document.getElementById('placeholderState');
+            const resultSection = document.getElementById('resultContent');
+            const output = document.getElementById('resultOutput');
+            const shareBox = document.getElementById('shareLinkBox');
+            const extractedBox = document.getElementById('extractedLinkBox');
+
+            // Process immediately without delay
+            const fullMsg = link ? `${msg}\n[Link]: ${link}` : msg;
+            const encrypted = encodeEmoji(fullMsg, pass);
+            
+            output.classList.remove('error');
+            output.textContent = encrypted;
+            
+            const shareURL = `${location.origin}${location.pathname}?e=${encodeURIComponent(encrypted)}`;
+            document.getElementById('shareUrlInput').value = shareURL;
+            
+            shareBox.style.display = 'block';
+            extractedBox.style.display = 'none';
+
+            placeholder.style.display = 'none';
+            resultSection.classList.add('active');
+            showToast('Emoji code generated instantly!', 'success');
+        }
+
+        function processDecryption() {
+            const em = document.getElementById('emojiText').value.trim();
+            const pass = document.getElementById('decryptPass').value;
+            
+            if (!em || !pass) {
+                showToast('Emoji code and password are required!', 'error');
+                return;
+            }
+
+            const placeholder = document.getElementById('placeholderState');
+            const resultSection = document.getElementById('resultContent');
+            const output = document.getElementById('resultOutput');
+            const shareBox = document.getElementById('shareLinkBox');
+            const extractedBox = document.getElementById('extractedLinkBox');
+
+            // Process immediately without delay
+            const decrypted = decodeEmoji(em, pass);
+            shareBox.style.display = 'none';
+
+            if (decrypted === null) {
+                output.classList.add('error');
+                output.textContent = "Error: Invalid emoji code or incorrect password.";
+                extractedBox.style.display = 'none';
+                showToast('Decryption failed', 'error');
+            } else {
+                output.classList.remove('error');
+                
+                const linkDelimiter = '\n[Link]: ';
+                const linkIndex = decrypted.indexOf(linkDelimiter);
+
+                if (linkIndex !== -1) {
+                    const messagePart = decrypted.substring(0, linkIndex);
+                    const linkPart = decrypted.substring(linkIndex + linkDelimiter.length);
+                    output.textContent = messagePart;
+                    document.getElementById('extractedUrlInput').value = linkPart;
+                    document.getElementById('extractedUrlBtn').href = linkPart;
+                    extractedBox.style.display = 'block';
+                } else {
+                    output.textContent = decrypted;
+                    extractedBox.style.display = 'none';
+                }
+                showToast('Message Revealed!', 'success');
+            }
+
+            placeholder.style.display = 'none';
+            resultSection.classList.add('active');
+        }
+
+        // === Helpers ===
+        function copyMainResult() {
+            const text = document.getElementById('resultOutput').textContent;
+            if(!text || text.includes('Error:')) return;
+            executeCopy(text);
+        }
+
+        function copyShareUrl() {
+            const url = document.getElementById('shareUrlInput').value;
+            executeCopy(url);
+        }
+
+        function executeCopy(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => { showToast('Copied to clipboard!'); })
+                .catch(() => { fallbackCopy(text); });
+            } else { fallbackCopy(text); }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try { document.execCommand('copy'); showToast('Copied to clipboard!'); } 
+            catch(e) { showToast('Failed to copy', 'error'); }
+            document.body.removeChild(textarea);
+        }
+
+        function resetApp() {
+            if(confirm('Are you sure you want to clear all configurations?')) {
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>

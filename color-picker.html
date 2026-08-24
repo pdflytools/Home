@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Color Code Finder Pro - PDFly Tools</title>
+    <meta name="description" content="Extract exact HEX, RGB, HSL, and CMYK color codes with precision sliders, live image eyedropper, and color harmony palettes. 100% Free.">
+    <meta name="keywords" content="color code finder, hex picker, rgb color picker, image color extractor, eyedropper tool, hsl converter, color palette generator, pdfly tools">
+    <meta name="author" content="GT Rao">
+    
+    <!-- Google Fonts: Plus Jakarta Sans for Ultra-HD Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* === UI/UX Variables (PDFly Standard) === */
+        :root {
+            --primary: #3b82f6; 
+            --secondary: #8b5cf6;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --radius-card: 16px; 
+            --radius-pill: 9999px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Light Theme */
+            --bg-body: #f8fafc; 
+            --bg-card: #ffffff; 
+            --bg-glass: rgba(255, 255, 255, 0.85);
+            --bg-input: #f1f5f9; 
+            --bg-hover: #e2e8f0;
+            --text-main: #0f172a; 
+            --text-muted: #64748b;
+            --border: #e2e8f0; 
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05); 
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.25);
+            
+            --success: #10b981; 
+            --danger: #ef4444; 
+            --warning: #f59e0b;
+            --info: #0ea5e9;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #020617; 
+            --bg-card: #0f172a; 
+            --bg-glass: rgba(2, 6, 23, 0.75);
+            --bg-input: #1e293b; 
+            --bg-hover: #334155; 
+            --text-main: #f8fafc; 
+            --text-muted: #94a3b8;
+            --border: #1e293b; 
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4); 
+            --shadow-hover: 0 10px 30px rgba(59, 130, 246, 0.35);
+        }
+
+        /* === Base Styles === */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-body); color: var(--text-main); transition: background-color 0.4s ease, color 0.4s ease; overflow-x: hidden; }
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--gradient); width: 0%; z-index: 9999; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* === Navbar (Static) === */
+        .navbar-wrapper { padding: 1.5rem 1rem 1rem; max-width: 1300px; margin: 0 auto; }
+        .navbar {
+            background: var(--bg-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 0.8rem 1.5rem; 
+            display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm);
+        }
+        .nav-brand { font-size: 1.3rem; font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; display: flex; align-items: center; gap: 8px;}
+        .nav-brand i { color: var(--primary); -webkit-text-fill-color: initial; }
+        .theme-toggle { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: var(--transition); font-size: 1.1rem; }
+        .theme-toggle:hover { background: var(--primary); color: white; transform: rotate(15deg); }
+
+        /* === Layout === */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.2rem; }
+        .header-section { text-align: center; margin-bottom: 3rem; padding-top: 1rem; }
+        .header-section h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 0.8rem; line-height: 1.2; letter-spacing: -1px; }
+        .header-section h1 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-section p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.1rem); max-width: 700px; margin: 0 auto; line-height: 1.6; }
+
+        .tool-workspace { display: flex; flex-direction: column; gap: 2rem; margin-bottom: 3rem; }
+        @media (min-width: 992px) { 
+            .tool-workspace { flex-direction: row; align-items: flex-start; gap: 2.5rem; }
+            .left-panel { flex: 1.2; min-width: 0; }
+            .right-panel { flex: 1.8; min-width: 0; position: sticky; top: 20px; }
+        }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.2rem, 3vw, 1.8rem); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; transition: var(--transition);}
+        .card:hover { border-color: rgba(59,130,246,0.3); box-shadow: var(--shadow-hover); }
+        .card h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
+
+        /* === Custom Tabs === */
+        .sub-tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; background: var(--bg-input); padding: 0.4rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border); }
+        .sub-tab { flex: 1; padding: 0.8rem 0.2rem; border: none; background: transparent; color: var(--text-muted); font-weight: 700; border-radius: 8px; cursor: pointer; transition: var(--transition); font-size: 0.95rem; display: flex; justify-content: center; align-items: center; gap: 8px;}
+        .sub-tab:hover { color: var(--text-main); }
+        .sub-tab.active { background: var(--bg-card); color: var(--primary); box-shadow: var(--shadow-sm); }
+        
+        .tab-pane { display: none; animation: fadeIn 0.3s ease; }
+        .tab-pane.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* === Sliders & Controls === */
+        .slider-group { margin-bottom: 1.5rem; }
+        .slider-label { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.8rem; text-transform: uppercase;}
+        .slider-label span.badge { color: white; background: var(--primary); padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 800; font-size: 0.85rem; }
+
+        input[type="range"] { width: 100%; -webkit-appearance: none; appearance: none; height: 10px; border-radius: var(--radius-pill); background: var(--bg-input); outline: none; cursor: pointer; border: 1px solid var(--border); }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #ffffff; cursor: pointer; border: 3px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+        #hueSlider { background: linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); }
+
+        /* Quick Color Picker */
+        .color-quick-picker { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; background: var(--bg-input); padding: 1rem; border-radius: 12px; border: 1px solid var(--border); }
+        .color-quick-picker input[type="color"] { -webkit-appearance: none; appearance: none; border: none; width: 45px; height: 45px; border-radius: 10px; cursor: pointer; background: transparent; }
+        .color-quick-picker input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-quick-picker input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 10px; }
+
+        /* Image Upload Box */
+        .upload-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 2rem 1rem; text-align: center; background: var(--bg-input); cursor: pointer; transition: var(--transition); margin-bottom: 1.5rem; position: relative; }
+        .upload-zone:hover { border-color: var(--primary); background: rgba(59,130,246,0.05); }
+        .upload-zone i { font-size: 2.5rem; color: var(--primary); margin-bottom: 0.8rem; }
+        .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+        /* Buttons */
+        .btn-group { display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;}
+        .btn { padding: 1rem 1.5rem; border: none; font-weight: 700; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; transition: var(--transition); flex: 1; min-width: 140px; }
+        .btn-primary { background: var(--gradient); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover { box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5); transform: translateY(-2px); }
+        .btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--bg-hover); color: var(--primary); border-color: var(--primary); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover { background: var(--danger); color: white; transform: translateY(-2px);}
+        
+        .btn-copy-tiny { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 8px; padding: 0.5rem 0.8rem; cursor: pointer; font-weight: 700; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.9rem;}
+        .btn-copy-tiny:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* === Output Area / Results === */
+        .output-card { display: flex; flex-direction: column; position: relative; min-height: 400px;}
+        
+        /* Canvas & Magnifier */
+        .preview-wrapper { position: relative; width: 100%; margin-bottom: 1.5rem; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg-input); display: none; justify-content: center; align-items: center; padding: 0.5rem;}
+        .preview-wrapper.active { display: flex; }
+        canvas#imageCanvas { display: block; max-width: 100%; height: auto; cursor: crosshair; border-radius: 8px; object-fit: contain; max-height: 400px;}
+        
+        .magnifier { position: absolute; border: 3px solid var(--primary); border-radius: 50%; width: 120px; height: 120px; overflow: hidden; display: none; z-index: 20; pointer-events: none; background: var(--bg-card); box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+        .magnifier canvas#magnifierCanvas { position: absolute; top: 0; left: 0; transform: scale(4); transform-origin: top left; image-rendering: pixelated; }
+
+        .ripple { position: absolute; border-radius: 50%; transform: scale(0); animation: ripple-animation 0.5s ease-out; background-color: rgba(59, 130, 246, 0.6); pointer-events: none; z-index: 10; }
+        @keyframes ripple-animation { to { transform: scale(4); opacity: 0; } }
+
+        /* Hero Color Display */
+        .color-hero-display { display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: var(--bg-input); padding: 1.5rem; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 1.5rem; flex-wrap: wrap;}
+        .color-hero-left { display: flex; align-items: center; gap: 1.2rem; }
+        .color-hero-swatch { width: 70px; height: 70px; border-radius: 12px; border: 2px solid var(--border); box-shadow: var(--shadow-sm); flex-shrink: 0; transition: var(--transition); }
+        .color-hero-info { display: flex; flex-direction: column; }
+        .color-hero-hex { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; color: var(--text-main); line-height: 1.1; }
+        .color-hero-meta { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-top: 5px; }
+
+        /* Formats Grid */
+        .codes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .code-box { background: var(--bg-input); border: 1px dashed var(--border); border-radius: 12px; padding: 1rem; display: flex; justify-content: space-between; align-items: center; transition: var(--transition); }
+        .code-box:hover { border-color: var(--primary); border-style: solid; background: var(--bg-card); box-shadow: var(--shadow-sm);}
+        .code-box-info p { font-size: 0.8rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); margin-bottom: 0.2rem; }
+        .code-box-info span { font-size: 1rem; font-weight: 700; color: var(--text-main); font-family: monospace; }
+
+        /* Harmonies & History */
+        .palette-section { margin-bottom: 2rem; }
+        .palette-title { font-size: 1rem; font-weight: 800; color: var(--text-main); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;}
+        
+        .palette-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; }
+        .palette-item { height: 50px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); position: relative;}
+        .palette-item:hover { transform: translateY(-4px) scale(1.05); box-shadow: var(--shadow-hover); z-index: 2;}
+        .palette-item span { font-size: 0.75rem; font-weight: 700; background: rgba(0,0,0,0.7); color: #fff; padding: 3px 6px; border-radius: 6px; opacity: 0; transition: opacity 0.2s ease; }
+        .palette-item:hover span { opacity: 1; }
+
+        .history-list { display: flex; flex-wrap: wrap; gap: 0.6rem; max-height: 100px; overflow-y: auto; padding-right: 5px;}
+        .history-list::-webkit-scrollbar { width: 6px; }
+        .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        .history-color-chip { width: 35px; height: 35px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; transition: var(--transition); flex-shrink: 0; box-shadow: var(--shadow-sm);}
+        .history-color-chip:hover { transform: scale(1.15); border-color: var(--primary); }
+
+        /* === 4 Features Grid === */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(1rem, 3vw, 1.5rem); margin: 4rem 0; }
+        .feature-card { background: var(--bg-card); padding: 1.5rem; text-align: center; border-radius: var(--radius-card); border: 1px solid var(--border); box-shadow: var(--shadow-sm); transition: var(--transition); }
+        .feature-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: var(--shadow-hover); }
+        .feature-card i { font-size: 2rem; margin-bottom: 1rem; color: var(--primary); transition: var(--transition); }
+        .feature-card:hover i { transform: scale(1.1) rotate(5deg); }
+        .feature-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 700; color: var(--text-main); }
+        .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* === SEO Friendly Card Section === */
+        .seo-text-section { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 3rem); margin: 3rem 0; box-shadow: var(--shadow-sm); }
+        .seo-text-section h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 800; margin-bottom: 1.5rem; color: var(--text-main); }
+        .seo-text-section h3 { font-size: clamp(1.1rem, 2vw, 1.4rem); font-weight: 700; margin: 2rem 0 1rem; color: var(--text-main); }
+        .seo-text-section p, .seo-text-section li { font-size: clamp(0.95rem, 1.5vw, 1.05rem); color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; }
+        .seo-text-section ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--text-muted); }
+
+        /* === Footer === */
+        .footer { margin-top: 4rem; padding: clamp(3rem, 5vw, 4rem) 1rem 2rem; border-top: 1px solid var(--border); background: var(--bg-card); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2.5rem; max-width: 1300px; margin: 0 auto 2rem; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--text-main); font-weight: 800; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; transition: var(--transition); font-size: 0.95rem; font-weight: 500; cursor: pointer;}
+        .footer-links a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
+        .dev-badge { background: var(--bg-input); padding: 0.6rem 1.2rem; border-radius: var(--radius-pill); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 700; font-size: 0.9rem; border: 1px solid var(--border); transition: var(--transition); }
+        .dev-badge:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
+        /* === Modals === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); z-index: 2000; padding: 1rem; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 2.5rem); transform: scale(0.9) translateY(20px); transition: var(--transition); border: 1px solid var(--border); box-shadow: var(--shadow-hover); position: relative; max-height: 90vh; overflow-y: auto; text-align: left; }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-input); border: 1px solid var(--border); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--text-main); cursor: pointer; transition: var(--transition); }
+        .modal-close:hover { color: white; background: var(--danger); border-color: var(--danger); transform: rotate(90deg); }
+        
+        /* Developer Profile inside Modal */
+        .dev-profile { text-align: center; }
+        .dev-avatar { width: clamp(100px, 15vw, 120px); height: clamp(100px, 15vw, 120px); border-radius: 50%; background: var(--bg-card); margin: 0 auto 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); border: 4px solid var(--primary); padding: 0; }
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .dev-tags { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+        .dev-tag { background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(59,130,246,0.2); }
+        .dev-social { width: 45px; height: 45px; border-radius: 50%; background: var(--bg-input); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: var(--transition); border: 1px solid var(--border); text-decoration: none; }
+        .dev-social:hover { background: var(--primary); color: white; transform: translateY(-3px); border-color: var(--primary); box-shadow: var(--shadow-sm); }
+
+        /* === Toast Notification === */
+        #toast-container { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: max-content; max-width: 90vw; pointer-events: none;}
+        .toast { background: var(--text-main); color: var(--bg-body); padding: 1rem 1.5rem; border-radius: var(--radius-pill); box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px; animation: slideUp 0.4s forwards, fadeOut 0.4s forwards 2.5s; font-weight: 700; font-size: 0.95rem; border: 1px solid var(--border);}
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.info { border-left: 4px solid var(--info); }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(20px); opacity: 0; } }
+        
+        #backToTop { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: var(--shadow-hover); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 1000; font-size: 1.2rem; }
+        #backToTop.show { opacity: 1; visibility: visible; }
+        #backToTop:hover { transform: translateY(-5px) scale(1.05); }
+    </style>
+</head>
+<body>
+
+    <!-- Scroll Progress -->
+    <div id="scroll-progress"></div>
+
+    <!-- Static Navbar -->
+    <div class="navbar-wrapper">
+        <nav class="navbar">
+            <a href="index.html" class="nav-brand">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>PDFly Tools</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                <i class="fa-solid fa-sun" id="themeIcon"></i>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="container">
+        
+        <!-- Header -->
+        <div class="header-section">
+            <h1>Color Code Finder <span>Pro</span></h1>
+            <p id="headlineSub">Precision Color Palette, Custom Sliders & Advanced Image Eyedropper Studio.</p>
+        </div>
+
+        <!-- Tool Grid -->
+        <div class="tool-workspace">
+            
+            <!-- Left Side: Controls -->
+            <div class="left-panel">
+                <div class="card">
+                    
+                    <!-- Custom Tabs -->
+                    <div class="sub-tabs">
+                        <button class="sub-tab active" id="tabSliderBtn" onclick="switchTab('sliders')">
+                            <i class="fa-solid fa-sliders"></i> Manual Sliders
+                        </button>
+                        <button class="sub-tab" id="tabImageBtn" onclick="switchTab('image')">
+                            <i class="fa-solid fa-eye-dropper"></i> Image Picker
+                        </button>
+                    </div>
+
+                    <!-- Sliders Controls -->
+                    <div id="slidersControls">
+                        
+                        <div class="color-quick-picker" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; background: var(--bg-input); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+                            <input type="color" id="nativeColorInput" value="#3b82f6" style="-webkit-appearance: none; border: none; width: 45px; height: 45px; border-radius: 10px; cursor: pointer; background: transparent;">
+                            <div>
+                                <p style="font-weight: 700; color: var(--text-main); font-size: 0.95rem; margin-bottom: 0.2rem;">Quick Native Picker</p>
+                                <p style="font-size: 0.8rem; color: var(--text-muted);">Click icon to open device color wheel</p>
+                            </div>
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="slider-label">
+                                <span><i class="fa-solid fa-circle-notch"></i> Hue</span>
+                                <span class="badge" id="hueValue">217°</span>
+                            </div>
+                            <input type="range" id="hueSlider" min="0" max="360" value="217">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="slider-label">
+                                <span><i class="fa-solid fa-droplet"></i> Saturation</span>
+                                <span class="badge" id="satValue">91%</span>
+                            </div>
+                            <input type="range" id="satSlider" min="0" max="100" value="91">
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="slider-label">
+                                <span><i class="fa-solid fa-sun"></i> Lightness</span>
+                                <span class="badge" id="lightValue">60%</span>
+                            </div>
+                            <input type="range" id="lightSlider" min="0" max="100" value="60">
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="copyFormat('hex')">
+                                <i class="fa-regular fa-copy"></i> Copy HEX
+                            </button>
+                            <button class="btn btn-secondary" onclick="randomizeColor()">
+                                <i class="fa-solid fa-shuffle"></i> Random
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Image Picker Controls -->
+                    <div id="imageControls" style="display: none;">
+                        
+                        <div class="upload-zone" id="dropZone">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <h3 style="font-size:1.1rem; margin-bottom: 0.3rem; color: var(--text-main);">Upload Image</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Drag & drop or click to browse (PNG, JPG, WEBP)</p>
+                            <input type="file" id="imageUploader" accept="image/*">
+                        </div>
+
+                        <div style="background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.2); padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+                                <i class="fa-solid fa-circle-info" style="color: var(--primary);"></i> Hover over the image preview on the right to zoom with the 4x magnification loupe and click any pixel to sample the exact color code.
+                            </p>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="triggerEyedropperAPI()">
+                                <i class="fa-solid fa-eye-dropper"></i> Screen Eyedropper
+                            </button>
+                            <button class="btn btn-danger" onclick="resetImagePicker()">
+                                <i class="fa-solid fa-arrow-rotate-left"></i> Reset Image
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Output/Results -->
+            <div class="right-panel">
+                <div class="card output-card">
+                    
+                    <!-- Interactive Canvas Preview for Image Mode -->
+                    <div class="preview-wrapper" id="previewWrapper">
+                        <canvas id="imageCanvas"></canvas>
+                        <div class="magnifier" id="magnifier">
+                            <canvas id="magnifierCanvas"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Main Hero Color Info -->
+                    <div class="color-hero-display">
+                        <div class="color-hero-left">
+                            <div class="color-hero-swatch" id="mainSwatch" style="background-color: #3b82f6;"></div>
+                            <div class="color-hero-info">
+                                <div class="color-hero-hex" id="hexDisplay">#3B82F6</div>
+                                <div class="color-hero-meta" id="colorNameMeta">Primary Royal Blue</div>
+                            </div>
+                        </div>
+                        <button class="btn-copy-tiny" onclick="copyFormat('hex')" title="Copy HEX Code" style="padding: 0.8rem; font-size: 1.2rem;">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+
+                    <!-- Formats Code Grid -->
+                    <div class="codes-grid">
+                        <div class="code-box">
+                            <div class="code-box-info">
+                                <p>HEX</p>
+                                <span id="codeHex">#3B82F6</span>
+                            </div>
+                            <button class="btn-copy-tiny" onclick="copyFormat('hex')" title="Copy HEX"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                        <div class="code-box">
+                            <div class="code-box-info">
+                                <p>RGB</p>
+                                <span id="codeRGB">rgb(59, 130, 246)</span>
+                            </div>
+                            <button class="btn-copy-tiny" onclick="copyFormat('rgb')" title="Copy RGB"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                        <div class="code-box">
+                            <div class="code-box-info">
+                                <p>HSL</p>
+                                <span id="codeHSL">hsl(217, 91%, 60%)</span>
+                            </div>
+                            <button class="btn-copy-tiny" onclick="copyFormat('hsl')" title="Copy HSL"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                        <div class="code-box">
+                            <div class="code-box-info">
+                                <p>CMYK</p>
+                                <span id="codeCMYK">76%, 47%, 0%, 4%</span>
+                            </div>
+                            <button class="btn-copy-tiny" onclick="copyFormat('cmyk')" title="Copy CMYK"><i class="fa-regular fa-copy"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Harmonic Palettes -->
+                    <div class="palette-section">
+                        <div class="palette-title">
+                            <i class="fa-solid fa-swatchbook" style="color: var(--primary);"></i> Color Harmony Palette
+                        </div>
+                        <div class="palette-row" id="harmonyPalette">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Color History -->
+                    <div class="palette-section">
+                        <div class="palette-title" style="justify-content: space-between;">
+                            <span><i class="fa-solid fa-clock-rotate-left" style="color: var(--warning);"></i> Sampled History</span>
+                            <button class="btn-copy-tiny" onclick="clearColorHistory()" title="Clear History" style="color: var(--danger); padding: 0.3rem 0.6rem; font-size: 0.8rem; border: none;">
+                                <i class="fa-solid fa-trash-can"></i> Clear
+                            </button>
+                        </div>
+                        <div class="history-list" id="historyList">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 Features Grid -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fa-solid fa-eye-dropper" style="color: var(--primary);"></i>
+                <h3>Pixel Precision Eyedropper</h3>
+                <p>Upload images and utilize the 4x magnification loupe to pinpoint colors with exact coordinate sampling directly on your screen.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-sliders" style="color: var(--secondary);"></i>
+                <h3>Multi-Format Converter</h3>
+                <p>Instantly transform values across HEX, RGB, HSL, and CMYK color spaces in real time without refreshing the page.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-swatchbook" style="color: var(--info);"></i>
+                <h3>Harmonic Palettes</h3>
+                <p>Automatically generate complementary, monochromatic, and analogous harmonious color variations for your web designs.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-shield-halved" style="color: var(--success);"></i>
+                <h3>100% Client-Side Privacy</h3>
+                <p>Your images and color palettes never leave your browser. Zero server uploads, completely safe and secure.</p>
+            </div>
+        </div>
+
+        <!-- SEO Content -->
+        <div class="seo-text-section">
+            <h2>Ultimate Online Color Code Studio & Image Eyedropper</h2>
+            <p><strong>Color Code Finder Pro</strong> is an all-in-one web utility designed for UI/UX designers, front-end developers, digital artists, and creators. Whether you are crafting responsive web designs, styling digital artwork, or matching exact brand guidelines, this tool provides instant access to all standard color formats.</p>
+            
+            <h3 style="margin-top: 1.5rem;">How to Use Color Code Finder Pro:</h3>
+            <ul>
+                <li><strong>Sliders Mode:</strong> Adjust the interactive Hue, Saturation, and Lightness bars to construct custom shades, or use the Native Palette wheel for rapid color selection.</li>
+                <li><strong>Image Eyedropper:</strong> Upload or drag-and-drop any graphic file. Hover over pixels to view an enlarged 4x crosshair loupe, and click to extract exact color codes.</li>
+                <li><strong>Harmonies & History:</strong> Click any generated harmony shade to inspect it, and access recent picks through the intelligent Color History panel.</li>
+                <li><strong>One-Click Copy:</strong> Tap any copy icon to immediately transfer HEX, RGB, HSL, or CMYK codes to your clipboard for your CSS or graphic design software.</li>
+            </ul>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>
+                    <a href="index.html" style="text-decoration: none; color: var(--text-main);">
+                        <i class="fa-solid fa-layer-group" style="color:var(--primary)"></i> PDFly Tools
+                    </a>
+                </h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Your ultimate suite for free, secure, and blazing-fast web utilities. Crafted with Ultra HD fluid UI tech.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Top Tools</h4>
+                <ul class="footer-links">
+                    <li><a href="resize-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Resize Image</a></li>
+                    <li><a href="compress-pdf.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Compress PDF</a></li>
+                    <li><a href="qr-code-maker.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> QR Code Maker</a></li>
+                    <li><a href="word-counter.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Word Counter Pro</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Legal & Info</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="openModal('privacyModal', event)"><i class="fa-solid fa-shield"></i> Privacy Policy</a></li>
+                    <li><a href="#" onclick="openModal('termsModal', event)"><i class="fa-solid fa-file-contract"></i> Terms of Service</a></li>
+                    <li><a href="#" onclick="openModal('contactModal', event)"><i class="fa-solid fa-headset"></i> Contact Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="dev-badge" onclick="openModal('devProfileModal', event)">
+                <i class="fa-solid fa-code"></i> Developed by GT Rao
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">&copy; 2026 PDFly Tools. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('privacyModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-shield" style="color: var(--primary);"></i> Privacy Policy</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.6;">Your privacy is strictly protected. This color tool operates 100% within your web browser utilizing client-side processing.</p>
+            <ul style="color: var(--text-muted); font-size: 0.95rem; padding-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                <li>Your uploaded images and extracted codes are never transmitted to our servers.</li>
+                <li>Processing happens utilizing your device's memory safely.</li>
+                <li>We do not track, store, intercept, or log any of your entered data.</li>
+            </ul>
+            <button class="btn btn-primary" onclick="closeModal('privacyModal')">Acknowledge</button>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('termsModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-file-contract" style="color: var(--primary);"></i> Terms of Service</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">By using PDFly Tools, you agree to use our utilities provided "as is". Because all tools run client-side, we are not liable for any data loss, though all operations are strictly safe. Commercial and personal use is entirely free.</p>
+            <button class="btn btn-primary" onclick="closeModal('termsModal')">I Agree</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('contactModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> Get in Touch</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">Have suggestions or found a bug? We'd love to hear from you. Reach out to us directly:</p>
+            <div style="background: var(--bg-input); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <p style="color: var(--text-main); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope" style="color: var(--primary);"></i> 
+                    <a href="mailto:pdflytools@gmail.com" style="text-decoration: none; color: inherit;">pdflytools@gmail.com</a>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> Azamgarh, Uttar Pradesh, India
+                </p>
+            </div>
+            <button class="btn btn-primary" onclick="closeModal('contactModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- Developer Modal -->
+    <div class="modal-overlay" id="devProfileModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('devProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="dev-profile">
+                <div class="dev-avatar">
+                    <img src="dev-profile.png" alt="GT Rao - Developer" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GT+Rao&background=3b82f6&color=fff&size=128&font-size=0.33&bold=true';">
+                </div>
+                <h2 style="font-size: clamp(1.8rem, 4vw, 2.2rem); margin-bottom: 0.2rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">GT Rao</h2>
+                <p style="color: var(--text-main); font-weight: 600; font-size: 1rem; margin-top: 0.2rem;">Student & Web Developer</p>
+                <p style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Azamgarh, Uttar Pradesh, India</p>
+                
+                <div class="dev-tags">
+                    <span class="dev-tag"><i class="fa-brands fa-html5"></i> Web Dev</span>
+                    <span class="dev-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
+                    <span class="dev-tag"><i class="fa-solid fa-wand-magic"></i> UI/UX Design</span>
+                    <span class="dev-tag"><i class="fa-solid fa-layer-group"></i> PDFly Tools</span>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center; padding: 1.25rem; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">
+                        Passionate Web Developer dedicated to crafting lightning-fast, secure, and user-centric web applications. I focus on writing clean code, building responsive interfaces, and ensuring absolute client-side privacy.
+                    </p>
+                </div>
+                
+                <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                     <a href="mailto:pdflytools@gmail.com" class="dev-social" title="Email Contact" target="_blank"><i class="fa-solid fa-envelope"></i></a>
+                     <a href="https://instagram.com/mr_gt_rao" class="dev-social" title="Personal Instagram" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                     <a href="https://instagram.com/educate_path" class="dev-social" title="Business / PDFly Tools" target="_blank"><i class="fa-solid fa-briefcase"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Overlays -->
+    <div id="toast-container"></div>
+    <button id="backToTop"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // === Core UI Management ===
+        const els = {
+            html: document.documentElement,
+            themeToggle: document.getElementById('themeToggle'),
+            themeIcon: document.getElementById('themeIcon'),
+            scrollProg: document.getElementById('scroll-progress'),
+            btt: document.getElementById('backToTop')
+        };
+
+        const initTheme = () => {
+            const saved = localStorage.getItem('pdfly-theme') || 'dark'; 
+            els.html.setAttribute('data-theme', saved);
+            els.themeIcon.className = saved === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        };
+        
+        els.themeToggle.addEventListener('click', () => {
+            const next = els.html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            els.html.setAttribute('data-theme', next);
+            localStorage.setItem('pdfly-theme', next);
+            els.themeIcon.className = next === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            showToast(`${next.charAt(0).toUpperCase() + next.slice(1)} Mode Activated`, 'success');
+        });
+        initTheme();
+
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            els.scrollProg.style.width = ((document.body.scrollTop || document.documentElement.scrollTop) / h) * 100 + "%";
+            els.btt.classList.toggle('show', (document.body.scrollTop || document.documentElement.scrollTop) > 300);
+        });
+        
+        els.btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const iconClass = type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info');
+            toast.innerHTML = `<i class="fa-solid ${iconClass}"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { if(container.contains(toast)) toast.remove(); }, 3500);
+        }
+
+        window.openModal = (id, e) => { 
+            if(e) e.preventDefault(); 
+            document.getElementById(id).classList.add('active'); 
+            document.body.style.overflow = 'hidden';
+        };
+        window.closeModal = (id) => {
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = '';
+        };
+        window.onclick = e => { 
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.classList.remove('active'); 
+                document.body.style.overflow = '';
+            }
+        };
+
+        // === State Variables ===
+        let currentColor = { h: 217, s: 91, l: 60, hex: '#3B82F6', r: 59, g: 130, b: 246 };
+        let colorHistory = JSON.parse(localStorage.getItem('pdfly_color_history') || '[]');
+        
+        // === DOM Elements ===
+        const hueSlider = document.getElementById('hueSlider');
+        const satSlider = document.getElementById('satSlider');
+        const lightSlider = document.getElementById('lightSlider');
+        const hueValue = document.getElementById('hueValue');
+        const satValue = document.getElementById('satValue');
+        const lightValue = document.getElementById('lightValue');
+        const nativeColorInput = document.getElementById('nativeColorInput');
+
+        const mainSwatch = document.getElementById('mainSwatch');
+        const hexDisplay = document.getElementById('hexDisplay');
+        const colorNameMeta = document.getElementById('colorNameMeta');
+        const codeHex = document.getElementById('codeHex');
+        const codeRGB = document.getElementById('codeRGB');
+        const codeHSL = document.getElementById('codeHSL');
+        const codeCMYK = document.getElementById('codeCMYK');
+        const harmonyPalette = document.getElementById('harmonyPalette');
+        const historyList = document.getElementById('historyList');
+
+        // Canvas Elements
+        const previewWrapper = document.getElementById('previewWrapper');
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const magnifier = document.getElementById('magnifier');
+        const magnifierCanvas = document.getElementById('magnifierCanvas');
+        const magnifierCtx = magnifierCanvas.getContext('2d', { willReadFrequently: true });
+        const imageUploader = document.getElementById('imageUploader');
+        const dropZone = document.getElementById('dropZone');
+        let uploadedImage = null;
+
+        // Initialize Base Colors
+        updateColorFromHsl(217, 91, 60, false);
+        renderHistory();
+
+        // --- Tab Switcher ---
+        function switchTab(tab) {
+            const tabSliderBtn = document.getElementById('tabSliderBtn');
+            const tabImageBtn = document.getElementById('tabImageBtn');
+            const slidersControls = document.getElementById('slidersControls');
+            const imageControls = document.getElementById('imageControls');
+            const headlineSub = document.getElementById('headlineSub');
+
+            if (tab === 'sliders') {
+                tabSliderBtn.classList.add('active');
+                tabImageBtn.classList.remove('active');
+                slidersControls.style.display = 'block';
+                imageControls.style.display = 'none';
+                previewWrapper.classList.remove('active');
+                headlineSub.textContent = 'Precision Color Palette, Custom Sliders & Converter Studio.';
+            } else {
+                tabImageBtn.classList.add('active');
+                tabSliderBtn.classList.remove('active');
+                imageControls.style.display = 'block';
+                slidersControls.style.display = 'none';
+                headlineSub.textContent = 'Upload Images & Eyedrop Exact Colors with 4x Zoom Loupe.';
+                if (uploadedImage) previewWrapper.classList.add('active');
+            }
+        }
+
+        // --- Color State Calculations ---
+        function updateFromSliders() {
+            updateColorFromHsl(parseInt(hueSlider.value), parseInt(satSlider.value), parseInt(lightSlider.value));
+        }
+
+        hueSlider.addEventListener('input', updateFromSliders);
+        satSlider.addEventListener('input', updateFromSliders);
+        lightSlider.addEventListener('input', updateFromSliders);
+
+        nativeColorInput.addEventListener('input', (e) => {
+            const hex = e.target.value;
+            const rgb = hexToRgb(hex);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            hueSlider.value = hsl.h;
+            satSlider.value = hsl.s;
+            lightSlider.value = hsl.l;
+            updateColorFromHsl(hsl.h, hsl.s, hsl.l);
+        });
+
+        function updateColorFromHsl(h, s, l, recordHistory = true) {
+            hueValue.textContent = `${h}°`;
+            satValue.textContent = `${s}%`;
+            lightValue.textContent = `${l}%`;
+
+            satSlider.style.background = `linear-gradient(to right, hsl(${h}, 0%, ${l}%), hsl(${h}, 100%, ${l}%))`;
+            lightSlider.style.background = `linear-gradient(to right, hsl(${h}, ${s}%, 0%), hsl(${h}, ${s}%, 50%), hsl(${h}, ${s}%, 100%))`;
+
+            const rgb = hslToRgb(h, s, l);
+            const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+            const cmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b);
+
+            currentColor = { h, s, l, hex, r: rgb.r, g: rgb.g, b: rgb.b };
+
+            mainSwatch.style.backgroundColor = hex;
+            hexDisplay.textContent = hex;
+            nativeColorInput.value = hex;
+            
+            codeHex.textContent = hex;
+            codeRGB.textContent = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+            codeHSL.textContent = `hsl(${h}, ${s}%, ${l}%)`;
+            codeCMYK.textContent = `${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%`;
+
+            colorNameMeta.textContent = getColorDescriptor(h, s, l);
+
+            renderHarmonyPalettes(h, s, l);
+
+            if (recordHistory) {
+                // Throttle history saves to avoid massive arrays when dragging slider quickly
+                clearTimeout(window.historyTimeout);
+                window.historyTimeout = setTimeout(() => addToHistory(hex), 500);
+            }
+        }
+
+        function randomizeColor() {
+            const h = Math.floor(Math.random() * 361);
+            const s = Math.floor(Math.random() * 61) + 40; 
+            const l = Math.floor(Math.random() * 61) + 20; 
+            hueSlider.value = h;
+            satSlider.value = s;
+            lightSlider.value = l;
+            updateColorFromHsl(h, s, l);
+            showToast(`Generated: ${currentColor.hex}`, 'success');
+        }
+
+        // --- Harmony Generator ---
+        function renderHarmonyPalettes(h, s, l) {
+            harmonyPalette.innerHTML = '';
+            
+            const shades = [
+                { h, s, l: Math.max(15, l - 30) },
+                { h, s: Math.max(10, s - 25), l: Math.min(85, l + 15) },
+                { h, s, l },
+                { h: (h + 180) % 360, s, l },
+                { h: (h + 30) % 360, s, l }
+            ];
+
+            shades.forEach(shade => {
+                const rgb = hslToRgb(shade.h, shade.s, shade.l);
+                const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+                
+                const item = document.createElement('div');
+                item.className = 'palette-item';
+                item.style.backgroundColor = hex;
+                item.innerHTML = `<span>${hex}</span>`;
+                item.title = `Click to load ${hex}`;
+                item.onclick = () => {
+                    hueSlider.value = shade.h;
+                    satSlider.value = shade.s;
+                    lightSlider.value = shade.l;
+                    updateColorFromHsl(shade.h, shade.s, shade.l);
+                    showToast(`Loaded ${hex}`, 'success');
+                };
+                harmonyPalette.appendChild(item);
+            });
+        }
+
+        // --- History Management ---
+        function addToHistory(hex) {
+            if (colorHistory.includes(hex)) colorHistory = colorHistory.filter(c => c !== hex);
+            colorHistory.unshift(hex);
+            if (colorHistory.length > 20) colorHistory.pop();
+            localStorage.setItem('pdfly_color_history', JSON.stringify(colorHistory));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            historyList.innerHTML = '';
+            if (colorHistory.length === 0) {
+                historyList.innerHTML = '<span style="font-size: 0.85rem; color: var(--text-muted); padding-top: 5px;">No sampled colors yet. Use the sliders or eyedropper!</span>';
+                return;
+            }
+            colorHistory.forEach(hex => {
+                const chip = document.createElement('div');
+                chip.className = 'history-color-chip';
+                chip.style.backgroundColor = hex;
+                chip.title = `Load ${hex}`;
+                chip.onclick = () => {
+                    const rgb = hexToRgb(hex);
+                    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                    hueSlider.value = hsl.h;
+                    satSlider.value = hsl.s;
+                    lightSlider.value = hsl.l;
+                    updateColorFromHsl(hsl.h, hsl.s, hsl.l, false);
+                    showToast(`Selected ${hex}`, 'success');
+                };
+                historyList.appendChild(chip);
+            });
+        }
+
+        function clearColorHistory() {
+            colorHistory = [];
+            localStorage.removeItem('pdfly_color_history');
+            renderHistory();
+            showToast('History cleared', 'info');
+        }
+
+        // --- Canvas & Image Eyedropper Logic ---
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.style.borderColor = 'var(--primary)', false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.style.borderColor = 'var(--border)', false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            let dt = e.dataTransfer;
+            let files = dt.files;
+            if(files.length > 0) loadImageFile(files[0]);
+        });
+        imageUploader.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) loadImageFile(e.target.files[0]);
+        });
+
+        function loadImageFile(file) {
+            if(!file.type.startsWith('image/')) return showToast("Only image files are supported", "error");
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadedImage = new Image();
+                uploadedImage.onload = () => {
+                    canvas.width = uploadedImage.naturalWidth;
+                    canvas.height = uploadedImage.naturalHeight;
+                    ctx.drawImage(uploadedImage, 0, 0);
+                    previewWrapper.classList.add('active');
+                    showToast('Image loaded! Hover and click to pick color.', 'success');
+                };
+                uploadedImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetImagePicker() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.width = 0; canvas.height = 0;
+            uploadedImage = null;
+            imageUploader.value = '';
+            previewWrapper.classList.remove('active');
+            magnifier.style.display = 'none';
+            showToast('Image reset', 'info');
+        }
+
+        // Canvas Hover & Click Eyedropper
+        canvas.addEventListener('mousemove', (e) => {
+            if (!uploadedImage) return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+
+            if (x >= 0 && x <= canvas.width && y >= 0 && y <= canvas.height) {
+                updateMagnifier(x, y, e.clientX, e.clientY);
+            } else {
+                magnifier.style.display = 'none';
+            }
+        });
+
+        canvas.addEventListener('mouseleave', () => magnifier.style.display = 'none');
+
+        canvas.addEventListener('click', (e) => {
+            if (!uploadedImage) return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const canvasX = (e.clientX - rect.left) * scaleX;
+            const canvasY = (e.clientY - rect.top) * scaleY;
+
+            const wrapRect = previewWrapper.getBoundingClientRect();
+            createRipple(e.clientX - wrapRect.left, e.clientY - wrapRect.top);
+
+            try {
+                const pixel = ctx.getImageData(Math.floor(canvasX), Math.floor(canvasY), 1, 1).data;
+                const [r, g, b, a] = pixel;
+                if (a > 0) {
+                    const hsl = rgbToHsl(r, g, b);
+                    hueSlider.value = hsl.h;
+                    satSlider.value = hsl.s;
+                    lightSlider.value = hsl.l;
+                    updateColorFromHsl(hsl.h, hsl.s, hsl.l);
+                    showToast(`Extracted: ${currentColor.hex}`, 'success');
+                }
+            } catch (err) {
+                showToast('Failed to read pixel data. Try another image.', 'error');
+            }
+        });
+
+        function updateMagnifier(canvasX, canvasY, mouseClientX, mouseClientY) {
+            const zoom = 4;
+            const magSize = 120;
+            const srcSize = magSize / zoom;
+            const halfSrc = srcSize / 2;
+
+            let sx = canvasX - halfSrc;
+            let sy = canvasY - halfSrc;
+
+            sx = Math.max(0, Math.min(canvas.width - srcSize, sx));
+            sy = Math.max(0, Math.min(canvas.height - srcSize, sy));
+
+            magnifierCanvas.width = srcSize;
+            magnifierCanvas.height = srcSize;
+
+            magnifierCtx.imageSmoothingEnabled = false;
+            magnifierCtx.clearRect(0, 0, srcSize, srcSize);
+            magnifierCtx.drawImage(canvas, Math.round(sx), Math.round(sy), srcSize, srcSize, 0, 0, srcSize, srcSize);
+
+            const offset = 18;
+            let left = mouseClientX - previewWrapper.getBoundingClientRect().left + offset;
+            let top = mouseClientY - previewWrapper.getBoundingClientRect().top + offset;
+            
+            // Boundary checks for magnifier relative to wrapper
+            if (left + magSize > previewWrapper.offsetWidth) left -= (magSize + offset * 2);
+            if (top + magSize > previewWrapper.offsetHeight) top -= (magSize + offset * 2);
+
+            magnifier.style.left = `${left}px`;
+            magnifier.style.top = `${top}px`;
+            magnifier.style.display = 'block';
+        }
+
+        function createRipple(x, y) {
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            ripple.style.left = `${x - 10}px`;
+            ripple.style.top = `${y - 10}px`;
+            ripple.style.width = '20px';
+            ripple.style.height = '20px';
+            previewWrapper.appendChild(ripple);
+            ripple.addEventListener('animationend', () => ripple.remove());
+        }
+
+        // Native Browser Eyedropper API
+        async function triggerEyedropperAPI() {
+            if ('EyeDropper' in window) {
+                try {
+                    const eyeDropper = new EyeDropper();
+                    const result = await eyeDropper.open();
+                    const hex = result.sRGBHex.toUpperCase();
+                    const rgb = hexToRgb(hex);
+                    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                    hueSlider.value = hsl.h;
+                    satSlider.value = hsl.s;
+                    lightSlider.value = hsl.l;
+                    updateColorFromHsl(hsl.h, hsl.s, hsl.l);
+                    showToast(`Sampled: ${hex}`, 'success');
+                } catch (e) {
+                    // Canceled by user
+                }
+            } else {
+                showToast('Screen Eyedropper API not supported in this browser. Upload an image instead!', 'error');
+            }
+        }
+
+        // --- Math & Color Conversion Helpers ---
+        function hslToRgb(h, s, l) {
+            s /= 100; l /= 100;
+            const c = (1 - Math.abs(2 * l - 1)) * s;
+            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            const m = l - c / 2;
+            let r = 0, g = 0, b = 0;
+            if (h < 60) { r = c; g = x; b = 0; }
+            else if (h < 120) { r = x; g = c; b = 0; }
+            else if (h < 180) { r = 0; g = c; b = x; }
+            else if (h < 240) { r = 0; g = x; b = c; }
+            else if (h < 300) { r = x; g = 0; b = c; }
+            else { r = c; g = 0; b = x; }
+            return {
+                r: Math.round((r + m) * 255),
+                g: Math.round((g + m) * 255),
+                b: Math.round((b + m) * 255)
+            };
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+        }
+
+        function hexToRgb(hex) {
+            let clean = hex.replace('#', '');
+            if (clean.length === 3) clean = clean.split('').map(c => c + c).join('');
+            const bigint = parseInt(clean, 16);
+            return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h = 0, s = 0, l = (max + min) / 2;
+            if (max !== min) {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function rgbToCmyk(r, g, b) {
+            const r_norm = r / 255, g_norm = g / 255, b_norm = b / 255;
+            const k = 1 - Math.max(r_norm, g_norm, b_norm);
+            if (k === 1) return { c: 0, m: 0, y: 0, k: 100 };
+            const c = (1 - r_norm - k) / (1 - k);
+            const m = (1 - g_norm - k) / (1 - k);
+            const y = (1 - b_norm - k) / (1 - k);
+            return {
+                c: Math.round(c * 100), m: Math.round(m * 100),
+                y: Math.round(y * 100), k: Math.round(k * 100)
+            };
+        }
+
+        function getColorDescriptor(h, s, l) {
+            if (l <= 8) return 'Deep Pitch Black';
+            if (l >= 94) return 'Pure Crisp White';
+            if (s <= 10) return 'Neutral Slate Gray';
+            
+            let family = '';
+            if (h >= 345 || h < 15) family = 'Crimson Red';
+            else if (h < 45) family = 'Amber Orange';
+            else if (h < 70) family = 'Vibrant Yellow';
+            else if (h < 155) family = 'Emerald Green';
+            else if (h < 195) family = 'Cyan Aqua';
+            else if (h < 260) family = 'Royal Blue';
+            else if (h < 310) family = 'Violet Purple';
+            else family = 'Magenta Pink';
+
+            const tone = l < 35 ? 'Dark ' : l > 70 ? 'Light ' : '';
+            return `${tone}${family}`;
+        }
+
+        // --- Copy Handlers ---
+        window.copyFormat = function(format) {
+            let text = '';
+            if (format === 'hex') text = currentColor.hex;
+            else if (format === 'rgb') text = `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`;
+            else if (format === 'hsl') text = `hsl(${currentColor.h}, ${currentColor.s}%, ${currentColor.l}%)`;
+            else if (format === 'cmyk') {
+                const cmyk = rgbToCmyk(currentColor.r, currentColor.g, currentColor.b);
+                text = `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`;
+            }
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast(`Copied ${text}`, 'success');
+                }).catch(() => fallbackCopy(text));
+            } else { fallbackCopy(text); }
+        };
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try { document.execCommand('copy'); showToast(`Copied ${text}`, 'success'); } 
+            catch (e) { showToast('Failed to copy', 'error'); }
+            document.body.removeChild(textarea);
+        }
+
+    </script>
+</body>
+</html>

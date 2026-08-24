@@ -14,7 +14,7 @@
     <!-- Fonts: Plus Jakarta Sans for crisp, Ultra-HD Typography -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Vector Icons (Infinite resolution, will never pixelate) -->
+    <!-- Vector Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -59,7 +59,6 @@
             line-height: 1.6; 
             overflow-x: hidden; 
             transition: background-color 0.4s ease, color 0.4s ease;
-            /* Ultra-HD Text Rendering Flags */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             text-rendering: optimizeLegibility;
@@ -106,10 +105,13 @@
         .greeting-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 6px 18px; border-radius: 30px; font-size: clamp(0.85rem, 1.5vw, 0.95rem); font-weight: 700; margin-bottom: 20px; border: 1px solid rgba(59, 130, 246, 0.25); letter-spacing: 0.5px; }
         .hero h1 { font-size: clamp(2.2rem, 6vw, 4.2rem); font-weight: 800; line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px; }
         .hero h1 span { background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.15rem); max-width: 650px; margin: 0 auto; line-height: 1.7; }
+        .hero p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.15rem); max-width: 750px; margin: 0 auto; line-height: 1.7; }
 
-        /* ================= TABS ================= */
-        .tabs-container { display: flex; justify-content: center; gap: clamp(8px, 2vw, 15px); flex-wrap: wrap; margin-bottom: clamp(30px, 5vh, 50px); padding: 0 5%; }
+        /* ================= TABS STRUCTURE (1 Top, 3 Bottom) ================= */
+        .tabs-layout { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: clamp(30px, 5vh, 50px); padding: 0 5%; }
+        .tab-top { display: flex; justify-content: center; width: 100%; }
+        .tab-bottom { display: flex; justify-content: center; gap: clamp(8px, 2vw, 15px); flex-wrap: wrap; }
+        
         .tab-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); padding: clamp(8px, 1.5vw, 12px) clamp(16px, 3vw, 25px); border-radius: 30px; font-size: clamp(0.85rem, 1.5vw, 0.95rem); font-weight: 600; cursor: pointer; transition: var(--transition); }
         .tab-btn:hover { background: var(--bg-card-hover); border-color: var(--primary); }
         .tab-btn.active { background: var(--primary); border-color: var(--primary); color: white; box-shadow: var(--shadow-glow); }
@@ -121,11 +123,7 @@
         .section-title i { color: var(--primary); }
 
         /* Perfect Scaling Grid */
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
-            gap: clamp(15px, 2vw, 25px); 
-        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: clamp(15px, 2vw, 25px); }
 
         .card { 
             background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; 
@@ -154,22 +152,31 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
-        /* ================= FOOTER ================= */
+        /* ================= PROFESSIONAL FOOTER ================= */
         footer { background: var(--bg-footer); border-top: 1px solid var(--border-color); padding: clamp(40px, 8vh, 80px) 5% 20px; }
-        .footer-grid { max-width: 1350px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: clamp(30px, 5vw, 50px); margin-bottom: clamp(40px, 6vh, 60px); }
+        
+        .footer-grid { max-width: 1350px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: clamp(30px, 4vw, 40px); margin-bottom: clamp(40px, 6vh, 60px); }
+        
         .footer-brand h2 { font-size: clamp(1.3rem, 2vw, 1.6rem); font-weight: 800; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
         .footer-brand h2 i { color: var(--primary); }
-        .footer-brand p { color: var(--text-muted); font-size: 0.95rem; max-width: 380px; margin-bottom: 25px; line-height: 1.7; }
+        .footer-brand p { color: var(--text-muted); font-size: 0.95rem; max-width: 320px; margin-bottom: 25px; line-height: 1.7; }
         
-        .social-links { display: flex; gap: 15px; }
-        .social-links a { width: 42px; height: 42px; border-radius: 50%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; color: var(--text-main); transition: var(--transition); border: 1px solid var(--border-color); font-size: 1.1rem; }
-        .social-links a:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-4px); box-shadow: var(--shadow-glow); }
-
         .footer-links h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; color: var(--text-main); }
         .footer-links ul { list-style: none; }
         .footer-links ul li { margin-bottom: 12px; }
         .footer-links ul li a { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: var(--transition); cursor: pointer; display: inline-block; }
         .footer-links ul li a:hover { color: var(--primary); transform: translateX(5px); }
+
+        /* Enhanced Contact & Location Boxes */
+        .contact-box { background: var(--bg-card); border: 1px solid var(--border-color); padding: 12px 18px; border-radius: 12px; display: inline-flex; align-items: center; gap: 15px; transition: var(--transition); text-decoration: none; width: 100%; max-width: 250px; cursor: default; }
+        a.contact-box { cursor: pointer; }
+        .contact-box i { font-size: 1.2rem; color: var(--primary); width: 20px; text-align: center; }
+        .contact-box div { display: flex; flex-direction: column; }
+        .contact-box span.title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 2px; }
+        .contact-box span.detail { font-size: 0.9rem; font-weight: 600; color: var(--text-main); }
+        
+        a.contact-box:hover { background: var(--bg-card-hover); border-color: var(--primary); box-shadow: var(--shadow-glow); transform: translateY(-3px); }
+        div.contact-box:hover { background: var(--bg-card-hover); border-color: rgba(255, 255, 255, 0.2); }
 
         .footer-bottom { max-width: 1350px; margin: 0 auto; padding-top: 30px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
         .copyright { color: var(--text-muted); font-size: 0.9rem; }
@@ -188,15 +195,23 @@
         .modal-close { position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-main); font-size: 1.1rem; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
         .modal-close:hover { background: #ef4444; color: white; border-color: #ef4444; transform: rotate(90deg); }
 
-        .dev-img-container { width: clamp(90px, 15vw, 110px); height: clamp(90px, 15vw, 110px); border-radius: 50%; margin: 0 auto 20px; background: var(--gradient-primary); padding: 4px; position: relative; }
-        .dev-img-container img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: var(--bg-body); border: 4px solid var(--bg-card); }
+        .dev-img-container { 
+            width: clamp(100px, 15vw, 120px); height: clamp(100px, 15vw, 120px); margin: 0 auto 20px; 
+            background: var(--gradient-primary); padding: 4px; position: relative; border-radius: 35px; 
+        }
+        .dev-img-container img { width: 100%; height: 100%; border-radius: 31px; object-fit: cover; background: var(--bg-body); border: 4px solid var(--bg-card); }
         
         .dev-name { font-size: clamp(1.5rem, 2.5vw, 1.8rem); font-weight: 800; color: var(--text-main); margin-bottom: 2px; }
         .dev-subtitle { color: var(--primary); font-size: 0.9rem; font-weight: 700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1.5px; }
         .dev-bio { color: var(--text-muted); font-size: clamp(0.9rem, 1.5vw, 1rem); line-height: 1.7; margin-bottom: 25px; }
-        .dev-tags { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-        .dev-tags span { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); color: var(--primary); font-size: 0.8rem; padding: 6px 15px; border-radius: 20px; font-weight: 600; transition: var(--transition); cursor: default; }
-        .dev-tags span:hover { background: var(--primary); color: #fff; transform: translateY(-2px); }
+        
+        .dev-social-icons { display: flex; justify-content: center; gap: 15px; }
+        .dev-social-icons a { 
+            width: 45px; height: 45px; border-radius: 50%; background: var(--bg-body); border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center; color: var(--text-main); font-size: 1.2rem; 
+            transition: var(--transition); text-decoration: none; 
+        }
+        .dev-social-icons a:hover { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: var(--shadow-glow); transform: translateY(-3px); }
 
         .legal-box { max-width: 650px; display: flex; flex-direction: column; }
         .legal-box h3 { font-size: clamp(1.4rem, 2vw, 1.8rem); color: var(--text-main); margin-bottom: 20px; text-align: left; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
@@ -213,24 +228,24 @@
         .toast-box i { color: var(--primary); font-size: 1.3rem; }
 
         /* ================= DEVICE SPECIFIC BREAKPOINTS ================= */
-        
-        /* Tablet & Large Mobile */
         @media (max-width: 768px) {
             .navbar-wrapper { width: 100%; top: 0; }
             nav { border-radius: 0; border-top: none; border-left: none; border-right: none; }
             .grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
-            .footer-grid { grid-template-columns: 1fr; text-align: center; gap: 35px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 35px; }
+            .footer-brand { grid-column: span 2; text-align: center; }
             .footer-brand p { margin: 0 auto 20px; }
-            .social-links { justify-content: center; }
+            .contact-box { max-width: 100%; }
             .footer-bottom { flex-direction: column; text-align: center; }
             .legal-box { width: 95%; max-height: 85vh; padding: 25px 20px; }
         }
 
-        /* Small Smartphone Breakpoint (Ensures 2 exact columns without breaking) */
         @media (max-width: 480px) {
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .footer-brand { grid-column: span 1; }
             .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
             .card { padding: 18px 12px; }
-            .card p { display: none; /* Keep UI clean on tiny screens */ }
+            .card p { display: none; }
             .search-box input { width: 90px; }
             .search-box:focus-within input { width: 130px; }
         }
@@ -259,14 +274,20 @@
     <section class="hero">
         <div class="greeting-badge" id="greetingBadge"><i class="fa-regular fa-sun"></i> Good Morning</div>
         <h1><span id="heroTitle">PDFly</span> Digital Suite.</h1>
-        <p>An ultra-fast, HD, privacy-focused toolkit for seamless PDF formatting, image editing, and smart digital tasks perfectly fitted for your screen.</p>
+        <!-- Updated 2-3 Line Description -->
+        <p>Your all-in-one browser suite for seamless PDF manipulation, advanced image editing, and smart daily utilities. Experience lightning-fast processing, format conversions, and secure text tools with 100% on-device privacy.</p>
     </section>
 
-    <div class="tabs-container">
-        <button class="tab-btn active" onclick="filterCategory('all')">All Tools</button>
-        <button class="tab-btn" onclick="filterCategory('image')">Image Tools</button>
-        <button class="tab-btn" onclick="filterCategory('pdf')">PDF Tools</button>
-        <button class="tab-btn" onclick="filterCategory('other')">Smart Utilities</button>
+    <!-- TABS STRUCTURE UPDATED (All Tools top center, 3 tools perfectly below) -->
+    <div class="tabs-layout">
+        <div class="tab-top">
+            <button class="tab-btn active" onclick="filterCategory('all')">All Tools</button>
+        </div>
+        <div class="tab-bottom">
+            <button class="tab-btn" onclick="filterCategory('image')">Image Tools</button>
+            <button class="tab-btn" onclick="filterCategory('pdf')">PDF Tools</button>
+            <button class="tab-btn" onclick="filterCategory('other')">Smart Utilities</button>
+        </div>
     </div>
 
     <main class="container">
@@ -379,44 +400,22 @@
         <div class="category-wrapper" data-category="other">
             <h2 class="section-title"><i class="fa-solid fa-toolbox"></i> Smart Utilities</h2>
             <div class="grid">
-                <div class="card tool-card" onclick="runTool('Unit Converter')" title="Convert units easily">
-                    <div class="icon-wrapper"><i class="fa-solid fa-ruler-combined"></i></div>
-                    <h3>Unit Converter</h3>
-                    <p>Convert units easily.</p>
-                </div>
-                <div class="card tool-card" onclick="runTool('Age Calculator')" title="Find exact age in days & years">
-                    <div class="icon-wrapper"><i class="fa-solid fa-calculator"></i></div>
-                    <h3>Age Calculator</h3>
-                    <p>Find exact age in days or years.</p>
-                </div>
-                <div class="card tool-card" onclick="runTool('Word Counter')" title="Count text length instantly">
-                    <div class="icon-wrapper"><i class="fa-solid fa-spell-check"></i></div>
-                    <h3>Word Counter</h3>
-                    <p>Count text length instantly.</p>
-                </div>
                 
-                <!-- Email Validator replaced with Email Variant -->
-                <div class="card tool-card" onclick="runTool('Email Variant')" title="Generate email variations">
-                    <div class="icon-wrapper"><i class="fa-solid fa-envelope-circle-check"></i></div>
-                    <h3>Email Variant</h3>
-                    <p>Generate email variations.</p>
-                </div>
-
-                <div class="card tool-card" onclick="runTool('Password Gen')" title="Create strong secure passwords">
-                    <div class="icon-wrapper"><i class="fa-solid fa-key"></i></div>
-                    <h3>Password Gen</h3>
-                    <p>Create strong secure passwords.</p>
-                </div>
+                <!-- Group 1: Security -->
                 <div class="card tool-card" onclick="runTool('Encrypt Text')" title="Hide data with encryption">
                     <div class="icon-wrapper"><i class="fa-solid fa-lock"></i></div>
                     <h3>Encrypt Text</h3>
                     <p>Hide data with encryption.</p>
                 </div>
-                
                 <div class="card tool-card" onclick="runTool('Hide Text')" title="Hide text within visible text">
                     <div class="icon-wrapper"><i class="fa-solid fa-user-secret"></i></div>
                     <h3>Hide Text</h3>
                     <p>Hide text within visible text.</p>
+                </div>
+                <div class="card tool-card" onclick="runTool('Image Encryptor')" title="Secure and lock your images">
+                    <div class="icon-wrapper"><i class="fa-solid fa-file-shield"></i></div>
+                    <h3>Image Encryptor</h3>
+                    <p>Secure and lock your images.</p>
                 </div>
                 <div class="card tool-card" onclick="runTool('Secret QR Message')" title="Encode secret messages in QR">
                     <div class="icon-wrapper"><i class="fa-solid fa-comment-sms"></i></div>
@@ -429,10 +428,55 @@
                     <p>Private temporary chatting.</p>
                 </div>
 
+                <!-- Group 2: Generators -->
+                <div class="card tool-card" onclick="runTool('Password Gen')" title="Create strong secure passwords">
+                    <div class="icon-wrapper"><i class="fa-solid fa-key"></i></div>
+                    <h3>Password Gen</h3>
+                    <p>Create strong secure passwords.</p>
+                </div>
+                <div class="card tool-card" onclick="runTool('QR Code Maker')" title="Make scannable QR codes">
+                    <div class="icon-wrapper"><i class="fa-solid fa-qrcode"></i></div>
+                    <h3>QR Code Maker</h3>
+                    <p>Make scannable QR codes.</p>
+                </div>
+                <div class="card tool-card" onclick="runTool('Shorten URL')" title="Shorten long web URLs">
+                    <div class="icon-wrapper"><i class="fa-solid fa-link"></i></div>
+                    <h3>Shorten URL</h3>
+                    <p>Shorten long web URLs.</p>
+                </div>
+
+                <!-- Group 3: Calculators -->
+                <div class="card tool-card" onclick="runTool('Age Calculator')" title="Find exact age in days & years">
+                    <div class="icon-wrapper"><i class="fa-solid fa-calculator"></i></div>
+                    <h3>Age Calculator</h3>
+                    <p>Find exact age in days or years.</p>
+                </div>
                 <div class="card tool-card" onclick="runTool('Match Birthday')" title="Check birth compatibility">
                     <div class="icon-wrapper"><i class="fa-solid fa-calendar-check"></i></div>
                     <h3>Match Birthday</h3>
                     <p>Check birth compatibility.</p>
+                </div>
+                <div class="card tool-card" onclick="runTool('Unit Converter')" title="Convert units easily">
+                    <div class="icon-wrapper"><i class="fa-solid fa-ruler-combined"></i></div>
+                    <h3>Unit Converter</h3>
+                    <p>Convert units easily.</p>
+                </div>
+
+                <!-- Group 4: Text & Creative -->
+                <div class="card tool-card" onclick="runTool('Word Counter')" title="Count text length instantly">
+                    <div class="icon-wrapper"><i class="fa-solid fa-spell-check"></i></div>
+                    <h3>Word Counter</h3>
+                    <p>Count text length instantly.</p>
+                </div>
+                <div class="card tool-card" onclick="runTool('Fancy Text')" title="Generate stylish social text">
+                    <div class="icon-wrapper"><i class="fa-solid fa-font"></i></div>
+                    <h3>Fancy Text</h3>
+                    <p>Generate stylish social text.</p>
+                </div>
+                <div class="card tool-card" onclick="runTool('Email Variant')" title="Generate email variations">
+                    <div class="icon-wrapper"><i class="fa-solid fa-envelope-circle-check"></i></div>
+                    <h3>Email Variant</h3>
+                    <p>Generate email variations.</p>
                 </div>
                 <div class="card tool-card" onclick="runTool('Biodata Maker')" title="Create marriage biodata">
                     <div class="icon-wrapper"><i class="fa-solid fa-address-card"></i></div>
@@ -443,26 +487,6 @@
                     <div class="icon-wrapper"><i class="fa-solid fa-eye-dropper"></i></div>
                     <h3>Color Picker</h3>
                     <p>Get HEX codes easily.</p>
-                </div>
-                <div class="card tool-card" onclick="runTool('Shorten URL')" title="Shorten long web URLs">
-                    <div class="icon-wrapper"><i class="fa-solid fa-link"></i></div>
-                    <h3>Shorten URL</h3>
-                    <p>Shorten long web URLs.</p>
-                </div>
-                <div class="card tool-card" onclick="runTool('QR Code Maker')" title="Make scannable QR codes">
-                    <div class="icon-wrapper"><i class="fa-solid fa-qrcode"></i></div>
-                    <h3>QR Code Maker</h3>
-                    <p>Make scannable QR codes.</p>
-                </div>
-                <div class="card tool-card" onclick="runTool('Fancy Text')" title="Generate stylish social text">
-                    <div class="icon-wrapper"><i class="fa-solid fa-font"></i></div>
-                    <h3>Fancy Text</h3>
-                    <p>Generate stylish social text.</p>
-                </div>
-                <div class="card tool-card" onclick="runTool('ASCII Art')" title="Create cool ASCII text art">
-                    <div class="icon-wrapper"><i class="fa-solid fa-pen-nib"></i></div>
-                    <h3>ASCII Art</h3>
-                    <p>Create cool ASCII text art.</p>
                 </div>
             </div>
         </div>
@@ -475,19 +499,24 @@
     <div class="modal-overlay" id="profileModal">
         <div class="modal-box">
             <button class="modal-close" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></button>
+            
             <div class="dev-img-container">
-                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Programmer&colors=3b82f6" alt="Developer Profile">
+                <img src="dev-profile.png" alt="Developer Profile">
             </div>
+            
             <div class="dev-name">GT Rao</div>
             <div class="dev-subtitle">Creator & Developer</div>
+            
+            <!-- Updated Developer Bio mentioning student & passion -->
             <div class="dev-bio">
-                Hello! Building front-end web applications, writing clean code, and creating digital utility tools like PDFly are my core passions. 
+                Hello! I am a student and a passionate web developer. Building responsive web applications, writing clean code, and engineering smart utilities like PDFly Tools are my core passions.
             </div>
-            <div class="dev-tags">
-                <span><i class="fa-solid fa-graduation-cap"></i> Student</span>
-                <span><i class="fa-solid fa-code"></i> Web Developer</span>
-                <span><i class="fa-solid fa-laptop-code"></i> Coding</span>
-                <span><i class="fa-solid fa-bolt"></i> Ultra HD UI</span>
+
+            <!-- Icon-Only Contact Options -->
+            <div class="dev-social-icons">
+                <a href="mailto:pdflytools@gmail.com" title="Email Me"><i class="fa-solid fa-envelope"></i></a>
+                <a href="https://instagram.com/mr_gt_rao" target="_blank" title="Personal Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://instagram.com/educate_path" target="_blank" title="Business Instagram"><i class="fa-solid fa-briefcase"></i></a>
             </div>
         </div>
     </div>
@@ -506,12 +535,8 @@
             <div class="footer-brand">
                 <h2><i class="fa-solid fa-shapes"></i> PDFly Tools</h2>
                 <p>The ultimate browser-based utility suite. We respect your privacy—files are processed securely and deleted automatically.</p>
-                <div class="social-links">
-                    <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-                    <a href="#"><i class="fa-brands fa-github"></i></a>
-                    <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
-                </div>
             </div>
+            
             <div class="footer-links">
                 <h4>Quick Links</h4>
                 <ul>
@@ -520,6 +545,7 @@
                     <li><a onclick="filterCategory('other')">Smart Tools</a></li>
                 </ul>
             </div>
+            
             <div class="footer-links">
                 <h4>Legal Information</h4>
                 <ul>
@@ -529,7 +555,30 @@
                     <li><a onclick="openLegal('disclaimer')">Disclaimer</a></li>
                 </ul>
             </div>
+
+            <!-- Contact Us: Showing Email & Address Visually -->
+            <div class="footer-links">
+                <h4>Contact Us</h4>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="mailto:pdflytools@gmail.com" class="contact-box">
+                        <i class="fa-solid fa-envelope"></i>
+                        <div>
+                            <span class="title">Email Support</span>
+                            <span class="detail">pdflytools@gmail.com</span>
+                        </div>
+                    </a>
+                    
+                    <div class="contact-box">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <div>
+                            <span class="title">Our Location</span>
+                            <span class="detail">Azamgarh, UP, India</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+        
         <div class="footer-bottom">
             <div class="copyright">&copy; 2026 PDFly Tools. All Rights Reserved.</div>
             <div class="dev-badge" onclick="openProfileModal()">
@@ -547,7 +596,6 @@
                 document.getElementById('themeIcon').className = 'fa-solid fa-sun';
             }
             
-            // Dynamic Greeting
             const hour = new Date().getHours();
             let greeting = "Good Evening";
             let icon = "fa-moon";
@@ -556,7 +604,6 @@
             else if (hour >= 12 && hour < 18) { greeting = "Good Afternoon"; icon = "fa-cloud-sun"; }
             
             document.getElementById('greetingBadge').innerHTML = `<i class="fa-solid ${icon}"></i> ${greeting}`;
-            
             assignAnimationDelays();
         });
 
@@ -626,7 +673,8 @@
             let cards = document.querySelectorAll('.tool-card');
             
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector('.tab-btn').classList.add('active');
+            // Default back to All Tools styling for search
+            document.querySelector('.tab-top .tab-btn').classList.add('active'); 
             document.querySelectorAll('.category-wrapper').forEach(cat => cat.style.display = 'block');
 
             cards.forEach(card => {
@@ -666,7 +714,7 @@
                 }
             });
             assignAnimationDelays();
-            window.scrollTo(0, document.querySelector('.tabs-container').offsetTop - 80);
+            window.scrollTo(0, document.querySelector('.tabs-layout').offsetTop - 80);
         }
 
         const profileModal = document.getElementById('profileModal');
@@ -683,10 +731,22 @@
         }
 
         const legalData = {
-            'privacy': { title: "Privacy Policy", content: `<h4>1. Data Processing</h4><p>All file processing is performed securely. Files are automatically deleted from servers after processing.</p><h4>2. Analytics</h4><p>We only collect standard, non-identifying analytic data.</p>` },
-            'terms': { title: "Terms of Service", content: `<h4>1. Acceptance</h4><p>By using PDFly Tools, you agree to these terms.</p><h4>2. Usage</h4><p>Tools are for personal and professional utility. No illegal activities permitted.</p>` },
-            'cookies': { title: "Cookies Policy", content: `<h4>1. Essential Cookies</h4><p>We use essential local storage to save your UI preferences (like Dark Mode).</p>` },
-            'disclaimer': { title: "Disclaimer", content: `<h4>1. "As-Is" Basis</h4><p>Tools are provided "as is" without warranty. We are not liable for any data loss.</p>` }
+            'privacy': { 
+                title: "Privacy Policy", 
+                content: `<h4>1. Information Gathering and Usage</h4><p>At PDFly Tools, your privacy is our highest priority. We do not require registration or personal data to use our utility tools. Any file uploaded for processing (Images, PDFs) is temporarily held in secure server memory strictly for execution.</p><h4>2. Data Security & Deletion</h4><p>We employ enterprise-grade security protocols. <strong>All user files are instantly and irreversibly deleted</strong> from our servers immediately after processing. We do not store, view, or distribute your files under any circumstances.</p><h4>3. Analytics & Third Parties</h4><p>We use essential analytics to monitor website traffic and improve user experience. This data is fully anonymized and never shared with or sold to third-party marketing agencies.</p>` 
+            },
+            'terms': { 
+                title: "Terms of Service", 
+                content: `<h4>1. Acceptance of Terms</h4><p>By accessing and utilizing PDFly Tools, you accept and agree to be bound by the terms and provision of this agreement. Furthermore, when using these specific services, you shall be subject to any posted guidelines or rules applicable to such services.</p><h4>2. Appropriate Usage</h4><p>You agree to use PDFly Tools only for lawful purposes. You are strictly prohibited from using our services to facilitate the creation, distribution, or manipulation of illegal, malicious, or highly sensitive confidential material without authorization.</p><h4>3. Intellectual Property</h4><p>The PDFly Tools brand, UI styling, functionality, and written content are the exclusive intellectual property of the developer.</p>` 
+            },
+            'cookies': { 
+                title: "Cookies Policy", 
+                content: `<h4>1. Strictly Necessary Cookies</h4><p>PDFly Tools utilizes local storage and essential browser cookies solely to provide a seamless user experience. This includes saving your UI preferences, such as retaining Dark Mode or Light Mode across your visits.</p><h4>2. Performance Cookies</h4><p>These cookies allow us to count visits and traffic sources so we can measure and improve the performance of our site. They help us to know which pages are the most and least popular.</p><h4>3. User Consent</h4><p>By continuing to use our digital suite, you acknowledge and consent to our utilization of these non-intrusive essential cookies.</p>` 
+            },
+            'disclaimer': { 
+                title: "Disclaimer", 
+                content: `<h4>1. Service Reliability</h4><p>The tools and utilities provided on PDFly Tools are offered on an "as is" and "as available" basis. While we strive for 100% accuracy and uptime, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, or availability of the digital tools.</p><h4>2. Limitation of Liability</h4><p>In no event will PDFly Tools be liable for any loss or damage including without limitation, indirect or consequential loss or damage, or any data loss or corruption arising out of, or in connection with, the use of this website.</p>` 
+            }
         };
 
         function openLegal(type) {

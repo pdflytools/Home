@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Secure Chat Sync - PDFly Tools</title>
+    
+    <!-- Advanced Meta Tags & SEO -->
+    <meta name="description" content="Secure, real-time, cross-device synchronized chat rooms with zero tracking and animated emojis. Built on PDFly Tools framework.">
+    <meta name="author" content="GT Rao">
+    
+    <!-- Google Fonts: Plus Jakarta Sans for Ultra-HD Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Scaledrone for Realtime Chat -->
+    <script src='https://cdn.scaledrone.com/scaledrone.min.js' type='text/javascript'></script>
+
+    <style>
+        /* === UI/UX Variables (GT Rao Standard) === */
+        :root {
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --radius-card: 16px;
+            --radius-pill: 9999px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Light Theme */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.85);
+            --bg-input: #f1f5f9;
+            --bg-hover: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.25);
+            
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #020617;
+            --bg-card: #0f172a;
+            --bg-glass: rgba(2, 6, 23, 0.75);
+            --bg-input: #1e293b;
+            --bg-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 10px 30px rgba(59, 130, 246, 0.35);
+        }
+
+        /* === Base Styles === */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; -webkit-tap-highlight-color: transparent; }
+        html, body { overflow-x: hidden; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: var(--text-main); transition: background-color 0.4s ease, color 0.4s ease; scroll-behavior: smooth; }
+        body.chat-active { overflow: hidden; height: 100vh; }
+        a { text-decoration: none; color: var(--primary); transition: var(--transition); }
+        button, input, textarea, select { font-family: inherit; outline: none; }
+
+        /* === Smart Tools & Loaders === */
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--gradient); width: 0%; z-index: 999999; }
+        #loader-overlay { position: fixed; inset: 0; background: var(--bg-glass); backdrop-filter: blur(10px); z-index: 9999999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: var(--transition); color: var(--text-main); font-weight: 800; font-size: 1.2rem; gap: 1rem; }
+        #loader-overlay.active { opacity: 1; pointer-events: all; }
+        .spinner { width: 60px; height: 60px; border: 5px solid rgba(59,130,246,0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* === Glassmorphism Navbar === */
+        .navbar { position: sticky; top: clamp(10px, 2vw, 15px); z-index: 1000; max-width: 1300px; margin: 0 auto 2rem; width: 95%; background: var(--bg-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: var(--radius-pill); padding: clamp(10px, 1.5vw, 1rem) clamp(1rem, 3vw, 2rem); display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); }
+        .nav-brand { font-size: clamp(1.2rem, 3vw, 1.5rem); font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 10px; }
+        .theme-toggle { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); width: clamp(40px, 5vw, 45px); height: clamp(40px, 5vw, 45px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); font-size: 1.2rem; }
+        .theme-toggle:hover { background: var(--primary); border-color: var(--primary); color: white; transform: rotate(15deg) scale(1.05); box-shadow: var(--shadow-hover); }
+
+        /* === Layout & Landing UI === */
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+        .hero { text-align: center; margin-bottom: clamp(2rem, 5vw, 3rem); padding: 2rem 0 1rem; }
+        .hero h1 { font-size: clamp(2rem, 6vw, 4rem); font-weight: 800; margin-bottom: 1rem; line-height: 1.2; letter-spacing: -1px; }
+        .hero h1 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.15rem); max-width: 650px; margin: 0 auto; line-height: 1.6; }
+
+        /* Tool Workspace */
+        .workspace { display: flex; justify-content: center; margin-bottom: 4rem; }
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 2.5rem); box-shadow: var(--shadow-sm); transition: var(--transition); width: 100%; max-width: 500px; }
+        .card.hoverable:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: var(--shadow-hover); }
+        
+        .input-group { position: relative; margin-bottom: 1.25rem; }
+        .input-group i { position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.1rem; }
+        .input-group input, .input-group select { width: 100%; padding: 1rem 1rem 1rem 3rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; color: var(--text-main); font-size: 1rem; font-weight: 600; transition: var(--transition); appearance: none; }
+        .input-group input:focus, .input-group select:focus { border-color: var(--primary); background: var(--bg-card); box-shadow: 0 0 0 4px rgba(59,130,246,0.15); }
+        .select-wrapper::after { content: '\f107'; font-family: 'FontAwesome'; position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+
+        .btn { padding: 1rem 1.8rem; border: none; font-weight: 700; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; transition: var(--transition); font-size: clamp(0.95rem, 1.5vw, 1.1rem); width: 100%; }
+        .btn-primary { background: var(--gradient); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5); }
+
+        /* Features & SEO */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(1rem, 3vw, 1.5rem); margin: 4rem 0; }
+        .feature-card { background: var(--bg-card); padding: 1.5rem; text-align: center; border-radius: var(--radius-card); border: 1px solid var(--border); box-shadow: var(--shadow-sm); transition: var(--transition); }
+        .feature-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: var(--shadow-hover); }
+        .feature-card i { font-size: 2rem; margin-bottom: 1rem; color: var(--primary); transition: var(--transition); }
+        .feature-card:hover i { transform: scale(1.1) rotate(5deg); }
+        .feature-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 700; }
+        .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+        .seo-text-section { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 3rem); margin: 3rem 0; box-shadow: var(--shadow-sm); }
+        .seo-text-section h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 800; margin-bottom: 1.5rem; }
+        .seo-text-section h3 { font-size: clamp(1.1rem, 2vw, 1.4rem); font-weight: 700; margin: 2rem 0 1rem; }
+        .seo-text-section p, .seo-text-section li { font-size: clamp(0.95rem, 1.5vw, 1.05rem); color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; }
+        .seo-text-section ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--text-muted); }
+
+        /* === CHAT APP FULLSCREEN UI === */
+        #chat-app-fs {
+            position: fixed; inset: 0; z-index: 99999;
+            background-color: var(--bg-body);
+            background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 25px 25px;
+            display: none; flex-direction: column;
+            transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        #chat-app-fs.active { transform: translateX(0); display: flex; }
+
+        .chat-header { background: var(--bg-glass); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; height: 75px; z-index: 10; box-shadow: var(--shadow-sm); }
+        .ch-left { display: flex; align-items: center; gap: 15px; }
+        .ch-avatar { width: 48px; height: 48px; background: var(--gradient); color: white; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 1.3rem; box-shadow: var(--shadow-sm); }
+        .ch-info h3 { font-size: 1.15rem; color: var(--text-main); font-weight: 800; }
+        .ch-info p { font-size: 0.85rem; color: var(--success); font-weight: 700; margin-top: 2px; }
+        
+        .ch-actions { display: flex; gap: 12px; }
+        .ch-btn { width: 45px; height: 45px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg-input); color: var(--text-main); font-size: 1.1rem; cursor: pointer; transition: var(--transition); display: grid; place-items: center; }
+        .ch-btn.danger { color: var(--danger); }
+        .ch-btn:hover { background: var(--bg-hover); border-color: var(--primary); transform: translateY(-3px); box-shadow: var(--shadow-sm); }
+
+        /* Members Sidebar Drawer */
+        #members-sidebar { position: fixed; top: 0; right: 0; width: 100%; max-width: 350px; height: 100%; background: var(--bg-card); border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(0,0,0,0.2); transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); z-index: 100000; display: flex; flex-direction: column; }
+        #members-sidebar.active { transform: translateX(0); }
+        .ms-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 1.2rem; color: var(--text-main); background: var(--bg-input); }
+        .ms-list { flex: 1; overflow-y: auto; padding: 20px; }
+        .ms-user { display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 16px; margin-bottom: 12px; background: var(--bg-input); border: 1px solid var(--border); transition: var(--transition); }
+        .ms-user:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+        .ms-user-name { font-weight: 800; font-size: 1rem; margin-bottom: 4px; color: var(--text-main); }
+        .ms-user-time { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; font-weight: 600; }
+        .ms-user-dot { width: 12px; height: 12px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success); margin-left: auto; }
+
+        /* Chat Messages Area */
+        #messages-list { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
+        
+        /* Message Long Press Styles (Disabling native text selection on mobile to allow long press) */
+        .msg-box { max-width: 80%; padding: 12px 18px; border-radius: 18px; position: relative; font-size: 1rem; box-shadow: var(--shadow-sm); word-wrap: break-word; line-height: 1.5; font-weight: 500; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; transition: transform 0.2s; }
+        .msg-box:active { transform: scale(0.98); }
+        @keyframes popIn { from { opacity: 0; transform: translateY(15px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        
+        .msg-box.sent { align-self: flex-end; background: var(--gradient); color: #fff; border-bottom-right-radius: 4px; }
+        .msg-box.received { align-self: flex-start; background: var(--bg-card); color: var(--text-main); border-bottom-left-radius: 4px; border: 1px solid var(--border); }
+        
+        .sender-name { font-size: 0.8rem; font-weight: 800; margin-bottom: 6px; display: block; opacity: 0.9; }
+        .msg-img { max-width: 250px; width: 100%; border-radius: 12px; margin-top: 5px; border: 1px solid rgba(0,0,0,0.1); }
+        .msg-time { font-size: 0.75rem; opacity: 0.8; text-align: right; margin-top: 8px; display: flex; align-items: center; justify-content: flex-end; gap: 5px; font-weight: 700; }
+        
+        /* Large Animated Emoji Specific */
+        .msg-box.only-emoji { background: transparent; border: none; box-shadow: none; font-size: 4rem; padding: 0; text-align: center; }
+        .msg-box.only-emoji.sent { align-self: flex-end; }
+        .msg-box.only-emoji.received { align-self: flex-start; }
+        .msg-box.only-emoji .msg-time { display: none; }
+        .msg-box.only-emoji .sender-name { display: none; }
+        .msg-box.only-emoji .msg-txt { display: inline-block; animation: emojiBounce 2s infinite; text-shadow: var(--shadow-sm); }
+        @keyframes emojiBounce { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-15px) scale(1.1); } }
+
+        .sys-log { align-self: center; background: var(--bg-input); padding: 8px 20px; border-radius: var(--radius-pill); font-size: 0.85rem; color: var(--text-muted); margin: 15px 0; border: 1px solid var(--border); font-weight: 700; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm); }
+        .sys-log i { color: var(--primary); }
+
+        /* Chat Footer & Input */
+        .chat-footer { background: var(--bg-glass); backdrop-filter: blur(20px); border-top: 1px solid var(--border); padding: 15px; display: flex; align-items: flex-end; gap: 10px; z-index: 20; padding-bottom: max(15px, env(safe-area-inset-bottom)); position: relative; }
+        .input-wrap { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: 24px; padding: 12px 20px; display: flex; align-items: center; gap: 10px; transition: var(--transition); }
+        .input-wrap:focus-within { border-color: var(--primary); background: var(--bg-card); box-shadow: 0 0 0 4px rgba(59,130,246,0.15); }
+        
+        #chat-in { flex: 1; border: none; outline: none; background: transparent; color: var(--text-main); max-height: 120px; resize: none; font-size: 1rem; line-height: 1.5; font-weight: 500; }
+        
+        .btn-send { width: 50px; height: 50px; border-radius: 50%; border: none; background: var(--gradient); color: white; font-size: 1.2rem; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 15px rgba(59,130,246,0.3); display: grid; place-items: center; transition: var(--transition); }
+        .btn-send:hover { transform: scale(1.1) rotate(10deg); box-shadow: 0 8px 25px rgba(59,130,246,0.5); }
+
+        /* Emoji Panel */
+        .emoji-btn { background: none; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; transition: var(--transition); padding: 5px; }
+        .emoji-btn:hover { color: var(--primary); transform: scale(1.1); }
+        
+        #emoji-panel { position: absolute; bottom: 80px; left: 15px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); display: none; grid-template-columns: repeat(5, 1fr); gap: 10px; z-index: 100; animation: popIn 0.3s ease; }
+        #emoji-panel.active { display: grid; }
+        .emoji-item { font-size: 1.8rem; cursor: pointer; text-align: center; transition: transform 0.2s; user-select: none; }
+        .emoji-item:hover { transform: scale(1.3); }
+
+        /* Long Press Context Menu */
+        #msg-context-menu { position: fixed; background: var(--bg-glass); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 9999999; display: none; flex-direction: column; overflow: hidden; min-width: 150px; animation: popIn 0.2s ease; }
+        #msg-context-menu.active { display: flex; }
+        .ctx-item { padding: 12px 20px; font-weight: 700; font-size: 0.95rem; color: var(--text-main); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: var(--transition); }
+        .ctx-item:hover { background: var(--bg-hover); color: var(--primary); }
+        .ctx-item.danger:hover { color: white; background: var(--danger); }
+
+        /* === Footer === */
+        .footer { margin-top: 4rem; padding: clamp(3rem, 5vw, 4rem) 1rem 2rem; border-top: 1px solid var(--border); background: var(--bg-card); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2.5rem; max-width: 1300px; margin: 0 auto 2rem; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--text-main); font-weight: 800; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; transition: var(--transition); font-size: 0.95rem; cursor: pointer; font-weight: 500; }
+        .footer-links a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
+        .dev-badge { background: var(--bg-input); padding: 0.6rem 1.2rem; border-radius: var(--radius-pill); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 700; font-size: 0.9rem; border: 1px solid var(--border); transition: var(--transition); }
+        .dev-badge:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
+        /* === Modals === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); z-index: 200000; padding: 1rem; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 2.5rem); transform: scale(0.9) translateY(20px); transition: var(--transition); border: 1px solid var(--border); box-shadow: var(--shadow-hover); position: relative; max-height: 90vh; overflow-y: auto; text-align: left; }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-input); border: 1px solid var(--border); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--text-main); cursor: pointer; transition: var(--transition); }
+        .modal-close:hover { color: white; background: var(--danger); border-color: var(--danger); transform: rotate(90deg); }
+        
+        /* Developer Profile */
+        .dev-profile { text-align: center; }
+        .dev-avatar { width: clamp(100px, 15vw, 120px); height: clamp(100px, 15vw, 120px); border-radius: 50%; background: var(--bg-card); margin: 0 auto 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); border: 4px solid var(--primary); padding: 0; }
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .dev-tags { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+        .dev-tag { background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(59,130,246,0.2); }
+        .dev-social { width: 45px; height: 45px; border-radius: 50%; background: var(--bg-input); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: var(--transition); border: 1px solid var(--border); text-decoration: none; }
+        .dev-social:hover { background: var(--primary); color: white; transform: translateY(-3px); border-color: var(--primary); box-shadow: var(--shadow-sm); }
+
+        /* === Toast Notification === */
+        #toast-container { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: var(--text-main); color: var(--bg-body); padding: 1rem 1.5rem; border-radius: var(--radius-pill); box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px; animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, fadeOut 0.4s ease forwards 3s; font-weight: 700; font-size: 0.95rem; }
+        .toast i { font-size: 1.2rem; color: var(--bg-body); }
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(20px); opacity: 0; } }
+
+        /* Back to Top */
+        #backToTop { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: var(--shadow-hover); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 1000; font-size: 1.2rem; }
+        #backToTop.show { opacity: 1; visibility: visible; }
+        #backToTop:hover { transform: translateY(-5px) scale(1.05); background: var(--secondary); }
+    </style>
+</head>
+<body>
+    <div id="scroll-progress"></div>
+    <div id="loader-overlay"><div class="spinner"></div><p id="loader-text">Securing Connection...</p></div>
+
+    <!-- ==========================================================================
+         LANDING PAGE (PDFly Tools Framework)
+         ========================================================================== -->
+    <div id="landing-page">
+        <nav class="navbar">
+            <a href="index.html" class="nav-brand">
+                <i class="fa-solid fa-bolt"></i>
+                <span>PDFly Tools</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                <i class="fa-solid fa-sun" id="themeIcon"></i>
+            </button>
+        </nav>
+
+        <main class="container">
+            <div class="hero">
+                <h1>Secure <span>Chat Sync</span></h1>
+                <p>Create a room, set capacity, and chat across devices in real-time. No databases, zero tracking, 100% private with Animated Emojis.</p>
+            </div>
+
+            <div class="workspace">
+                <div class="card hoverable">
+                    <h2 style="text-align: center; margin-bottom: 1.5rem; color: var(--text-main); font-weight: 800;">Join Room</h2>
+                    
+                    <div class="input-group">
+                        <i class="fa-solid fa-users-rectangle"></i>
+                        <input type="text" id="room-in" placeholder="Room Name (e.g. Squad)">
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="pin-in" placeholder="Secret Pin (e.g. 1234)">
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="name-in" placeholder="Your Display Name">
+                    </div>
+
+                    <div class="input-group select-wrapper">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <select id="capacity-in">
+                            <option value="2" selected>Max Capacity: 2 Members</option>
+                            <option value="3">Max Capacity: 3 Members</option>
+                            <option value="4">Max Capacity: 4 Members</option>
+                            <option value="5">Max Capacity: 5 Members</option>
+                            <option value="10">Max Capacity: 10 Members</option>
+                            <option value="0">Max Capacity: Unlimited</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="joinChat()">
+                        <i class="fa-solid fa-right-to-bracket"></i> Enter Secure Chat
+                    </button>
+                </div>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fa-solid fa-face-smile-wink"></i>
+                    <h3>Animated Emojis</h3>
+                    <p>Send standard emojis to watch them beautifully animate inside the chat dynamically.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-hand-pointer"></i>
+                    <h3>Message Long-Press</h3>
+                    <p>Long press any message in the chat to seamlessly Copy or Delete it locally.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <h3>Zero Tracking</h3>
+                    <p>No databases, no server logs. Messages vanish permanently when you close the session.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-bolt"></i>
+                    <h3>Real-Time Sync</h3>
+                    <p>Instantaneous cross-device messaging powered by blazing fast WebSocket technology.</p>
+                </div>
+            </div>
+
+            <div class="seo-text-section">
+                <h2>Why Choose Secure Chat Sync?</h2>
+                <p>In today's digital landscape, privacy is paramount. Most traditional messaging applications mandate phone numbers, email addresses, and persistently store your data on cloud servers indefinitely. <strong>Secure Chat Sync</strong>, engineered on the PDFly Tools Framework, provides a frictionless and highly secure alternative.</p>
+                
+                <h3>Advanced Client-Side Architecture</h3>
+                <p>Our tool utilizes an advanced engine to establish peer-to-peer style communication channels. Everything runs directly in your browser:</p>
+                <ul>
+                    <li><strong>No Backend Storage:</strong> Chat rooms exist solely in memory. Once the last user leaves, the room and its history evaporate completely.</li>
+                    <li><strong>Capacity Enforcement:</strong> The capacity feature allows room creators to enforce a hard limit (e.g., exactly 2 people), preventing unwanted eavesdroppers.</li>
+                    <li><strong>Animated Emojis & Long Press:</strong> Experience premium chat features like auto-animating large emojis and mobile-friendly long-press context menus for copying and deleting.</li>
+                </ul>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>
+                        <a href="index.html" style="text-decoration: none; color: var(--text-main);">
+                            <i class="fa-solid fa-bolt" style="color:var(--primary)"></i> PDFly Tools
+                        </a>
+                    </h4>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Your ultimate suite for free, secure, and blazing-fast web utilities. Crafted with Ultra HD fluid UI tech.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Top Tools</h4>
+                    <ul class="footer-links">
+                        <li><a href="resize-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Resize Image</a></li>
+                        <li><a href="compress-pdf.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Compress PDF</a></li>
+                        <li><a href="password-gen.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Password Gen</a></li>
+                        <li><a href="qr-code-maker.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> QR Code maker</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal & Info</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" onclick="openModal('privacyModal', event)"><i class="fa-solid fa-shield"></i> Privacy Policy</a></li>
+                        <li><a href="#" onclick="openModal('termsModal', event)"><i class="fa-solid fa-file-contract"></i> Terms of Service</a></li>
+                        <li><a href="#" onclick="openModal('contactModal', event)"><i class="fa-solid fa-headset"></i> Contact Support</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="dev-badge" onclick="openModal('devProfileModal')">
+                    <i class="fa-solid fa-code"></i> Developed by GT Rao
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">&copy; 2026 PDFly Tools. All Rights Reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+
+    <!-- ==========================================================================
+         CHAT APP UI (Fullscreen overlay)
+         ========================================================================== -->
+    <div id="chat-app-fs">
+        <div class="chat-header">
+            <div class="ch-left">
+                <div class="ch-avatar" id="head-avatar">#</div>
+                <div class="ch-info">
+                    <h3 id="head-title">Loading...</h3>
+                    <p id="head-status">Connecting...</p>
+                </div>
+            </div>
+            <div class="ch-actions">
+                <button class="ch-btn" onclick="toggleMembersSidebar()" title="Active Members"><i class="fa-solid fa-users"></i></button>
+                <button class="ch-btn danger" onclick="leaveChat()" title="Leave Room"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+            </div>
+        </div>
+
+        <!-- Members Sidebar -->
+        <div id="members-sidebar">
+            <div class="ms-header">
+                <span><i class="fa-solid fa-users" style="color: var(--primary); margin-right: 8px;"></i> Members List</span>
+                <button class="ch-btn" style="width: 38px; height: 38px;" onclick="toggleMembersSidebar()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="ms-list" id="members-list-content"></div>
+        </div>
+
+        <div id="messages-list"></div>
+
+        <div class="chat-footer">
+            <button class="ch-btn" onclick="document.getElementById('file-in').click()" title="Send Image"><i class="fa-solid fa-image"></i></button>
+            <input type="file" id="file-in" accept="image/*" style="display:none" />
+            
+            <div class="input-wrap">
+                <button class="emoji-btn" onclick="toggleEmojiPanel()"><i class="fa-regular fa-face-smile"></i></button>
+                <textarea id="chat-in" rows="1" placeholder="Type a message (Hold msg for options)"></textarea>
+            </div>
+            <button class="btn-send" onclick="sendMsg()"><i class="fa-solid fa-paper-plane"></i></button>
+
+            <!-- Emoji Picker Panel -->
+            <div id="emoji-panel">
+                <div class="emoji-item" onclick="insertEmoji('😂')">😂</div>
+                <div class="emoji-item" onclick="insertEmoji('❤️')">❤️</div>
+                <div class="emoji-item" onclick="insertEmoji('🔥')">🔥</div>
+                <div class="emoji-item" onclick="insertEmoji('👍')">👍</div>
+                <div class="emoji-item" onclick="insertEmoji('🚀')">🚀</div>
+                <div class="emoji-item" onclick="insertEmoji('✨')">✨</div>
+                <div class="emoji-item" onclick="insertEmoji('🎉')">🎉</div>
+                <div class="emoji-item" onclick="insertEmoji('😎')">😎</div>
+                <div class="emoji-item" onclick="insertEmoji('😭')">😭</div>
+                <div class="emoji-item" onclick="insertEmoji('🙏')">🙏</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Long Press Context Menu -->
+    <div id="msg-context-menu">
+        <div class="ctx-item" id="ctx-copy"><i class="fa-regular fa-copy"></i> Copy Text</div>
+        <div class="ctx-item danger" id="ctx-delete"><i class="fa-regular fa-trash-can"></i> Delete for Me</div>
+    </div>
+
+
+    <!-- ==========================================================================
+         MODALS
+         ========================================================================== -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('privacyModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-shield" style="color: var(--primary);"></i> Privacy Policy</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">At PDFly Tools, your privacy is strictly protected. This chat application operates entirely client-side via WebSocket. We do not store, intercept, or log any messages, images, or IP addresses on our servers. All active sessions evaporate immediately upon room closure.</p>
+            <button class="btn btn-primary" onclick="closeModal('privacyModal')">Acknowledge</button>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('termsModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-file-contract" style="color: var(--primary);"></i> Terms of Service</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">By using GT Chat Pro Sync, you agree to use this tool for lawful communication only. PDFly Tools provides this utility "as is" without warranty. We hold no liability for data lost due to network disconnections.</p>
+            <button class="btn btn-primary" onclick="closeModal('termsModal')">I Agree</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('contactModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> Contact Support</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">Experiencing issues or want to report a bug? Reach out directly.</p>
+            <div style="background: var(--bg-input); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <p style="color: var(--text-main); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope" style="color: var(--primary);"></i> <a href="mailto:pdflytools@gmail.com" style="text-decoration: none; color: inherit;">pdflytools@gmail.com</a>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> Azamgarh, Uttar Pradesh, India
+                </p>
+            </div>
+            <button class="btn btn-primary" onclick="closeModal('contactModal')">Close</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="devProfileModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('devProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="dev-profile">
+                <div class="dev-avatar">
+                    <img src="dev-profile.png" alt="GT Rao - Developer" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GT+Rao&background=3b82f6&color=fff&size=128&font-size=0.33&bold=true';">
+                </div>
+                <h2 style="font-size: clamp(1.8rem, 4vw, 2.2rem); margin-bottom: 0.2rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">GT Rao</h2>
+                <p style="color: var(--text-main); font-weight: 600; font-size: 1rem; margin-top: 0.2rem;">Student & Web Developer</p>
+                <p style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Azamgarh, Uttar Pradesh, India</p>
+                
+                <div class="dev-tags">
+                    <span class="dev-tag"><i class="fa-brands fa-html5"></i> Web Dev</span>
+                    <span class="dev-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
+                    <span class="dev-tag"><i class="fa-solid fa-shield"></i> Network Security</span>
+                    <span class="dev-tag"><i class="fa-solid fa-layer-group"></i> PDFly Tools</span>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center; padding: 1.25rem; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">
+                        Passionate Web Developer dedicated to crafting lightning-fast, secure, and user-centric web applications. I focus on writing clean code, building responsive interfaces, and ensuring absolute client-side privacy.
+                    </p>
+                </div>
+                
+                <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                     <a href="mailto:pdflytools@gmail.com" class="dev-social" title="Email Contact" target="_blank"><i class="fa-solid fa-envelope"></i></a>
+                     <a href="https://instagram.com/mr_gt_rao" class="dev-social" title="Personal Instagram" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                     <a href="https://instagram.com/educate_path" class="dev-social" title="Business / PDFly Tools" target="_blank"><i class="fa-solid fa-briefcase"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container & BackToTop -->
+    <div id="toast-container"></div>
+    <button id="backToTop" title="Go to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <!-- ==========================================================================
+         JAVASCRIPT LOGIC
+         ========================================================================== -->
+    <script>
+        // === 1. Core State & Theme Logic ===
+        const els = {
+            html: document.documentElement,
+            themeToggle: document.getElementById('themeToggle'),
+            themeIcon: document.getElementById('themeIcon'),
+            scrollProg: document.getElementById('scroll-progress'),
+            btt: document.getElementById('backToTop'),
+            loader: document.getElementById('loader-overlay')
+        };
+
+        const initTheme = () => {
+            const saved = localStorage.getItem('pdfly-theme') || 'dark'; 
+            els.html.setAttribute('data-theme', saved);
+            els.themeIcon.className = saved === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        };
+        els.themeToggle.addEventListener('click', () => {
+            const next = els.html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            els.html.setAttribute('data-theme', next);
+            localStorage.setItem('pdfly-theme', next);
+            els.themeIcon.className = next === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            showToast(`${next.charAt(0).toUpperCase() + next.slice(1)} Mode Activated`, 'success');
+        });
+        initTheme();
+
+        // Scroll Progress & Back to Top
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            els.scrollProg.style.width = ((document.body.scrollTop || document.documentElement.scrollTop) / h) * 100 + "%";
+            els.btt.classList.toggle('show', (document.body.scrollTop || document.documentElement.scrollTop) > 300);
+        });
+        els.btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-circle-xmark' : 'fa-info-circle';
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3000);
+        }
+
+        // Modals
+        window.openModal = (id, e) => { if(e) e.preventDefault(); document.getElementById(id).classList.add('active'); };
+        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+        window.addEventListener('click', e => { if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('active'); });
+
+        function getCurrentTime() { return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }); }
+
+
+        // === 2. Chat Engine (Scaledrone) Logic ===
+        const CHANNEL_ID = '7hDDsGe9ccjUe6gZ';
+        let drone, room, me = {}, currentRoomID = '';
+        let roomCapacity = 2;
+        let activeMembers = {}; 
+
+        function joinChat() {
+            const r = document.getElementById('room-in').value.trim();
+            const p = document.getElementById('pin-in').value.trim();
+            const n = document.getElementById('name-in').value.trim();
+            roomCapacity = parseInt(document.getElementById('capacity-in').value);
+            
+            if(!r || !p || !n) return showToast("Please fill all required fields", "error");
+
+            document.getElementById('loader-text').innerText = "Securing Connection...";
+            els.loader.classList.add('active');
+
+            document.getElementById('head-title').innerText = r + (roomCapacity === 0 ? "" : ` (Max ${roomCapacity})`);
+            document.getElementById('head-avatar').innerText = r.charAt(0).toUpperCase();
+
+            // Hash room name for privacy
+            currentRoomID = 'observable-' + btoa(r.toLowerCase() + p).replace(/[^a-zA-Z0-9]/g, '');
+
+            initDrone(n);
+        }
+
+        function initDrone(name) {
+            drone = new Scaledrone(CHANNEL_ID, { data: { name: name, color: getRandomColor() } });
+
+            drone.on('open', error => {
+                if(error) { els.loader.classList.remove('active'); return showToast("Network Error. Try again.", "error"); }
+                me = { id: drone.clientId, name: name };
+                room = drone.subscribe(currentRoomID, { historyCount: 30 });
+
+                room.on('open', err => {
+                    els.loader.classList.remove('active');
+                    if(err) return showToast("Failed to join room.", "error");
+                    
+                    document.getElementById('landing-page').style.display = 'none';
+                    document.body.classList.add('chat-active');
+                    const chatApp = document.getElementById('chat-app-fs');
+                    chatApp.style.display = 'flex';
+                    setTimeout(() => chatApp.classList.add('active'), 50);
+                    
+                    document.getElementById('head-status').innerText = 'Connected securely';
+                    addSysLog(`<i class="fa-solid fa-lock"></i> Welcome, ${name}. End-to-end synced at ${getCurrentTime()}.`);
+                });
+
+                room.on('members', m => {
+                    if (roomCapacity !== 0 && m.length > roomCapacity) {
+                        showToast(`Room is full! Limit is set to ${roomCapacity}.`, "error");
+                        leaveChat(); return;
+                    }
+                    const timeNow = getCurrentTime();
+                    m.forEach(mem => {
+                        const mName = mem.clientData ? mem.clientData.name : 'Unknown';
+                        const mColor = mem.clientData ? mem.clientData.color : '#ccc';
+                        activeMembers[mem.id] = { name: mName, color: mColor, joinTime: timeNow };
+                    });
+                    document.getElementById('head-status').innerText = `${m.length} Online`;
+                    renderMembersList();
+                });
+
+                room.on('message', msg => handleMsg(msg));
+                room.on('history_message', msg => handleMsg(msg));
+                
+                room.on('member_join', m => { 
+                    const timeNow = getCurrentTime();
+                    const mName = m.clientData ? m.clientData.name : 'Unknown';
+                    const mColor = m.clientData ? m.clientData.color : '#ccc';
+                    activeMembers[m.id] = { name: mName, color: mColor, joinTime: timeNow };
+                    document.getElementById('head-status').innerText = `${Object.keys(activeMembers).length} Online`; 
+                    addSysLog(`<i class="fa-solid fa-arrow-right-to-bracket"></i> <b>${mName}</b> joined at ${timeNow}`); 
+                    renderMembersList();
+                });
+                
+                room.on('member_leave', ({id}) => { 
+                    const timeNow = getCurrentTime();
+                    const mem = activeMembers[id];
+                    if(mem) {
+                        addSysLog(`<i class="fa-solid fa-arrow-right-from-bracket" style="color:var(--danger)"></i> <b>${mem.name}</b> left at ${timeNow}`);
+                        delete activeMembers[id];
+                        document.getElementById('head-status').innerText = `${Object.keys(activeMembers).length} Online`; 
+                        renderMembersList();
+                    }
+                });
+            });
+        }
+
+        function leaveChat() {
+            if(drone) drone.close();
+            activeMembers = {};
+            document.getElementById('messages-list').innerHTML = '';
+            document.getElementById('members-sidebar').classList.remove('active');
+            document.getElementById('chat-app-fs').classList.remove('active');
+            
+            setTimeout(() => {
+                document.getElementById('chat-app-fs').style.display = 'none';
+                document.getElementById('landing-page').style.display = 'block';
+                document.body.classList.remove('chat-active');
+            }, 400);
+            showToast("Disconnected safely.", "success");
+        }
+
+        // === 3. Message Handling & Animated Emoji Logic ===
+        
+        // Regex to check if text contains ONLY emojis (up to 3 emojis max for large animation)
+        const isOnlyEmoji = (str) => {
+            const emojiRegex = /^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)+$/u;
+            const noSpace = str.replace(/\s/g, '');
+            return emojiRegex.test(noSpace) && Array.from(noSpace).length <= 3;
+        };
+
+        function handleMsg(packet) {
+            const { data, id, timestamp, member, clientId } = packet;
+            if(document.getElementById(id)) return;
+
+            const sender = member ? member.clientData : (data.senderInfo || {name:'Unknown', color:'#555'});
+            const isMe = clientId === drone.clientId;
+
+            const list = document.getElementById('messages-list');
+            const time = new Date(timestamp * 1000).toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = `msg-box ${isMe ? 'sent' : 'received'}`;
+            
+            // Check if Animated Emoji should be applied
+            if(data.text && isOnlyEmoji(data.text)) {
+                div.classList.add('only-emoji');
+            }
+
+            let html = '';
+            if(!isMe) html += `<span class="sender-name" style="color:${sender.color}">${sender.name}</span>`;
+
+            if(data.image) html += `<img src="${data.image}" class="msg-img">`;
+            
+            if(data.text) {
+                // Attach raw text as data attribute for copying
+                div.dataset.rawText = data.text;
+                html += `<span class="msg-txt">${escapeHtml(data.text)}</span>`;
+            }
+
+            html += `<div class="msg-time">${time} <i class="fa-solid fa-check-double" style="color:${isMe?'#fff':'var(--primary)'}"></i></div>`;
+
+            div.innerHTML = html;
+            
+            // Attach Long Press Listeners
+            attachLongPress(div, id);
+
+            list.appendChild(div);
+            list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' });
+        }
+
+        function sendMsg() {
+            const input = document.getElementById('chat-in');
+            const text = input.value.trim();
+            if(!text) return;
+
+            drone.publish({ room: currentRoomID, message: { text: text, senderInfo: me } });
+            input.value = '';
+            input.style.height = 'auto';
+            document.getElementById('emoji-panel').classList.remove('active');
+            input.focus();
+        }
+
+        // Textarea Auto-resize & Enter Key
+        const textarea = document.getElementById('chat-in');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+        textarea.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+        });
+
+        // Emoji Panel Logic
+        function toggleEmojiPanel() {
+            document.getElementById('emoji-panel').classList.toggle('active');
+        }
+        function insertEmoji(emoji) {
+            const input = document.getElementById('chat-in');
+            input.value += emoji;
+            input.focus();
+        }
+
+        // === 4. Long Press & Context Menu Logic ===
+        let pressTimer;
+        let activeMsgId = null;
+        let activeMsgText = "";
+        const ctxMenu = document.getElementById('msg-context-menu');
+
+        function attachLongPress(element, id) {
+            const startPress = (e) => {
+                if(e.type === 'click' && e.clientX === 0) return; 
+                
+                // Set active data
+                activeMsgId = id;
+                activeMsgText = element.dataset.rawText || "";
+                
+                pressTimer = setTimeout(() => showContextMenu(e, element), 600);
+            };
+            const cancelPress = () => clearTimeout(pressTimer);
+
+            element.addEventListener('mousedown', startPress);
+            element.addEventListener('touchstart', startPress, {passive: true});
+            element.addEventListener('mouseup', cancelPress);
+            element.addEventListener('mouseleave', cancelPress);
+            element.addEventListener('touchend', cancelPress);
+            element.addEventListener('touchcancel', cancelPress);
+        }
+
+        function showContextMenu(e, element) {
+            e.preventDefault();
+            navigator.vibrate && navigator.vibrate(50); // Haptic feedback on mobile
+
+            // Position Menu
+            let x = e.clientX || (e.touches && e.touches[0].clientX);
+            let y = e.clientY || (e.touches && e.touches[0].clientY);
+            
+            // Boundary checks
+            if(x + 150 > window.innerWidth) x = window.innerWidth - 160;
+            if(y + 100 > window.innerHeight) y = window.innerHeight - 110;
+
+            ctxMenu.style.left = `${x}px`;
+            ctxMenu.style.top = `${y}px`;
+            
+            // Only show copy if there is text
+            document.getElementById('ctx-copy').style.display = activeMsgText ? 'flex' : 'none';
+            ctxMenu.classList.add('active');
+        }
+
+        // Context Menu Actions
+        document.getElementById('ctx-copy').addEventListener('click', () => {
+            if(activeMsgText) {
+                navigator.clipboard.writeText(activeMsgText).then(() => showToast('Message Copied!'));
+            }
+            ctxMenu.classList.remove('active');
+        });
+
+        document.getElementById('ctx-delete').addEventListener('click', () => {
+            if(activeMsgId) {
+                const el = document.getElementById(activeMsgId);
+                if(el) {
+                    el.style.transform = 'scale(0)';
+                    el.style.opacity = '0';
+                    setTimeout(() => el.remove(), 200);
+                    showToast('Message deleted locally', 'success');
+                }
+            }
+            ctxMenu.classList.remove('active');
+        });
+
+        // Close menu on outside click
+        document.addEventListener('click', (e) => {
+            if(!ctxMenu.contains(e.target) && !e.target.closest('.msg-box')) {
+                ctxMenu.classList.remove('active');
+            }
+        });
+        document.addEventListener('touchstart', (e) => {
+            if(!ctxMenu.contains(e.target) && !e.target.closest('.msg-box')) {
+                ctxMenu.classList.remove('active');
+            }
+        });
+
+        // === 5. Sidebar & UI Helpers ===
+        function toggleMembersSidebar() { document.getElementById('members-sidebar').classList.toggle('active'); }
+
+        function renderMembersList() {
+            const list = document.getElementById('members-list-content');
+            list.innerHTML = '';
+            Object.keys(activeMembers).forEach(id => {
+                const mem = activeMembers[id];
+                const isMe = id === drone.clientId;
+                list.innerHTML += `
+                    <div class="ms-user">
+                        <div class="ch-avatar" style="width:40px; height:40px; background:${mem.color}; font-size:1rem; box-shadow:none;">
+                            ${mem.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div style="flex:1;">
+                            <div class="ms-user-name">${mem.name} ${isMe ? '<span style="color:var(--primary);">(You)</span>' : ''}</div>
+                            <div class="ms-user-time"><i class="fa-regular fa-clock"></i> Joined: ${mem.joinTime}</div>
+                        </div>
+                        <div class="ms-user-dot"></div>
+                    </div>
+                `;
+            });
+        }
+
+        // Image Compression Feature
+        document.getElementById('file-in').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            document.getElementById('loader-text').innerText = "Compressing Image...";
+            els.loader.classList.add('active');
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width, h = img.height;
+                    const max = 250; 
+                    if(w > h) { if(w > max) { h *= max/w; w = max; } } else { if(h > max) { w *= max/h; h = max; } }
+                    
+                    canvas.width = w; canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    
+                    let imgData = canvas.toDataURL('image/jpeg', 0.4); 
+                    if(imgData.length > 32000) {
+                        els.loader.classList.remove('active');
+                        return showToast("Image is too complex to send. Try a simpler image.", "error");
+                    }
+
+                    drone.publish({ room: currentRoomID, message: { image: imgData, senderInfo: me } });
+                    els.loader.classList.remove('active');
+                    e.target.value = ''; 
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+        });
+
+        // Utils
+        function getRandomColor() {
+            const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        function addSysLog(htmlTxt) {
+            const d = document.createElement('div');
+            d.className = 'sys-log'; d.innerHTML = htmlTxt;
+            document.getElementById('messages-list').appendChild(d);
+            document.getElementById('messages-list').scrollTo({ top: document.getElementById('messages-list').scrollHeight });
+        }
+        
+        function escapeHtml(unsafe) {
+            return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+    </script>
+</body>
+</html>

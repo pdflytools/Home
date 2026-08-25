@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Steganography Pro - PDFly Tools</title>
+    <meta name="description" content="Securely hide text, files, and images inside a cover image using LSB steganography, AES-256 encryption, and GZIP compression. A premium client-side tool by PDFly Tools.">
+    
+    <!-- Google Fonts: Plus Jakarta Sans for Ultra-HD Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* === UI/UX Variables (GT Rao Standard) === */
+        :root {
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --radius-card: 16px;
+            --radius-pill: 9999px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Light Theme */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.85);
+            --bg-input: #f1f5f9;
+            --bg-hover: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.25);
+            
+            /* Status Colors */
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #020617;
+            --bg-card: #0f172a;
+            --bg-glass: rgba(2, 6, 23, 0.75);
+            --bg-input: #1e293b;
+            --bg-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 10px 30px rgba(59, 130, 246, 0.35);
+        }
+
+        /* === Base Styles === */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+        html, body { overflow-x: hidden; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: var(--text-main); transition: background-color 0.4s ease, color 0.4s ease; }
+
+        /* === Smart Tools === */
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--gradient); width: 0%; z-index: 9999; transition: width 0.1s ease; }
+
+        /* === Glassmorphism Navbar === */
+        .navbar {
+            position: sticky; top: clamp(10px, 2vw, 15px); z-index: 1000; max-width: 1300px; margin: 0 auto 2rem; width: 95%;
+            background: var(--bg-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: var(--radius-pill); padding: clamp(10px, 1.5vw, 1rem) clamp(1rem, 3vw, 2rem);
+            display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm);
+        }
+        .nav-brand { font-size: clamp(1.2rem, 3vw, 1.5rem); font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .nav-brand i { color: var(--primary); -webkit-text-fill-color: initial; }
+        .theme-toggle { background: var(--bg-input); border: 1px solid var(--border); outline: none; color: var(--text-main); width: clamp(40px, 5vw, 45px); height: clamp(40px, 5vw, 45px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); font-size: 1.2rem; }
+        .theme-toggle:hover { background: var(--primary); border-color: var(--primary); color: white; transform: rotate(15deg) scale(1.05); box-shadow: var(--shadow-hover); }
+
+        /* === Layout === */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+        .header { text-align: center; margin-bottom: clamp(2rem, 5vw, 3rem); padding: 2rem 0 1rem; }
+        .header h1 { font-size: clamp(2rem, 6vw, 4rem); font-weight: 800; margin-bottom: 1rem; line-height: 1.2; letter-spacing: -1px; }
+        .header h1 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.15rem); max-width: 700px; margin: 0 auto; line-height: 1.6; }
+
+        /* === Workspace Card & Tabs === */
+        .workspace { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); overflow: hidden; transition: var(--transition); margin-bottom: 3rem; }
+        .workspace:hover { box-shadow: var(--shadow-hover); border-color: rgba(59, 130, 246, 0.4); }
+        
+        .tabs { display: flex; background: var(--bg-input); border-bottom: 1px solid var(--border); padding: 0.5rem; gap: 0.5rem; }
+        .tab-btn { flex: 1; padding: 1rem; border: none; background: transparent; color: var(--text-muted); font-weight: 700; font-size: clamp(0.9rem, 2vw, 1.05rem); border-radius: 12px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; }
+        .tab-btn.active, .tab-btn:hover { background: var(--bg-card); color: var(--primary); box-shadow: var(--shadow-sm); }
+        
+        .tab-content { display: none; padding: clamp(1.5rem, 4vw, 3rem); animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* === Forms & Inputs === */
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: flex; justify-content: space-between; font-size: clamp(0.9rem, 1.5vw, 1rem); font-weight: 700; color: var(--text-main); margin-bottom: 0.6rem; }
+        .form-group .label-subtext { font-size: 0.85rem; color: var(--text-muted); margin-top: -5px; margin-bottom: 10px; display: block; font-weight: 500; }
+        
+        textarea, input[type="text"], input[type="password"], select { width: 100%; padding: 1rem 1.2rem; font-family: inherit; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 12px; font-size: 1rem; transition: var(--transition); font-weight: 500; appearance: none; }
+        textarea:focus, input:focus, select:focus { outline: none; border-color: var(--primary); background: var(--bg-card); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
+        textarea.large { min-height: 120px; line-height: 1.5; resize: vertical; }
+        
+        /* Input with icon */
+        .input-with-icon { position: relative; }
+        .input-with-icon > i.main-icon { position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.1rem; }
+        .input-with-icon input { padding-left: 3rem; padding-right: 90px; }
+        
+        .action-icon-btn { position: absolute; top: 50%; transform: translateY(-50%); background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); z-index: 10; }
+        .action-icon-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .action-icon-btn.eye-btn { right: 50px; }
+        .action-icon-btn.gen-btn { right: 10px; }
+
+        /* === Custom File Dropzones === */
+        .hidden-file-input { display: none !important; }
+        .filebox { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 2.5rem 1.5rem; border-radius: 12px; border: 2px dashed var(--border); background: var(--bg-input); cursor: pointer; transition: var(--transition); text-align: center; color: var(--text-muted); position: relative; overflow: hidden; }
+        .filebox:hover { border-color: var(--primary); background: rgba(59,130,246,0.03); color: var(--primary); box-shadow: inset 0 0 0 4px rgba(59,130,246,0.05); }
+        .filebox i.main-icon { font-size: 2.5rem; color: var(--primary); margin-bottom: 0.5rem; transition: transform 0.3s; }
+        .filebox:hover i.main-icon { transform: translateY(-5px); }
+        .filebox-text { font-weight: 700; font-size: 1.05rem; color: var(--text-main); word-break: break-all; }
+        
+        .remove-file-btn { position: absolute; top: 10px; right: 10px; background: var(--danger); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: none; place-items: center; font-size: 0.9rem; box-shadow: var(--shadow-sm); transition: var(--transition); z-index: 2; }
+        .remove-file-btn:hover { transform: scale(1.1) rotate(90deg); }
+
+        .preview-container { margin-top: 15px; text-align: center; display: none; background: var(--bg-input); border-radius: 12px; padding: 15px; border: 1px solid var(--border); }
+        .preview { max-width: 100%; max-height: 250px; border-radius: 8px; object-fit: contain; box-shadow: var(--shadow-sm); }
+
+        /* === Smart Capacity === */
+        .capacity-wrapper { margin-top: 15px; display: none; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.2rem; box-shadow: var(--shadow-sm); }
+        .cap-header { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 800; margin-bottom: 10px; color: var(--text-main); }
+        .cap-bar-bg { width: 100%; height: 10px; background: var(--bg-input); border-radius: 5px; overflow: hidden; }
+        .cap-bar-fill { height: 100%; width: 0%; background: var(--success); transition: width 0.4s ease, background-color 0.3s; }
+
+        /* === Toggle Switch === */
+        .toggle-wrap { display: flex; align-items: center; justify-content: space-between; background: var(--bg-input); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 1.5rem; gap: 15px; }
+        .toggle-label { font-weight: 700; font-size: 1rem; display: flex; flex-direction: column; color: var(--text-main); }
+        .toggle-label small { font-weight: 500; color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
+        
+        .switch { position: relative; display: inline-block; width: 52px; height: 28px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        /* === Buttons === */
+        .btn-group { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+        .btn { padding: 1rem 1.8rem; border: none; font-family: inherit; font-weight: 700; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; transition: var(--transition); font-size: clamp(0.95rem, 1.5vw, 1.1rem); flex: 1; min-width: 200px; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn-primary { background: var(--gradient); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover:not(:disabled) { box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5); }
+        .btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-secondary:hover:not(:disabled) { background: var(--bg-hover); color: var(--primary); border-color: var(--primary); }
+        .btn-success { background: var(--success); color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+        .btn-success:hover { box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5); }
+        
+        /* === Result Display === */
+        .result-box { display: none; flex-direction: column; margin-top: 2rem; padding: 2rem; background: rgba(59,130,246,0.03); border: 2px dashed var(--primary); border-radius: var(--radius-card); animation: fadeIn 0.4s ease; }
+        .result-box.active { display: flex; }
+        .result-box h3 { margin-bottom: 15px; color: var(--primary); font-weight: 800; display: flex; align-items: center; gap: 8px; font-size: 1.4rem; }
+        
+        .decoded-text-box { background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border); white-space: pre-wrap; word-break: break-all; font-family: monospace; font-size: 0.95rem; max-height: 250px; overflow-y: auto; color: var(--text-main); }
+        .decoded-text-box::-webkit-scrollbar { width: 6px; }
+        .decoded-text-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        /* === 4 Features Grid === */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(1rem, 3vw, 1.5rem); margin: 4rem 0; }
+        .feature-card { background: var(--bg-card); padding: 1.5rem; text-align: center; border-radius: var(--radius-card); border: 1px solid var(--border); box-shadow: var(--shadow-sm); transition: var(--transition); }
+        .feature-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: var(--shadow-hover); }
+        .feature-card i { font-size: 2rem; margin-bottom: 1rem; color: var(--primary); transition: var(--transition); }
+        .feature-card:hover i { transform: scale(1.1) rotate(5deg); }
+        .feature-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 700; color: var(--text-main); }
+        .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* === SEO Friendly Card Section === */
+        .seo-text-section { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 3rem); margin: 3rem 0; box-shadow: var(--shadow-sm); }
+        .seo-text-section h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 800; margin-bottom: 1.5rem; color: var(--text-main); }
+        .seo-text-section h3 { font-size: clamp(1.1rem, 2vw, 1.4rem); font-weight: 700; margin: 2rem 0 1rem; color: var(--text-main); }
+        .seo-text-section p, .seo-text-section li { font-size: clamp(0.95rem, 1.5vw, 1.05rem); color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; }
+        .seo-text-section ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--text-muted); }
+
+        /* === Modals === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); z-index: 2000; padding: 1rem; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 2.5rem); transform: scale(0.9) translateY(20px); transition: var(--transition); border: 1px solid var(--border); box-shadow: var(--shadow-hover); position: relative; max-height: 90vh; overflow-y: auto; text-align: left; }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-input); border: 1px solid var(--border); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--text-main); cursor: pointer; transition: var(--transition); }
+        .modal-close:hover { color: white; background: var(--danger); border-color: var(--danger); transform: rotate(90deg); }
+        
+        /* Developer Profile */
+        .dev-profile { text-align: center; }
+        .dev-avatar { width: clamp(100px, 15vw, 120px); height: clamp(100px, 15vw, 120px); border-radius: 50%; background: var(--bg-card); margin: 0 auto 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); border: 4px solid var(--primary); padding: 0; }
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .dev-tags { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+        .dev-tag { background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(59,130,246,0.2); }
+        .dev-social { width: 45px; height: 45px; border-radius: 50%; background: var(--bg-input); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: var(--transition); border: 1px solid var(--border); text-decoration: none; }
+        .dev-social:hover { background: var(--primary); color: white; transform: translateY(-3px); border-color: var(--primary); box-shadow: var(--shadow-sm); }
+
+        /* === Footer === */
+        .footer { margin-top: 4rem; padding: clamp(3rem, 5vw, 4rem) 1rem 2rem; border-top: 1px solid var(--border); background: var(--bg-card); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2.5rem; max-width: 1300px; margin: 0 auto 2rem; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--text-main); font-weight: 800; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; transition: var(--transition); font-size: 0.95rem; cursor: pointer; font-weight: 500; }
+        .footer-links a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1.2rem; }
+        .dev-badge { background: var(--bg-input); padding: 0.6rem 1.2rem; border-radius: var(--radius-pill); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 700; font-size: 0.9rem; border: 1px solid var(--border); transition: var(--transition); }
+        .dev-badge:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
+        /* === Toast Notification === */
+        #toast-container { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: var(--text-main); color: var(--bg-body); padding: 1rem 1.5rem; border-radius: var(--radius-pill); box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px; animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, fadeOut 0.4s ease forwards 3s; font-weight: 700; font-size: 0.95rem; border: 1px solid var(--border); }
+        .toast i { font-size: 1.2rem; color: var(--bg-body); }
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.info { border-left: 4px solid var(--primary); }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(20px); opacity: 0; } }
+
+        /* === Back to Top & Loader === */
+        #backToTop { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: var(--shadow-hover); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 1000; font-size: 1.2rem; }
+        #backToTop.show { opacity: 1; visibility: visible; }
+        #backToTop:hover { transform: translateY(-5px) scale(1.05); background: var(--secondary); }
+        
+        .loader-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 1.5rem; z-index: 9999; display: none; color: white; font-weight: 800; font-size: 1.2rem; }
+        .spinner { width: 60px; height: 60px; border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; box-shadow: 0 0 20px rgba(59,130,246,0.3); }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="scroll-progress"></div>
+
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>PDFly Tools</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+            <i class="fa-solid fa-sun" id="themeIcon"></i>
+        </button>
+    </nav>
+
+    <div class="container">
+        <header class="header">
+            <h1>Image Steganography <span>Pro</span></h1>
+            <p>Hide highly confidential files, documents, or text invisibly inside any picture using military-grade encryption. 100% Client-Side Security.</p>
+        </header>
+
+        <main class="workspace">
+            <div class="tabs">
+                <button class="tab-btn active" data-target="tab-encode" onclick="switchTab('encode')"><i class="fa-solid fa-lock"></i> Encode (Hide)</button>
+                <button class="tab-btn" data-target="tab-decode" onclick="switchTab('decode')"><i class="fa-solid fa-unlock"></i> Decode (Extract)</button>
+            </div>
+
+            <!-- ENCODE TAB -->
+            <div id="tab-encode" class="tab-content active">
+                
+                <div class="form-group">
+                    <label>
+                        <span><i class="fa-solid fa-image" style="color:var(--primary)"></i> 1. Select Cover Image</span>
+                    </label>
+                    <span class="label-subtext">This image acts as your vault. Direct access to local files and gallery.</span>
+                    
+                    <input type="file" id="coverFile" accept=".png, .jpg, .jpeg, .webp, image/png, image/jpeg, image/webp" class="hidden-file-input">
+                    <label class="filebox" id="coverDropZone" for="coverFile">
+                        <button class="remove-file-btn" id="rmCoverBtn" title="Remove File" onclick="event.preventDefault();"><i class="fa-solid fa-xmark"></i></button>
+                        <i class="fa-solid fa-cloud-arrow-up main-icon"></i>
+                        <span class="filebox-text" id="coverBoxText">Click to Select Cover Image</span>
+                        <small style="margin-top: 5px;">Supports Gallery & Local Files</small>
+                    </label>
+                    
+                    <div id="coverPreviewContainer" class="preview-container"><img id="coverPreview" class="preview"></div>
+                    
+                    <div id="capacityWrapper" class="capacity-wrapper">
+                        <div class="cap-header">
+                            <span>Vault Capacity</span>
+                            <span id="capText">0 MB / 0 MB (0%)</span>
+                        </div>
+                        <div class="cap-bar-bg"><div class="cap-bar-fill" id="capBarFill"></div></div>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-top: 2.5rem;">
+                    <label>
+                        <span><i class="fa-solid fa-file-shield" style="color:var(--primary)"></i> 2. Secret Content</span>
+                    </label>
+                    <select id="secretType">
+                        <option value="text">Confidential Text Message</option>
+                        <option value="file">Any Private File (PDF, ZIP, Image, Video)</option>
+                        <option value="text+file">Text Message + File Attachment</option>
+                    </select>
+                </div>
+
+                <div id="secretTextBox" class="form-group">
+                    <textarea id="secretText" class="large" placeholder="Type your highly secure message here..."></textarea>
+                </div>
+
+                <div id="secretFileBox" class="form-group" style="display:none;">
+                    <input type="file" id="secretFileOther" accept="*/*" class="hidden-file-input">
+                    <label class="filebox" id="secretFileDropZone" for="secretFileOther" style="padding: 1.5rem;">
+                        <button class="remove-file-btn" id="rmSecretBtn" title="Remove File" onclick="event.preventDefault();"><i class="fa-solid fa-xmark"></i></button>
+                        <i class="fa-solid fa-file-arrow-up main-icon"></i>
+                        <span class="filebox-text" id="secretBoxTextOther">Click to Select Secret File</span>
+                    </label>
+                </div>
+
+                <div class="form-group" style="margin-top: 2.5rem;">
+                    <label>
+                        <span><i class="fa-solid fa-shield-halved" style="color:var(--primary)"></i> 3. Security Settings</span>
+                    </label>
+                </div>
+                
+                <div class="toggle-wrap">
+                    <div class="toggle-label">
+                        Smart GZIP Compression
+                        <small>Shrinks data before encrypting to save space.</small>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="useCompression" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fa-solid fa-key main-icon"></i>
+                        <input type="password" id="encodePass" placeholder="Create a strong encryption password...">
+                        <button class="action-icon-btn eye-btn" id="encEyeBtn" title="Show/Hide"><i class="fa-solid fa-eye"></i></button>
+                        <button class="action-icon-btn gen-btn" id="genPwdBtn" title="Generate Password"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="location.reload()">
+                        <i class="fa-solid fa-rotate-right"></i> Reset Fields
+                    </button>
+                    <button class="btn btn-primary" id="encodeBtn">
+                        <i class="fa-solid fa-lock"></i> Encrypt & Hide Data
+                    </button>
+                </div>
+
+                <!-- Encode Result Box -->
+                <div id="encodeResultBox" class="result-box">
+                    <h3><i class="fa-solid fa-circle-check"></i> Vault Encoded Successfully!</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Your highly secure image is ready. Share it as a document (to prevent WhatsApp compression) to keep the data intact.</p>
+                    <a id="downloadEncodedBtn" class="btn btn-success" download="Secure_Vault_PDFly.png">
+                        <i class="fa-solid fa-download"></i> Download Secure Image
+                    </a>
+                </div>
+            </div>
+
+            <!-- DECODE TAB -->
+            <div id="tab-decode" class="tab-content">
+                
+                <div class="form-group">
+                    <label>
+                        <span><i class="fa-solid fa-magnifying-glass" style="color:var(--primary)"></i> 1. Select Encoded Image</span>
+                    </label>
+                    <span class="label-subtext">Upload the PNG image that contains your hidden data.</span>
+                    
+                    <input type="file" id="stegoFile" accept=".png, image/png" class="hidden-file-input">
+                    <label class="filebox" id="stegoDropZone" for="stegoFile">
+                        <button class="remove-file-btn" id="rmStegoBtn" title="Remove File" onclick="event.preventDefault();"><i class="fa-solid fa-xmark"></i></button>
+                        <i class="fa-solid fa-file-image main-icon"></i>
+                        <span class="filebox-text" id="stegoBoxText">Click to Select Encoded Image</span>
+                    </label>
+                    <div id="stegoPreviewContainer" class="preview-container"><img id="stegoPreview" class="preview"></div>
+                </div>
+                
+                <div class="form-group" style="margin-top: 2.5rem;">
+                    <label>
+                        <span><i class="fa-solid fa-key" style="color:var(--primary)"></i> 2. Decryption Password</span>
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="fa-solid fa-unlock-keyhole main-icon"></i>
+                        <input type="password" id="decodePass" placeholder="Enter the password used during encoding...">
+                        <button class="action-icon-btn gen-btn" id="decEyeBtn" title="Show/Hide"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="location.reload()">
+                        <i class="fa-solid fa-rotate-right"></i> Reset Fields
+                    </button>
+                    <button class="btn btn-primary" id="decodeBtn">
+                        <i class="fa-solid fa-unlock-keyhole"></i> Decrypt & Extract
+                    </button>
+                </div>
+
+                <!-- Decode Result Box -->
+                <div id="decodeResultBox" class="result-box">
+                    <h3 style="color: var(--success);"><i class="fa-solid fa-envelope-open-text"></i> Data Extracted Successfully!</h3>
+                    
+                    <div id="decodedTextContainer" style="display:none; margin-top: 1rem;">
+                        <label style="font-weight:700; margin-bottom:8px; display:block; color:var(--text-main);">Extracted Message:</label>
+                        <div id="decodedText" class="decoded-text-box"></div>
+                        <button class="btn btn-secondary" onclick="copyText('decodedText', 'Secret text copied!')" style="width:auto; min-width:150px; padding: 0.8rem 1.5rem;">
+                            <i class="fa-regular fa-copy"></i> Copy Text
+                        </button>
+                    </div>
+                    
+                    <div id="decodedFileContainer" style="display:none; margin-top: 1.5rem; padding-top:1.5rem; border-top:1px solid var(--border);">
+                        <label style="font-weight:700; margin-bottom:15px; display:block; color:var(--text-main);">Extracted File:</label>
+                        <img id="decodedImage" class="preview" style="display:none; margin-bottom:15px;" alt="Decoded Image">
+                        <a id="downloadSecretBtn" class="btn btn-success"><i class="fa-solid fa-download"></i> Download Secret File</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 4 Features Grid -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fa-solid fa-layer-group"></i>
+                <h3>Invisible LSB Encoding</h3>
+                <p>Embeds data directly into the least significant bits of image pixels, making the hidden data visually undetectable.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-shield-halved"></i>
+                <h3>AES-256 Encryption</h3>
+                <p>Military-grade encryption ensures your secret text or files are securely locked before they are even hidden.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-file-zipper"></i>
+                <h3>Universal File Support</h3>
+                <p>Hide text, PDFs, ZIP archives, or even other images securely inside a single cover image.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-microchip"></i>
+                <h3>100% Client-Side</h3>
+                <p>Powered by Web Workers. All encryption and processing happens in your browser. Data never touches our servers.</p>
+            </div>
+        </div>
+
+        <!-- SEO / Info Content Section -->
+        <div class="seo-text-section">
+            <h2>What is Image Steganography Pro?</h2>
+            <p>Welcome to <strong>PDFly Tools</strong>. Image Steganography Pro is an advanced utility designed to securely hide confidential texts, documents, and files inside standard image files. Using this tool, you can create a "vault" out of any normal picture, ensuring your sensitive data remains completely invisible to the naked eye.</p>
+            
+            <h3>How PDFly Steganography Works</h3>
+            <p>Our tool utilizes a highly optimized combination of cryptography and steganography:</p>
+            <ul>
+                <li><strong>AES-256 Encryption:</strong> Your secrets are first encrypted using the native Web Crypto API, meaning they cannot be read without the correct password.</li>
+                <li><strong>Smart GZIP Compression:</strong> Large texts and files are compressed automatically to save space inside the image.</li>
+                <li><strong>LSB (Least Significant Bit) Injection:</strong> The encrypted binary data is carefully injected into the color pixels of the cover image. Because it only changes the least significant bits, the image looks completely normal.</li>
+            </ul>
+
+            <h3>100% Privacy Guaranteed</h3>
+            <p>At PDFly Tools, we prioritize true privacy. This utility operates entirely on the <strong>Client-Side (in your browser window)</strong> using dedicated Web Workers. Your images, passwords, and secret files are never uploaded to the internet or saved to any external server.</p>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>
+                    <a href="index.html" style="text-decoration: none; color: var(--text-main);">
+                        <i class="fa-solid fa-layer-group" style="color:var(--primary)"></i> PDFly Tools
+                    </a>
+                </h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Your ultimate suite for free, secure, and blazing-fast web utilities. Crafted with Ultra HD fluid UI tech.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Top Tools</h4>
+                <ul class="footer-links">
+                    <li><a href="resize-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Resize Image</a></li>
+                    <li><a href="compress-pdf.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Compress PDF</a></li>
+                    <li><a href="password-gen.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Password Gen</a></li>
+                    <li><a href="ghost-text.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Ghost Text</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Legal & Info</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="openModal('privacyModal', event)"><i class="fa-solid fa-shield"></i> Privacy Policy</a></li>
+                    <li><a href="#" onclick="openModal('termsModal', event)"><i class="fa-solid fa-file-contract"></i> Terms of Service</a></li>
+                    <li><a href="#" onclick="openModal('contactModal', event)"><i class="fa-solid fa-headset"></i> Contact Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="dev-badge" onclick="openModal('devProfileModal')">
+                <i class="fa-solid fa-code"></i> Developed by GT Rao
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">&copy; 2026 PDFly Tools. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals (Privacy, Terms, Contact, Developer) -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('privacyModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-shield" style="color: var(--primary);"></i> Privacy Policy</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.6;">Your privacy is strictly protected. This encryption tool operates 100% within your web browser utilizing client-side processing.</p>
+            <ul style="color: var(--text-muted); font-size: 0.95rem; padding-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                <li>No text, files, or images are ever transmitted to our servers.</li>
+                <li>Processing happens utilizing your device's memory safely via Web Workers.</li>
+                <li>We do not track, store, or log your personal data.</li>
+            </ul>
+            <button class="btn btn-primary" onclick="closeModal('privacyModal')">Acknowledge</button>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('termsModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-file-contract" style="color: var(--primary);"></i> Terms of Service</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">By using PDFly Tools, you agree to use our utilities provided "as is". Because all tools run client-side, we are not liable for any data loss, forgotten passwords, or corrupted images. Commercial and personal use is entirely free.</p>
+            <button class="btn btn-primary" onclick="closeModal('termsModal')">I Agree</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('contactModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> Get in Touch</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">Have suggestions or found a bug? We'd love to hear from you. Reach out to us directly:</p>
+            <div style="background: var(--bg-input); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <p style="color: var(--text-main); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope" style="color: var(--primary);"></i> 
+                    <a href="mailto:pdflytools@gmail.com" style="text-decoration: none; color: inherit;">pdflytools@gmail.com</a>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> Azamgarh, Uttar Pradesh, India
+                </p>
+            </div>
+            <button class="btn btn-primary" onclick="closeModal('contactModal')">Close</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="devProfileModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('devProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="dev-profile">
+                <div class="dev-avatar">
+                    <img src="dev-profile.png" alt="GT Rao - Developer" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GT+Rao&background=3b82f6&color=fff&size=128&font-size=0.33&bold=true';">
+                </div>
+                <h2 style="font-size: clamp(1.8rem, 4vw, 2.2rem); margin-bottom: 0.2rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">GT Rao</h2>
+                <p style="color: var(--text-main); font-weight: 600; font-size: 1rem; margin-top: 0.2rem;">Student & Web Developer</p>
+                <p style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Azamgarh, Uttar Pradesh, India</p>
+                
+                <div class="dev-tags">
+                    <span class="dev-tag"><i class="fa-brands fa-html5"></i> Web Dev</span>
+                    <span class="dev-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
+                    <span class="dev-tag"><i class="fa-solid fa-shield"></i> Security Auth</span>
+                    <span class="dev-tag"><i class="fa-solid fa-layer-group"></i> PDFly Tools</span>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center; padding: 1.25rem; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">
+                        Passionate Web Developer dedicated to crafting lightning-fast, secure, and user-centric web applications. I focus on writing clean code, building responsive interfaces, and ensuring absolute client-side privacy.
+                    </p>
+                </div>
+                
+                <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                     <a href="mailto:pdflytools@gmail.com" class="dev-social" title="Email Contact" target="_blank"><i class="fa-solid fa-envelope"></i></a>
+                     <a href="https://instagram.com/mr_gt_rao" class="dev-social" title="Personal Instagram" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                     <a href="https://instagram.com/educate_path" class="dev-social" title="Business / PDFly Tools" target="_blank"><i class="fa-solid fa-briefcase"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container & Smart Tools -->
+    <div id="toast-container"></div>
+    <button id="backToTop" title="Go to top"><i class="fa-solid fa-arrow-up"></i></button>
+    
+    <!-- Ultra HD Loader -->
+    <div class="loader-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p id="loaderText">Processing Secure Data...</p>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // === State & DOM Elements ===
+        const els = {
+            html: document.documentElement,
+            themeToggle: document.getElementById('themeToggle'),
+            themeIcon: document.getElementById('themeIcon'),
+            scrollProg: document.getElementById('scroll-progress'),
+            btt: document.getElementById('backToTop'),
+            loader: document.getElementById('loadingOverlay'),
+            loaderText: document.getElementById('loaderText')
+        };
+
+        // === Theme System ===
+        const initTheme = () => {
+            const saved = localStorage.getItem('pdfly-theme') || 'dark'; 
+            els.html.setAttribute('data-theme', saved);
+            els.themeIcon.className = saved === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        };
+        els.themeToggle.addEventListener('click', () => {
+            const next = els.html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            els.html.setAttribute('data-theme', next);
+            localStorage.setItem('pdfly-theme', next);
+            els.themeIcon.className = next === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            showToast(`${next.charAt(0).toUpperCase() + next.slice(1)} Mode Activated`, 'success');
+        });
+        initTheme();
+
+        // === Smart Tools (Scroll, BTT, Toast, Loader) ===
+        window.addEventListener('scroll', () => {
+            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            els.scrollProg.style.width = ((document.body.scrollTop || document.documentElement.scrollTop) / h) * 100 + "%";
+            els.btt.classList.toggle('show', (document.body.scrollTop || document.documentElement.scrollTop) > 300);
+        });
+        els.btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-circle-xmark' : 'fa-info-circle';
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { if(container.contains(toast)) toast.remove(); }, 3500);
+        }
+
+        function showLoader(text) {
+            els.loaderText.textContent = text;
+            els.loader.style.display = 'flex';
+        }
+        function hideLoader() { els.loader.style.display = 'none'; }
+
+        // === Global Copy Text Utility ===
+        function copyText(elementId, successMsg) {
+            const textElement = document.getElementById(elementId);
+            const textToCopy = textElement.innerText || textElement.textContent;
+            if (!textToCopy) return showToast("Nothing to copy!", "error");
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showToast(successMsg, "success");
+            }).catch(err => {
+                showToast("Failed to copy text. Browser blocked.", "error");
+            });
+        }
+
+        // === Modals System ===
+        window.openModal = (id, e) => { if(e) e.preventDefault(); document.getElementById(id).classList.add('active'); };
+        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+        window.onclick = e => { if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('active'); };
+
+        // === Tabs Logic ===
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.querySelector(`[data-target="tab-${tab}"]`).classList.add('active');
+        }
+
+        // === PASSWORD VISIBILITY TOGGLE ===
+        function setupEyeBtn(btnId, inputId) {
+            document.getElementById(btnId).addEventListener('click', (e) => {
+                e.preventDefault();
+                const inp = document.getElementById(inputId);
+                const icon = document.getElementById(btnId).querySelector('i');
+                if (inp.type === 'password') { inp.type = 'text'; icon.className = 'fa-solid fa-eye-slash'; } 
+                else { inp.type = 'password'; icon.className = 'fa-solid fa-eye'; }
+            });
+        }
+        setupEyeBtn('encEyeBtn', 'encodePass'); setupEyeBtn('decEyeBtn', 'decodePass');
+
+        // Gen Password
+        document.getElementById('genPwdBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+            let pwd = ""; for(let i=0; i<16; i++) pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+            const inp = document.getElementById('encodePass'); inp.value = pwd; inp.type = 'text';
+            showToast("Password Generated & Copied!", "success");
+            navigator.clipboard.writeText(pwd); setTimeout(() => inp.type = 'password', 3000);
+        });
+
+        // === INLINE WEB WORKER (FOR FAST & NON-BLOCKING LSB PROCESSING) ===
+        const workerCode = `
+        self.onmessage = function(e) {
+            const { type, imgData, payloadBytes, extractByteLength, skipBytes } = e.data;
+            
+            if (type === 'embed') {
+                const data = imgData.data;
+                const pLen = payloadBytes.length;
+                let pIdx = 0, bIdx = 7;
+                for (let i = 0; i < data.length && pIdx < pLen; i += 4) {
+                    for(let c=0; c<3; c++) { 
+                        if (pIdx >= pLen) break;
+                        const bit = (payloadBytes[pIdx] >> bIdx) & 1;
+                        data[i+c] = (data[i+c] & 0xFE) | bit;
+                        bIdx--;
+                        if (bIdx < 0) { bIdx = 7; pIdx++; }
+                    }
+                }
+                self.postMessage({ success: true, imgData }, [imgData.data.buffer]);
+            } 
+            
+            else if (type === 'extract') {
+                const data = imgData.data;
+                const out = new Uint8Array(extractByteLength);
+                const skipBits = skipBytes * 8;
+                let pIdx = 0, bIdx = 7, currentByte = 0, bitCount = 0;
+                
+                for (let i = 0; i < data.length && pIdx < extractByteLength; i += 4) {
+                    for(let c=0; c<3; c++) {
+                        if (pIdx >= extractByteLength) break;
+                        if (bitCount < skipBits) { bitCount++; } 
+                        else {
+                            currentByte = (currentByte << 1) | (data[i+c] & 1);
+                            bIdx--;
+                            if (bIdx < 0) { 
+                                out[pIdx++] = currentByte; 
+                                currentByte = 0; 
+                                bIdx = 7; 
+                            }
+                        }
+                    }
+                }
+                self.postMessage({ success: true, out }, [out.buffer]);
+            }
+        };
+        `;
+        const workerBlob = new Blob([workerCode], { type: 'application/javascript' });
+        const workerUrl = URL.createObjectURL(workerBlob);
+
+        function runLSBWorker(data, transferList) {
+            return new Promise((resolve, reject) => {
+                const worker = new Worker(workerUrl);
+                worker.onmessage = (e) => { resolve(e.data); worker.terminate(); };
+                worker.onerror = (err) => { reject(err); worker.terminate(); };
+                worker.postMessage(data, transferList);
+            });
+        }
+
+        // === CRYPTO & CONSTANTS ===
+        const TYPE_TEXT = 0x54, TYPE_FILE = 0x46, TYPE_TEXT_FILE = 0x59;
+        const MAGIC_SIG = [0x50, 0x44, 0x46]; // PDF
+        const HEADER_SIZE = 8;
+        let CURRENT_CAPACITY = 0;
+
+        const utf8Encode = str => new TextEncoder().encode(str);
+        const utf8Decode = buf => new TextDecoder().decode(buf);
+        const uint32ToBytes = n => new Uint8Array([(n >>> 24) & 0xFF, (n >>> 16) & 0xFF, (n >>> 8) & 0xFF, n & 0xFF]);
+        const bytesToUint32 = arr => (arr[0] << 24) | (arr[1] << 16) | (arr[2] << 8) | arr[3];
+
+        async function deriveKey(password, salt) {
+            const passKey = await crypto.subtle.importKey('raw', utf8Encode(password), { name: 'PBKDF2' }, false, ['deriveKey']);
+            return await crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' }, passKey, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
+        }
+
+        // === UI FILE HANDLING ===
+        function setZoneSuccess(zoneId, fileName, btnId) {
+            const box = document.getElementById(zoneId);
+            box.style.borderColor = 'var(--success)'; box.style.background = 'rgba(16, 185, 129, 0.05)';
+            box.querySelector('i.main-icon').className = 'fa-solid fa-circle-check main-icon'; box.querySelector('i.main-icon').style.color = 'var(--success)';
+            box.querySelector('.filebox-text').textContent = fileName;
+            document.getElementById(btnId).style.display = 'grid';
+        }
+        
+        function resetZone(zoneId, text, iconClass, btnId, inputId, previewId) {
+            const box = document.getElementById(zoneId);
+            box.style.borderColor = ''; box.style.background = '';
+            box.querySelector('i.main-icon').className = iconClass + ' main-icon'; box.querySelector('i.main-icon').style.color = '';
+            box.querySelector('.filebox-text').textContent = text;
+            document.getElementById(btnId).style.display = 'none';
+            document.getElementById(inputId).value = '';
+            if(previewId) {
+                document.getElementById(previewId + 'Container').style.display = 'none';
+                document.getElementById(previewId).src = '';
+            }
+        }
+
+        document.getElementById('rmCoverBtn').addEventListener('click', () => { resetZone('coverDropZone', 'Click to Select Cover Image', 'fa-solid fa-cloud-arrow-up', 'rmCoverBtn', 'coverFile', 'coverPreview'); CURRENT_CAPACITY = 0; document.getElementById('capacityWrapper').style.display = 'none'; });
+        document.getElementById('rmSecretBtn').addEventListener('click', () => { resetZone('secretFileDropZone', 'Click to Select Secret File', 'fa-solid fa-file-arrow-up', 'rmSecretBtn', 'secretFileOther', null); updateCapacityBar(); });
+        document.getElementById('rmStegoBtn').addEventListener('click', () => { resetZone('stegoDropZone', 'Click to Select Encoded Image', 'fa-solid fa-file-image', 'rmStegoBtn', 'stegoFile', 'stegoPreview'); });
+
+        document.getElementById('secretType').addEventListener('change', (e) => {
+            const t = e.target.value;
+            document.getElementById('secretTextBox').style.display = t.includes('text') ? 'block' : 'none';
+            document.getElementById('secretFileBox').style.display = t.includes('file') ? 'block' : 'none';
+            updateCapacityBar();
+        });
+
+        document.getElementById('coverFile').addEventListener('change', function() {
+            if(!this.files[0]) return;
+            setZoneSuccess('coverDropZone', this.files[0].name, 'rmCoverBtn');
+            const url = URL.createObjectURL(this.files[0]);
+            const img = new Image();
+            img.onload = () => {
+                document.getElementById('coverPreview').src = url;
+                document.getElementById('coverPreviewContainer').style.display = 'block';
+                CURRENT_CAPACITY = Math.floor((img.width * img.height * 3) / 8);
+                document.getElementById('capacityWrapper').style.display = 'block';
+                updateCapacityBar();
+            };
+            img.src = url;
+        });
+
+        document.getElementById('secretFileOther').addEventListener('change', function() {
+            if(this.files[0]) { setZoneSuccess('secretFileDropZone', this.files[0].name, 'rmSecretBtn'); updateCapacityBar(); }
+        });
+        
+        document.getElementById('stegoFile').addEventListener('change', function() {
+            if(this.files[0]) {
+                setZoneSuccess('stegoDropZone', this.files[0].name, 'rmStegoBtn');
+                document.getElementById('stegoPreview').src = URL.createObjectURL(this.files[0]);
+                document.getElementById('stegoPreviewContainer').style.display = 'block';
+            }
+        });
+
+        function updateCapacityBar() {
+            if(CURRENT_CAPACITY === 0) return;
+            let sBytes = 50; // Overhead
+            if(document.getElementById('secretType').value.includes('text')) sBytes += utf8Encode(document.getElementById('secretText').value || '').length;
+            if(document.getElementById('secretType').value.includes('file') && document.getElementById('secretFileOther').files[0]) sBytes += document.getElementById('secretFileOther').files[0].size;
+            
+            let pct = (sBytes / CURRENT_CAPACITY) * 100;
+            const bar = document.getElementById('capBarFill');
+            document.getElementById('capText').textContent = `${(sBytes/1048576).toFixed(2)} MB / ${(CURRENT_CAPACITY/1048576).toFixed(2)} MB (${pct.toFixed(1)}%)`;
+            
+            if (pct > 100) { pct = 100; bar.style.backgroundColor = 'var(--danger)'; }
+            else if (pct > 80) { bar.style.backgroundColor = 'var(--warning)'; }
+            else { bar.style.backgroundColor = 'var(--success)'; }
+            bar.style.width = pct + '%';
+        }
+        document.getElementById('secretText').addEventListener('input', updateCapacityBar);
+
+        // === ENCODE EXECUTION ===
+        document.getElementById('encodeBtn').addEventListener('click', async () => {
+            const resBox = document.getElementById('encodeResultBox'); resBox.classList.remove('active');
+            
+            try {
+                const cover = document.getElementById('coverFile').files[0]; if (!cover) throw new Error('Cover Image is required.');
+                const pwd = document.getElementById('encodePass').value; if (!pwd) throw new Error('Password is required.');
+                const useComp = document.getElementById('useCompression').checked;
+                const t = document.getElementById('secretType').value;
+
+                let sParts = [], sType = TYPE_TEXT, ext = 'bin', sLen = 0;
+                
+                if(t.includes('text')) {
+                    const txt = document.getElementById('secretText').value; if(!txt) throw new Error('Text is empty.');
+                    const b = utf8Encode(txt); sParts.push(b); sLen += b.length; sType = TYPE_TEXT;
+                }
+                if(t.includes('file')) {
+                    const f = document.getElementById('secretFileOther').files[0]; if(!f) throw new Error('File missing.');
+                    const b = new Uint8Array(await f.arrayBuffer()); sParts.push(b); sLen += b.length;
+                    ext = f.name.split('.').pop() || 'bin';
+                    sType = t.includes('text') ? TYPE_TEXT_FILE : TYPE_FILE;
+                }
+
+                showLoader('Building Payload...');
+                
+                // Yield to UI Thread
+                await new Promise(r => setTimeout(r, 100));
+
+                let pArr = [new Uint8Array([sType])];
+                if (sType === TYPE_TEXT_FILE) { pArr.push(uint32ToBytes(sParts[0].length)); pArr.push(uint32ToBytes(sParts[1].length)); }
+                if (sType !== TYPE_TEXT) { const eB = utf8Encode(ext); pArr.push(uint32ToBytes(eB.length)); pArr.push(eB); }
+                pArr.push(...sParts);
+                
+                let plainData = new Uint8Array(pArr.reduce((a, b) => a + b.length, 0));
+                let off = 0; for(let a of pArr) { plainData.set(a, off); off += a.length; }
+
+                if(useComp && window.CompressionStream) {
+                    showLoader('Compressing Data...');
+                    plainData = new Uint8Array(await new Response(new Blob([plainData]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer());
+                }
+
+                showLoader('Encrypting (AES-256)...');
+                const salt = new Uint8Array(16), iv = new Uint8Array(12);
+                crypto.getRandomValues(salt); crypto.getRandomValues(iv);
+                const key = await deriveKey(pwd, salt);
+                const ciphertext = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plainData));
+                
+                const finalBytes = new Uint8Array(HEADER_SIZE + salt.length + iv.length + ciphertext.length);
+                finalBytes.set(MAGIC_SIG, 0); finalBytes.set(uint32ToBytes(salt.length + iv.length + ciphertext.length), 3);
+                finalBytes.set([useComp ? 1 : 0], 7); finalBytes.set(salt, 8); finalBytes.set(iv, 24); finalBytes.set(ciphertext, 36);
+
+                if (finalBytes.length > CURRENT_CAPACITY) throw new Error('Secret is too large for this image.');
+
+                showLoader('Drawing Canvas...');
+                const img = new Image(); img.src = URL.createObjectURL(cover);
+                await new Promise(r => img.onload = r);
+                const cvs = document.createElement('canvas'); cvs.width = img.width; cvs.height = img.height;
+                const ctx = cvs.getContext('2d', { willReadFrequently: true }); ctx.drawImage(img, 0, 0);
+                const imgData = ctx.getImageData(0, 0, cvs.width, cvs.height);
+
+                showLoader('Embedding Data via Web Worker...');
+                const workerRes = await runLSBWorker({ type: 'embed', imgData, payloadBytes: finalBytes }, [imgData.data.buffer]);
+                
+                showLoader('Generating Secure PNG...');
+                ctx.putImageData(workerRes.imgData, 0, 0);
+                cvs.toBlob((blob) => {
+                    hideLoader();
+                    const url = URL.createObjectURL(blob);
+                    const dBtn = document.getElementById('downloadEncodedBtn');
+                    dBtn.href = url;
+                    resBox.classList.add('active'); 
+                    showToast("Encryption Complete!", "success");
+                    resBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 'image/png');
+
+            } catch (err) {
+                hideLoader(); 
+                showToast(err.message, 'error');
+            }
+        });
+
+        // === DECODE EXECUTION ===
+        document.getElementById('decodeBtn').addEventListener('click', async () => {
+            const resBox = document.getElementById('decodeResultBox'); resBox.classList.remove('active');
+            document.getElementById('decodedTextContainer').style.display = 'none'; 
+            document.getElementById('decodedFileContainer').style.display = 'none';
+            
+            try {
+                const f = document.getElementById('stegoFile').files[0]; if(!f) throw new Error("Upload encoded image.");
+                const pwd = document.getElementById('decodePass').value; if(!pwd) throw new Error("Password required.");
+
+                showLoader('Loading Encoded Canvas...');
+                
+                const img = new Image(); img.src = URL.createObjectURL(f);
+                await new Promise(r => img.onload = r);
+                const cvs = document.createElement('canvas'); cvs.width = img.width; cvs.height = img.height;
+                const ctx = cvs.getContext('2d', { willReadFrequently: true }); ctx.drawImage(img, 0, 0);
+                const imgData = ctx.getImageData(0, 0, cvs.width, cvs.height);
+
+                showLoader('Scanning Header via Web Worker...');
+                
+                const headRes = await runLSBWorker({ type: 'extract', imgData: ctx.getImageData(0,0,img.width,img.height), extractByteLength: HEADER_SIZE, skipBytes: 0 }, []);
+                const headBytes = headRes.out;
+                
+                if(headBytes[0] !== MAGIC_SIG[0] || headBytes[1] !== MAGIC_SIG[1] || headBytes[2] !== MAGIC_SIG[2]) throw new Error('No Steganography data found in this image!');
+                
+                const pLen = bytesToUint32(headBytes.slice(3, 7));
+                const isComp = (headBytes[7] & 1) === 1;
+
+                showLoader('Extracting Encrypted Payload...');
+                const payRes = await runLSBWorker({ type: 'extract', imgData, extractByteLength: pLen, skipBytes: HEADER_SIZE }, [imgData.data.buffer]);
+                const pBytes = payRes.out;
+
+                showLoader('Decrypting (AES-256)...');
+                const salt = pBytes.slice(0, 16), iv = pBytes.slice(16, 28), cipher = pBytes.slice(28);
+                const key = await deriveKey(pwd, salt);
+                let plain;
+                try { plain = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipher)); } 
+                catch(e) { throw new Error('Incorrect Password or Corrupted Data.'); }
+
+                if(isComp && window.DecompressionStream) {
+                    showLoader('Decompressing File...');
+                    plain = new Uint8Array(await new Response(new Blob([plain]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
+                }
+
+                showLoader('Parsing Content...');
+                let sType = plain[0], content = '', fileData = null, fileExt = 'bin', off = 1;
+
+                if (sType === TYPE_TEXT) { content = utf8Decode(plain.slice(off)); } 
+                else {
+                    let tLen = 0, fLen = 0;
+                    if (sType === TYPE_TEXT_FILE) { tLen = bytesToUint32(plain.slice(off, off+4)); off += 4; fLen = bytesToUint32(plain.slice(off, off+4)); off += 4; }
+                    const eLen = bytesToUint32(plain.slice(off, off+4)); off += 4;
+                    fileExt = utf8Decode(plain.slice(off, off+eLen)); off += eLen;
+
+                    if (sType === TYPE_TEXT_FILE) { content = utf8Decode(plain.slice(off, off+tLen)); off += tLen; fileData = plain.slice(off, off+fLen); } 
+                    else { fileData = plain.slice(off); }
+                }
+
+                hideLoader(); 
+                resBox.classList.add('active'); 
+                showToast("Extraction Complete!", "success");
+
+                if (content) { 
+                    document.getElementById('decodedText').textContent = content; 
+                    document.getElementById('decodedTextContainer').style.display = 'block'; 
+                }
+                if (fileData) {
+                    document.getElementById('decodedFileContainer').style.display = 'block';
+                    const mimeTypes = { 'png':'image/png', 'jpg':'image/jpeg', 'pdf':'application/pdf', 'zip':'application/zip'};
+                    const mime = mimeTypes[fileExt.toLowerCase()] || 'application/octet-stream';
+                    const blob = new Blob([fileData], { type: mime });
+                    if (mime.startsWith('image/')) { 
+                        const dImg = document.getElementById('decodedImage'); 
+                        dImg.src = URL.createObjectURL(blob); 
+                        dImg.style.display = 'block'; 
+                    }
+                    const dBtn = document.getElementById('downloadSecretBtn'); 
+                    dBtn.href = URL.createObjectURL(blob); 
+                    dBtn.download = `Extracted_Secret.${fileExt}`;
+                }
+                
+                resBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+            } catch(err) {
+                hideLoader();
+                showToast(err.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

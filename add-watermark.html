@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Watermark Pro - PDFly Tools</title>
+    <meta name="description" content="Secure your photos with custom text, logos, repeating patterns, and precise opacity controls instantly inside your browser. 100% Free.">
+    
+    <!-- Google Fonts: Plus Jakarta Sans + Watermark Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Dancing+Script:wght@700&family=Oswald:wght@600&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* === UI/UX Variables (GT Rao Standard) === */
+        :root {
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --radius-card: 16px;
+            --radius-pill: 9999px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Light Theme */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.75);
+            --bg-input: #f1f5f9;
+            --bg-hover: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.25);
+            
+            /* Status Colors */
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #020617;
+            --bg-card: #0f172a;
+            --bg-glass: rgba(2, 6, 23, 0.75);
+            --bg-input: #1e293b;
+            --bg-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.35);
+        }
+
+        /* === Base Styles === */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+        html, body { overflow-x: hidden; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: var(--text-main); transition: background-color 0.3s ease, color 0.3s ease; }
+
+        /* === Smart Tools === */
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--gradient); width: 0%; z-index: 9999; transition: width 0.1s ease; }
+
+        /* === Glassmorphism Navbar === */
+        .navbar {
+            position: sticky; top: 15px; z-index: 1000; max-width: 1300px; margin: 0 auto 2rem; width: 95%;
+            background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm);
+        }
+        .nav-brand { font-size: clamp(1.2rem, 3vw, 1.5rem); font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 10px; text-decoration: none;}
+        .nav-brand i { color: var(--primary); -webkit-text-fill-color: initial; }
+        .theme-toggle { background: var(--bg-input); border: none; outline: none; color: var(--text-main); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); font-size: 1.2rem; }
+        .theme-toggle:hover { background: var(--bg-hover); transform: scale(1.1) rotate(15deg); color: var(--primary); }
+
+        /* === Layout === */
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+        .header { text-align: center; margin-bottom: 3rem; padding: 2rem 0 1rem; }
+        .header h1 { font-size: clamp(2rem, 6vw, 4rem); font-weight: 800; margin-bottom: 1rem; line-height: 1.2; letter-spacing: -0.5px; }
+        .header h1 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.2rem); max-width: 600px; margin: 0 auto; }
+
+        /* === Cards === */
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); padding: clamp(1rem, 3vw, 1.5rem); transition: var(--transition); }
+        .card.hoverable:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); border-color: rgba(59, 130, 246, 0.4); }
+
+        /* === Tool Grid Interface === */
+        .tool-grid { display: grid; gap: clamp(1rem, 3vw, 2rem); align-items: start; }
+        @media (min-width: 992px) { .tool-grid { grid-template-columns: 1fr 380px; } }
+
+        /* Upload & Preview Area */
+        .upload-area {
+            border: 2px dashed var(--primary); border-radius: var(--radius-card); padding: clamp(2rem, 5vw, 4rem) 1rem; text-align: center;
+            background: rgba(59, 130, 246, 0.03); cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; align-items: center; gap: 1rem;
+            min-height: clamp(350px, 50vh, 550px); justify-content: center;
+        }
+        .upload-area:hover { background: rgba(59, 130, 246, 0.08); transform: scale(1.01); }
+        .upload-area i { font-size: clamp(3rem, 8vw, 5rem); color: var(--primary); transition: var(--transition); }
+        .upload-area:hover i { transform: translateY(-10px) scale(1.05); }
+        .upload-area h3 { font-size: clamp(1.2rem, 3vw, 1.8rem); color: var(--text-main); font-weight: 700; }
+        .upload-area p { color: var(--text-muted); font-size: clamp(0.85rem, 2vw, 1rem); }
+        
+        #preview-section { display: none; position: relative; height: 100%; min-height: clamp(350px, 50vh, 550px); }
+        .preview-wrapper { background: var(--bg-input); border-radius: var(--radius-card); padding: 1rem; display: flex; justify-content: center; align-items: center; height: 100%; position: relative; overflow: hidden; flex-direction: column; }
+        
+        /* Canvas Styling */
+        #previewCanvas { max-width: 100%; max-height: 60vh; border-radius: 8px; display: block; box-shadow: var(--shadow-sm); }
+        
+        .floating-actions { position: absolute; top: 1.5rem; right: 1.5rem; z-index: 10; display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
+
+        /* Controls Area */
+        .controls-wrapper { display: flex; flex-direction: column; gap: 1.5rem; height: 100%; }
+        
+        /* Pill Tabs */
+        .tabs { display: flex; flex-wrap: wrap; background: var(--bg-input); border-radius: 16px; padding: 0.4rem; gap: 0.4rem; }
+        .tab-btn { flex: 1; padding: 0.8rem 0.5rem; border: none; background: transparent; color: var(--text-muted); font-weight: 600; font-family: inherit; border-radius: 12px; cursor: pointer; transition: var(--transition); font-size: clamp(0.75rem, 1.5vw, 0.9rem); display: flex; align-items: center; justify-content: center; gap: 0.4rem; min-width: 45%; }
+        .tab-btn.active, .tab-btn:hover { background: var(--bg-card); color: var(--primary); box-shadow: var(--shadow-sm); }
+        .tab-content { display: none; padding-top: 1rem; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Form Inputs */
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem; }
+        .input-group { display: flex; gap: 0.5rem; }
+        input[type="number"], input[type="text"], select { width: 100%; padding: 0.8rem 1rem; font-family: inherit; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 12px; font-size: 1rem; transition: var(--transition); font-weight: 600; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); background: var(--bg-card); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
+        input[type="color"] { width: 100%; height: 45px; padding: 0; border: none; border-radius: 12px; cursor: pointer; background: transparent; }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 12px; }
+
+        /* Range Sliders */
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: var(--bg-input); border-radius: var(--radius-pill); outline: none; margin: 12px 0; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: var(--primary); border-radius: 50%; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: var(--transition); }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+        /* Toggle Switch */
+        .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-input); border: 1px solid var(--border); transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: var(--text-muted); transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); border-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); background-color: white; }
+
+        /* Buttons & Badges */
+        .btn { padding: 0.8rem 1.5rem; border: none; font-family: inherit; font-weight: 700; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; transition: var(--transition); font-size: 1rem; }
+        .btn:hover { transform: translateY(-3px); }
+        .btn:active { transform: translateY(0); }
+        .btn-primary { background: var(--gradient); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover { box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5); }
+        .btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--bg-hover); color: var(--primary); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover { background: var(--danger); color: white; }
+        .btn-icon { width: 45px; height: 45px; padding: 0; border-radius: 12px; flex-shrink: 0; }
+
+        .badge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+        .format-badge, .pos-badge { background: var(--bg-input); border: 1px solid var(--border); padding: 0.6rem; text-align: center; border-radius: 10px; cursor: pointer; font-weight: 700; color: var(--text-muted); transition: var(--transition); font-size: 0.9rem; }
+        .format-badge.active, .pos-badge.active, .format-badge:hover, .pos-badge:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .pos-badge { display: flex; align-items: center; justify-content: center; height: 45px; font-size: 1.1rem; }
+
+        /* Result Section */
+        #result-section { display: none; margin-top: 2rem; animation: fadeIn 0.5s ease; }
+        .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 3vw, 2rem); margin-bottom: 2rem; }
+        @media (max-width: 768px) { .result-grid { grid-template-columns: 1fr; } }
+        .result-box { text-align: center; background: var(--bg-input); padding: 1rem; border-radius: var(--radius-card); border: 1px solid var(--border); position: relative; }
+        .result-box img { max-width: 100%; height: auto; max-height: 250px; border-radius: 8px; margin-bottom: 1rem; image-rendering: high-quality; box-shadow: var(--shadow-sm); }
+        .stat-pill { display: inline-block; padding: 0.4rem 1rem; background: var(--bg-card); border-radius: var(--radius-pill); font-weight: 800; font-size: 0.95rem; color: var(--primary); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+        .action-bar { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; background: var(--bg-card); padding: 1.5rem; border-radius: var(--radius-card); box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
+
+        /* === 4 Features Grid === */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin: 4rem 0; }
+        @media (max-width: 576px) { .features-grid { grid-template-columns: 1fr; } }
+
+        /* === SEO Friendly Card Section === */
+        .seo-text-section { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 2rem; margin: 3rem 0; width: 100%; word-wrap: break-word; overflow-wrap: break-word; overflow: hidden; }
+        @media (max-width: 576px) { .seo-text-section { padding: 1.25rem; } }
+        .seo-text-section h2 { font-size: clamp(1.3rem, 2.5vw, 1.8rem); font-weight: 700; margin-bottom: 1rem; }
+        .seo-text-section h3 { font-size: clamp(1.1rem, 2vw, 1.3rem); font-weight: 600; margin-bottom: 0.5rem; margin-top: 1.5rem; }
+        .seo-text-section p { font-size: clamp(0.9rem, 1.5vw, 1rem); color: var(--text-muted); margin-bottom: 1rem; line-height: 1.6; word-break: break-word; }
+        .seo-text-section li { word-break: break-word; color: var(--text-muted); line-height: 1.6; margin-bottom: 0.5rem; }
+        .seo-text-section ul { list-style: disc; margin-left: 1.5rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+        /* === Modals === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: var(--transition); z-index: 2000; padding: 1rem; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 2.5rem); transform: scale(0.9) translateY(20px); transition: var(--transition); border: 1px solid var(--border); box-shadow: var(--shadow-hover); position: relative; max-height: 90vh; overflow-y: auto; }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-input); border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; transition: var(--transition); }
+        .modal-close:hover { color: var(--danger); transform: rotate(90deg); background: rgba(239,68,68,0.1); }
+        
+        /* Developer Profile */
+        .dev-profile { text-align: center; }
+        .dev-avatar { width: 110px; height: 110px; border-radius: 50%; background: var(--bg-card); margin: 0 auto 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); border: 4px solid var(--primary); overflow: hidden; padding: 0; }
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .dev-tags { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+        .dev-tag { background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(59,130,246,0.2); }
+        .dev-social { width: 45px; height: 45px; border-radius: 50%; background: var(--bg-input); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: var(--transition); border: 1px solid var(--border); text-decoration: none; }
+        .dev-social:hover { background: var(--primary); color: white; transform: translateY(-3px); border-color: var(--primary); }
+
+        /* === Footer === */
+        .footer { margin-top: 4rem; padding: 3rem 1rem 2rem; border-top: 1px solid var(--border); background: var(--bg-card); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; max-width: 1300px; margin: 0 auto 2rem; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--text-main); font-weight: 700; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; transition: var(--transition); font-size: 0.95rem; cursor: pointer; font-weight: 500; }
+        .footer-links a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        .dev-badge { background: var(--bg-input); padding: 0.6rem 1.2rem; border-radius: var(--radius-pill); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 700; font-size: 0.9rem; border: 1px solid var(--border); transition: var(--transition); }
+        .dev-badge:hover { background: rgba(139, 92, 246, 0.1); color: var(--secondary); border-color: var(--secondary); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+
+        /* === Toast Notification === */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: var(--bg-card); border-left: 4px solid var(--primary); color: var(--text-main); padding: 1rem 1.5rem; border-radius: 12px; box-shadow: var(--shadow-hover); display: flex; align-items: center; gap: 12px; animation: slideIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards, slideOut 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards 3s; font-weight: 600; font-size: 0.95rem; border: 1px solid var(--border); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast i { font-size: 1.2rem; }
+        .toast.success i { color: var(--success); }
+        .toast.error i { color: var(--danger); }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
+
+        /* === Back to Top & Loader === */
+        #backToTop { position: fixed; bottom: 30px; left: 30px; width: 45px; height: 45px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: var(--shadow-hover); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 1000; font-size: 1.2rem; }
+        #backToTop.show { opacity: 1; visibility: visible; }
+        #backToTop:hover { transform: translateY(-5px); background: var(--secondary); }
+        
+        .loader-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 1.5rem; z-index: 9999; display: none; color: var(--primary); font-weight: 800; font-size: 1.2rem; }
+        .spinner { width: 60px; height: 60px; border: 5px solid var(--bg-input); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; box-shadow: 0 0 20px rgba(59,130,246,0.2); }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="scroll-progress"></div>
+
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>PDFly Tools</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+            <i class="fa-solid fa-sun"></i>
+        </button>
+    </nav>
+
+    <div class="container">
+        <header class="header">
+            <h1>Image Watermark <span>Pro</span></h1>
+            <p>Secure your digital assets instantly. Add professional custom text, logos, and advanced patterns directly in your browser.</p>
+        </header>
+
+        <!-- Main Tool Area -->
+        <main class="tool-grid">
+            <!-- Left Side: Upload & Live Canvas Preview -->
+            <section class="left-panel">
+                <div class="card hoverable" style="padding: 0; overflow: hidden; border: none; background: transparent; box-shadow: none; height: 100%;">
+                    
+                    <div id="upload-section" class="upload-area">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <h3>Drag & Drop Original Image Here</h3>
+                        <p>or click to browse from your device</p>
+                        <span style="font-size: 0.85rem; color: var(--text-muted); background: var(--bg-card); padding: 6px 12px; border-radius: var(--radius-pill); border: 1px solid var(--border); font-weight: 600; box-shadow: var(--shadow-sm);">JPG, PNG, WEBP</span>
+                        <input type="file" id="fileInput" hidden accept="image/*">
+                    </div>
+
+                    <div id="preview-section" class="card" style="padding: 0; border:none; box-shadow: var(--shadow-sm);">
+                        <div class="floating-actions">
+                            <button class="btn btn-danger btn-icon" id="resetImgBtn" title="Remove Image">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="preview-wrapper" id="previewWrapper" style="padding: 1rem; border-radius: var(--radius-card);">
+                            <canvas id="previewCanvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Side: Controls -->
+            <section class="controls-wrapper card hoverable">
+                <div class="tabs">
+                    <button class="tab-btn active" data-target="tab-text"><i class="fa-solid fa-font"></i> Text</button>
+                    <button class="tab-btn" data-target="tab-logo"><i class="fa-solid fa-image"></i> Logo</button>
+                    <button class="tab-btn" data-target="tab-settings"><i class="fa-solid fa-sliders"></i> Adjust</button>
+                    <button class="tab-btn" data-target="tab-export"><i class="fa-solid fa-download"></i> Export</button>
+                </div>
+
+                <!-- Text Watermark Tab -->
+                <div id="tab-text" class="tab-content active">
+                    <div class="form-group">
+                        <label>Watermark Text</label>
+                        <input type="text" id="wmText" value="© PDFly Tools" placeholder="Type your copyright text">
+                    </div>
+                    <div class="form-group">
+                        <label>Font Style</label>
+                        <select id="wmFont">
+                            <option value="'Plus Jakarta Sans', sans-serif">Jakarta Sans</option>
+                            <option value="Arial, sans-serif">Arial Bold</option>
+                            <option value="'Oswald', sans-serif">Oswald</option>
+                            <option value="'Playfair Display', serif">Playfair Display</option>
+                            <option value="'Dancing Script', cursive">Dancing Script</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label>Text Color</label>
+                            <input type="color" id="wmColor" value="#ffffff">
+                        </div>
+                        <div>
+                            <label>Text Scale: <span id="valSize">50%</span></label>
+                            <input type="range" id="wmSize" min="10" max="250" value="50">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logo Watermark Tab -->
+                <div id="tab-logo" class="tab-content">
+                    <div class="form-group">
+                        <label class="upload-area" style="min-height: 150px; padding: 1.5rem;" id="logoDropZone">
+                            <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2rem;"></i>
+                            <h3 style="font-size: 1rem;" id="logoBoxText">Upload Logo (PNG)</h3>
+                            <input type="file" id="wmLogo" hidden accept="image/png, image/jpeg, image/webp">
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>Logo Scale: <span id="valLogoScale">20%</span></label>
+                        <input type="range" id="wmLogoScale" min="5" max="100" value="20">
+                    </div>
+                </div>
+
+                <!-- Settings & Positioning Tab -->
+                <div id="tab-settings" class="tab-content">
+                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label>Opacity: <span id="valOpacity">70%</span></label>
+                            <input type="range" id="wmOpacity" min="5" max="100" value="70">
+                        </div>
+                        <div>
+                            <label>Angle: <span id="valRotate">-30°</span></label>
+                            <input type="range" id="wmRotate" min="-180" max="180" value="-30">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 1.5rem; background: var(--bg-input); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+                        <label style="margin-bottom: 0;">
+                            <span>Pattern Tiling Mode</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="wmTile" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+                        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 5px; font-weight: 500;">Repeats watermark fully across the image.</p>
+                    </div>
+
+                    <div class="form-group" id="posGroup" style="display: none; margin-top: 1.5rem;">
+                        <label style="justify-content: center; margin-bottom: 12px; color: var(--primary);">Single Position</label>
+                        <div class="badge-grid" id="posGrid" style="max-width: 250px; margin: 0 auto;">
+                            <div class="pos-badge" data-pos="top-left"><i class="fa-solid fa-arrow-up-left"></i></div>
+                            <div class="pos-badge" data-pos="top-center"><i class="fa-solid fa-arrow-up"></i></div>
+                            <div class="pos-badge" data-pos="top-right"><i class="fa-solid fa-arrow-up-right"></i></div>
+                            <div class="pos-badge" data-pos="middle-left"><i class="fa-solid fa-arrow-left"></i></div>
+                            <div class="pos-badge active" data-pos="center"><i class="fa-solid fa-bullseye"></i></div>
+                            <div class="pos-badge" data-pos="middle-right"><i class="fa-solid fa-arrow-right"></i></div>
+                            <div class="pos-badge" data-pos="bottom-left"><i class="fa-solid fa-arrow-down-left"></i></div>
+                            <div class="pos-badge" data-pos="bottom-center"><i class="fa-solid fa-arrow-down"></i></div>
+                            <div class="pos-badge" data-pos="bottom-right"><i class="fa-solid fa-arrow-down-right"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Options Tab -->
+                <div id="tab-export" class="tab-content">
+                    <div class="form-group">
+                        <label>Export Format</label>
+                        <div class="badge-grid" id="formatSelector">
+                            <div class="format-badge active" data-format="image/jpeg">JPG</div>
+                            <div class="format-badge" data-format="image/png">PNG</div>
+                            <div class="format-badge" data-format="image/webp">WEBP</div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 1.5rem;" id="qualityGroup">
+                        <label>Render Quality: <span id="valQuality">95%</span></label>
+                        <input type="range" id="exportQuality" min="10" max="100" value="95">
+                        <small id="pngWarning" style="color: var(--warning); font-size: 0.8rem; display:none; margin-top: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> PNG format ignores quality settings.</small>
+                    </div>
+                </div>
+
+                <div style="margin-top: auto; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                    <button id="processBtn" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1.1rem;">
+                        <i class="fa-solid fa-shield-halved"></i> Apply Watermark
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Result Section -->
+        <section id="result-section">
+            <div class="card hoverable">
+                <h2 style="text-align: center; margin-bottom: 2rem; font-weight: 800;">Protection Applied</h2>
+                <div class="result-grid">
+                    <div class="result-box">
+                        <h4 style="margin-bottom: 1rem; color: var(--text-muted);">Original File</h4>
+                        <img id="resOriginal" alt="Original Image">
+                        <div><div class="stat-pill" style="color:var(--text-muted); border-color:var(--text-muted);" id="statOriginal">--</div></div>
+                        <div style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted);" id="dimOriginal">--</div>
+                    </div>
+                    <div class="result-box" style="border-color: var(--primary); background: rgba(59,130,246,0.03);">
+                        <h4 style="margin-bottom: 1rem; color: var(--primary);">Watermarked Output</h4>
+                        <img id="resProcessed" alt="Processed Image">
+                        <div><div class="stat-pill" id="statProcessed">--</div></div>
+                        <div style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted);" id="dimProcessed">--</div>
+                    </div>
+                </div>
+                
+                <div class="action-bar">
+                    <button class="btn btn-primary" id="downloadBtn" style="flex:1; min-width: 200px;">
+                        <i class="fa-solid fa-download"></i> Download Image
+                    </button>
+                    <button class="btn btn-secondary" id="copyBtn" style="flex:1; min-width: 200px;">
+                        <i class="fa-solid fa-copy"></i> Copy to Clipboard
+                    </button>
+                    <button class="btn btn-danger" id="startOverBtn" style="flex:1; min-width: 200px;">
+                        <i class="fa-solid fa-rotate-right"></i> Watermark Another
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4 Features Grid (GT Rao Layout) -->
+        <div class="features-grid">
+            <div class="card" style="padding:1.5rem;">
+                <i class="fa-solid fa-layer-group text-primary" style="font-size: 1.8rem; margin-bottom: 0.8rem; color: var(--primary);"></i>
+                <h3 style="font-size:1.1rem;">Advanced Tiling</h3>
+                <p style="font-size:0.9rem;">Prevent easy cropping. Pattern Mode repeats your watermark diagonally across the entire image.</p>
+            </div>
+            <div class="card" style="padding:1.5rem;">
+                <i class="fa-solid fa-palette text-primary" style="font-size: 1.8rem; margin-bottom: 0.8rem; color: var(--warning);"></i>
+                <h3 style="font-size:1.1rem;">Text & Logo Overlay</h3>
+                <p style="font-size:0.9rem;">Choose from premium Google fonts or upload your own PNG logo for a professional brand overlay.</p>
+            </div>
+            <div class="card" style="padding:1.5rem;">
+                <i class="fa-solid fa-shield-halved text-primary" style="font-size: 1.8rem; margin-bottom: 0.8rem; color: var(--success);"></i>
+                <h3 style="font-size:1.1rem;">100% Client-Side Privacy</h3>
+                <p style="font-size:0.9rem;">Your sensitive photos never leave your device. All rendering occurs directly inside your browser memory.</p>
+            </div>
+            <div class="card" style="padding:1.5rem;">
+                <i class="fa-solid fa-laptop-code text-primary" style="font-size: 1.8rem; margin-bottom: 0.8rem; color: var(--secondary);"></i>
+                <h3 style="font-size:1.1rem;">Live Canvas Rendering</h3>
+                <p style="font-size:0.9rem;">Experience real-time visual updates as you tweak opacity, size, and rotation parameters smoothly.</p>
+            </div>
+        </div>
+
+        <!-- SEO / Info Content Section -->
+        <div class="seo-text-section">
+            <h2>Why Protect Your Images with Watermarks?</h2>
+            <p>Whether you are a photographer, content creator, or business owner, protecting your visual content from unauthorized use is a priority. <strong>Image Watermark Pro</strong> provides a powerful solution to overlay custom text or logos onto your images instantly.</p>
+            
+            <h3>Watermarking Best Practices</h3>
+            <ul>
+                <li><strong>Opacity Matters:</strong> A watermark shouldn't ruin the viewing experience. Keep opacity between 30% to 60% so your image remains clear while still being protected.</li>
+                <li><strong>Use Pattern Tiling:</strong> A single logo in the corner can easily be cropped out. Enable "Pattern Tiling Mode" to cover the entire image diagonally, making theft nearly impossible.</li>
+                <li><strong>Choose the Right Format:</strong> Export as JPEG for smaller file sizes or WebP for optimal web performance without losing quality.</li>
+                <li><strong>Client-Side Security:</strong> Unlike many online editors, our tool processes all pixel data locally via HTML5 Canvas. Your images are never uploaded to the cloud, ensuring absolute privacy.</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>
+                    <a href="index.html" style="text-decoration: none; color: var(--text-main);">
+                        <i class="fa-solid fa-layer-group" style="color:var(--primary)"></i> PDFly Tools
+                    </a>
+                </h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Your ultimate suite for free, secure, and blazing-fast web utilities. Designed with modern fluid UI tech.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Top Tools</h4>
+                <ul class="footer-links">
+                    <li><a href="resize-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Resize Image</a></li>
+                    <li><a href="compress-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Compress Image</a></li>
+                    <li><a href="crop-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Crop Image</a></li>
+                    <li><a href="watermark-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Image Watermark</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal & Info</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="openModal('privacyModal', event)"><i class="fa-solid fa-shield"></i> Privacy Policy</a></li>
+                    <li><a href="#" onclick="openModal('termsModal', event)"><i class="fa-solid fa-file-contract"></i> Terms of Service</a></li>
+                    <li><a href="#" onclick="openModal('contactModal', event)"><i class="fa-solid fa-headset"></i> Contact Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="dev-badge" id="devBadge">
+                <i class="fa-solid fa-code"></i> Developed by GT Rao
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">&copy; 2026 PDFly Tools. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <!-- Privacy Modal -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('privacyModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-shield" style="color: var(--primary);"></i> Privacy Policy</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.6;">Your privacy is strictly protected. <strong>Image Watermark Pro</strong> operates 100% within your web browser utilizing client-side processing.</p>
+            <ul style="color: var(--text-muted); font-size: 0.95rem; padding-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                <li>No images or files are ever transmitted to our servers.</li>
+                <li>We do not track, store, or log your personal data.</li>
+                <li>Processing happens utilizing your device's memory safely.</li>
+            </ul>
+            <button class="btn btn-primary" style="width:100%" onclick="closeModal('privacyModal')">Acknowledge</button>
+        </div>
+    </div>
+    
+    <!-- Terms Modal -->
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('termsModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-file-contract" style="color: var(--primary);"></i> Terms of Service</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">By using PDFly Tools, you agree to use our utilities provided "as is". Because all tools run client-side, we are not liable for any data loss, though all operations are strictly safe. Commercial and personal use is entirely free.</p>
+            <button class="btn btn-primary" style="width:100%" onclick="closeModal('termsModal')">I Agree</button>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('contactModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> Get in Touch</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">Have suggestions or found a bug? We'd love to hear from you. Reach out to us directly:</p>
+            <div style="background: var(--bg-input); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <p style="color: var(--text-main); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope" style="color: var(--primary);"></i> 
+                    <a href="mailto:pdflytools@gmail.com" style="text-decoration: none; color: inherit;">pdflytools@gmail.com</a>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> Azamgarh, Uttar Pradesh, India
+                </p>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="closeModal('contactModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- Password Modal -->
+    <div class="modal-overlay" id="passwordModal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <button class="modal-close" onclick="closeModal('passwordModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div style="font-size: 3.5rem; color: var(--warning); margin-bottom: 1rem;"><i class="fa-solid fa-lock"></i></div>
+            <h2 style="margin-bottom: 0.5rem; font-weight: 800;">Developer Area</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Authenticate to view profile. <br><small style="color: var(--primary); font-weight: 600;">(Hint: Dev Name)</small></p>
+            <input type="password" id="devPwdInput" placeholder="Enter Password" style="width: 100%; padding: 1rem; border-radius: 12px; border: 2px solid var(--border); background: var(--bg-input); color: var(--text-main); margin-bottom: 1rem; text-align: center; font-size: 1.1rem; letter-spacing: 2px;">
+            <button class="btn btn-primary" id="devPwdSubmit" style="width: 100%; padding: 1rem;"><i class="fa-solid fa-key"></i> Unlock Profile</button>
+        </div>
+    </div>
+
+    <!-- Exact GT Rao Developer Profile Modal -->
+    <div class="modal-overlay" id="devProfileModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('devProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="dev-profile">
+                <div class="dev-avatar">
+                    <img src="dev-profile.png" alt="GT Rao - Developer" class="profile-pic" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GT+Rao&background=3b82f6&color=fff&size=128&font-size=0.33&bold=true';">
+                </div>
+                <h2 style="font-size: 2.2rem; margin-bottom: 0.2rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">GT Rao</h2>
+                <p style="color: var(--text-main); font-weight: 600; font-size: 1rem; margin-top: 0.2rem;">Student & Web Developer</p>
+                <p style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Azamgarh, Uttar Pradesh, India</p>
+                <div class="dev-tags">
+                    <span class="dev-tag"><i class="fa-brands fa-html5"></i> Web Dev</span>
+                    <span class="dev-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
+                    <span class="dev-tag"><i class="fa-solid fa-wand-magic"></i> UI/UX Design</span>
+                    <span class="dev-tag"><i class="fa-solid fa-layer-group"></i> Web Apps</span>
+                </div>
+                <div style="margin-top: 1.5rem; text-align: center; padding: 1.25rem; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">
+                        Passionate Web Developer dedicated to crafting lightning-fast, secure, and user-centric web applications. As the creator of <strong>PDFly Tools</strong>, I focus on writing clean code, building responsive interfaces, and ensuring client-side security to deliver premium, highly functional digital experiences that are accessible to everyone.
+                    </p>
+                </div>
+                <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                     <a href="mailto:pdflytools@gmail.com" class="dev-social" title="Email Contact" target="_blank"><i class="fa-solid fa-envelope"></i></a>
+                     <a href="https://instagram.com/mr_gt_rao" class="dev-social" title="Personal Instagram" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                     <a href="https://instagram.com/educate_path" class="dev-social" title="Business / PDFly Tools" target="_blank"><i class="fa-solid fa-briefcase"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+    <button id="backToTop" title="Go to top"><i class="fa-solid fa-arrow-up"></i></button>
+    <div class="loader-overlay" id="loadingOverlay"><div class="spinner"></div><p>Applying Protection...</p></div>
+
+    <!-- Scripts -->
+    <script>
+        // === Core State Management ===
+        let baseFile = null;
+        let baseImgUrl = '';
+        let baseImgObj = null;
+        let logoImgObj = null;
+        let finalBlob = null;
+        let activeTab = 'tab-text';
+        let activePosition = 'center';
+
+        const els = {
+            html: document.documentElement,
+            themeToggle: document.getElementById('themeToggle'),
+            scrollProg: document.getElementById('scroll-progress'),
+            btt: document.getElementById('backToTop'),
+            
+            uploadArea: document.getElementById('upload-section'),
+            fileIn: document.getElementById('fileInput'),
+            previewSec: document.getElementById('preview-section'),
+            canvas: document.getElementById('previewCanvas'),
+            resetImgBtn: document.getElementById('resetImgBtn'),
+            
+            tabBtns: document.querySelectorAll('.tab-btn'),
+            tabContents: document.querySelectorAll('.tab-content'),
+            
+            // Text Controls
+            wmText: document.getElementById('wmText'),
+            wmFont: document.getElementById('wmFont'),
+            wmColor: document.getElementById('wmColor'),
+            wmSize: document.getElementById('wmSize'),
+            valSize: document.getElementById('valSize'),
+            
+            // Logo Controls
+            logoDropZone: document.getElementById('logoDropZone'),
+            wmLogo: document.getElementById('wmLogo'),
+            logoBoxText: document.getElementById('logoBoxText'),
+            wmLogoScale: document.getElementById('wmLogoScale'),
+            valLogoScale: document.getElementById('valLogoScale'),
+            
+            // Settings Controls
+            wmOpacity: document.getElementById('wmOpacity'),
+            valOpacity: document.getElementById('valOpacity'),
+            wmRotate: document.getElementById('wmRotate'),
+            valRotate: document.getElementById('valRotate'),
+            wmTile: document.getElementById('wmTile'),
+            posGroup: document.getElementById('posGroup'),
+            posBtns: document.querySelectorAll('.pos-badge'),
+            
+            // Export
+            formatSelector: document.getElementById('formatSelector'),
+            formatBadges: document.querySelectorAll('.format-badge'),
+            qualSlider: document.getElementById('exportQuality'),
+            qualVal: document.getElementById('valQuality'),
+            pngWarn: document.getElementById('pngWarning'),
+            
+            processBtn: document.getElementById('processBtn'),
+            
+            // Results
+            resSec: document.getElementById('result-section'),
+            resOrig: document.getElementById('resOriginal'),
+            resProc: document.getElementById('resProcessed'),
+            statOrig: document.getElementById('statOriginal'),
+            statProc: document.getElementById('statProcessed'),
+            dimOrig: document.getElementById('dimOriginal'),
+            dimProc: document.getElementById('dimProcessed'),
+            dlBtn: document.getElementById('downloadBtn'),
+            copyBtn: document.getElementById('copyBtn'),
+            startOverBtn: document.getElementById('startOverBtn'),
+            
+            loader: document.getElementById('loadingOverlay')
+        };
+        const ctx = els.canvas.getContext('2d');
+
+        // === Theme & Smart Tools System ===
+        const initTheme = () => {
+            const saved = localStorage.getItem('pdfly-theme') || 'dark';
+            els.html.setAttribute('data-theme', saved);
+            els.themeToggle.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+        };
+        els.themeToggle.addEventListener('click', () => {
+            const next = els.html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            els.html.setAttribute('data-theme', next);
+            localStorage.setItem('pdfly-theme', next);
+            els.themeToggle.innerHTML = next === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+            showToast(`${next.charAt(0).toUpperCase() + next.slice(1)} HD UI Activated`, 'success');
+        });
+        initTheme();
+
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            els.scrollProg.style.width = (winScroll / height) * 100 + "%";
+            if (winScroll > 300) els.btt.classList.add('show'); else els.btt.classList.remove('show');
+        });
+        els.btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        const showToast = (msg, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-circle-xmark' : 'fa-info-circle';
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { if(container.contains(toast)) toast.remove(); }, 3500);
+        };
+
+        // === Modals System (GT Rao Auth) ===
+        window.openModal = (id, e) => { if(e) e.preventDefault(); document.getElementById(id).classList.add('active'); };
+        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+        document.getElementById('devBadge').addEventListener('click', () => { document.getElementById('devPwdInput').value = ''; openModal('passwordModal'); });
+        document.getElementById('devPwdSubmit').addEventListener('click', () => {
+            if(document.getElementById('devPwdInput').value === 'GT Rao') {
+                closeModal('passwordModal'); setTimeout(() => openModal('devProfileModal'), 300); showToast('Developer Access Granted!', 'success');
+            } else { showToast('Incorrect Password', 'error'); }
+        });
+
+        // === Tabs Logic ===
+        els.tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                els.tabBtns.forEach(b => b.classList.remove('active'));
+                els.tabContents.forEach(c => c.classList.remove('active'));
+                btn.classList.add('active'); 
+                const target = document.getElementById(btn.dataset.target);
+                target.classList.add('active');
+                activeTab = btn.dataset.target;
+                renderCanvas(); // Trigger render when switching modes
+            });
+        });
+
+        const formatBytes = (bytes, decimals = 2) => {
+            if (!+bytes) return '0 B';
+            const k = 1024, dm = decimals < 0 ? 0 : decimals, sizes = ['B', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+        };
+
+        // === File Handling (Base & Logo) ===
+        const setupDragDrop = (area, input, isLogo = false) => {
+            area.addEventListener('click', () => input.click());
+            area.addEventListener('dragover', (e) => { e.preventDefault(); area.style.borderColor = 'var(--secondary)'; area.style.background = 'rgba(139, 92, 246, 0.05)'; });
+            area.addEventListener('dragleave', (e) => { e.preventDefault(); area.style.borderColor = 'var(--primary)'; area.style.background = isLogo ? 'var(--bg-input)' : 'rgba(59, 130, 246, 0.03)'; });
+            area.addEventListener('drop', (e) => { 
+                e.preventDefault(); 
+                area.style.borderColor = 'var(--primary)'; 
+                area.style.background = isLogo ? 'var(--bg-input)' : 'rgba(59, 130, 246, 0.03)'; 
+                if(e.dataTransfer.files.length) { input.files = e.dataTransfer.files; handleFile(e.dataTransfer.files[0], isLogo); }
+            });
+            input.addEventListener('change', (e) => { if(e.target.files.length) handleFile(e.target.files[0], isLogo); });
+        };
+        setupDragDrop(els.uploadArea, els.fileIn, false);
+        setupDragDrop(els.logoDropZone, els.wmLogo, true);
+
+        const handleFile = (file, isLogo) => {
+            if (!file.type.startsWith('image/')) return showToast('Please upload a valid image file.', 'error');
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    if (isLogo) {
+                        logoImgObj = img;
+                        els.logoBoxText.innerText = file.name;
+                        showToast('Logo Loaded', 'info');
+                        if(activeTab === 'tab-logo') renderCanvas();
+                    } else {
+                        baseFile = file;
+                        baseImgUrl = e.target.result;
+                        baseImgObj = img;
+                        els.canvas.width = baseImgObj.width;
+                        els.canvas.height = baseImgObj.height;
+                        els.uploadArea.style.display = 'none';
+                        els.previewSec.style.display = 'block';
+                        showToast('Base Image Ready');
+                        renderCanvas();
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        els.resetImgBtn.addEventListener('click', () => { 
+            baseFile = null; baseImgUrl = ''; baseImgObj = null; els.fileIn.value = ''; 
+            els.uploadArea.style.display = 'flex'; els.previewSec.style.display = 'none';
+            els.resSec.style.display = 'none'; ctx.clearRect(0, 0, els.canvas.width, els.canvas.height);
+            showToast('Image cleared'); 
+        });
+
+        // === Live Update Listeners ===
+        const updateSlider = (slider, display, suffix = '') => {
+            slider.addEventListener('input', (e) => { display.innerText = e.target.value + suffix; renderCanvas(); });
+        };
+        updateSlider(els.wmSize, els.valSize, '%');
+        updateSlider(els.wmLogoScale, els.valLogoScale, '%');
+        updateSlider(els.wmOpacity, els.valOpacity, '%');
+        updateSlider(els.wmRotate, els.valRotate, '°');
+        
+        els.wmText.addEventListener('input', renderCanvas);
+        els.wmFont.addEventListener('change', renderCanvas);
+        els.wmColor.addEventListener('input', renderCanvas);
+
+        els.wmTile.addEventListener('change', () => {
+            els.posGroup.style.display = els.wmTile.checked ? 'none' : 'block';
+            renderCanvas();
+        });
+
+        els.posBtns.forEach(btn => btn.addEventListener('click', () => {
+            els.posBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activePosition = btn.dataset.pos;
+            renderCanvas();
+        }));
+
+        // Export format logic
+        let exportFormatVal = 'image/jpeg';
+        els.formatBadges.forEach(b => b.addEventListener('click', () => {
+            els.formatBadges.forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+            exportFormatVal = b.dataset.format;
+            els.pngWarn.style.display = exportFormatVal === 'image/png' ? 'block' : 'none';
+        }));
+        els.qualSlider.addEventListener('input', (e) => { els.qualVal.innerText = e.target.value + '%'; });
+
+        // === Core HTML5 Canvas Rendering Engine ===
+        let renderTimeout;
+        const renderCanvas = () => {
+            if(!baseImgObj) return;
+            
+            clearTimeout(renderTimeout);
+            renderTimeout = setTimeout(() => {
+                const cw = els.canvas.width;
+                const ch = els.canvas.height;
+                
+                // Draw Base
+                ctx.clearRect(0, 0, cw, ch);
+                ctx.globalAlpha = 1.0;
+                ctx.drawImage(baseImgObj, 0, 0, cw, ch);
+                
+                // Gather Params
+                const opacity = els.wmOpacity.value / 100;
+                const rotateAngle = els.wmRotate.value * (Math.PI / 180);
+                const isTiled = els.wmTile.checked;
+                
+                ctx.globalAlpha = opacity;
+
+                if (activeTab === 'tab-text') {
+                    // TEXT RENDERING
+                    const text = els.wmText.value || ' ';
+                    const fontFam = els.wmFont.value;
+                    const baseSize = Math.max(cw, ch) * 0.001; 
+                    const fontSize = els.wmSize.value * baseSize;
+                    
+                    ctx.fillStyle = els.wmColor.value;
+                    ctx.font = `bold ${fontSize}px ${fontFam}`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    
+                    if (isTiled) {
+                        drawTiledText(text, cw, ch, rotateAngle, fontSize);
+                    } else {
+                        drawSingle(cw, ch, rotateAngle, () => ctx.fillText(text, 0, 0));
+                    }
+
+                } else if (activeTab === 'tab-logo' && logoImgObj) {
+                    // LOGO RENDERING
+                    const scalePct = els.wmLogoScale.value / 100;
+                    const maxLogoWidth = cw * 0.5; 
+                    const scaleFactor = (maxLogoWidth / logoImgObj.width) * scalePct;
+                    const lw = logoImgObj.width * scaleFactor;
+                    const lh = logoImgObj.height * scaleFactor;
+
+                    if (isTiled) {
+                        drawTiledImage(lw, lh, cw, ch, rotateAngle);
+                    } else {
+                        drawSingle(cw, ch, rotateAngle, () => ctx.drawImage(logoImgObj, -lw/2, -lh/2, lw, lh));
+                    }
+                }
+                ctx.globalAlpha = 1.0; 
+            }, 15); // Debounce
+        };
+
+        // Alignment Helper
+        const drawSingle = (cw, ch, angle, drawFn) => {
+            let x = cw / 2; let y = ch / 2;
+            const padding = Math.min(cw, ch) * 0.05; 
+            
+            switch(activePosition) {
+                case 'top-left': x = padding; y = padding; ctx.textAlign = 'left'; ctx.textBaseline = 'top'; break;
+                case 'top-center': x = cw/2; y = padding; ctx.textBaseline = 'top'; break;
+                case 'top-right': x = cw - padding; y = padding; ctx.textAlign = 'right'; ctx.textBaseline = 'top'; break;
+                case 'middle-left': x = padding; y = ch/2; ctx.textAlign = 'left'; break;
+                case 'middle-right': x = cw - padding; y = ch/2; ctx.textAlign = 'right'; break;
+                case 'bottom-left': x = padding; y = ch - padding; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; break;
+                case 'bottom-center': x = cw/2; y = ch - padding; ctx.textBaseline = 'bottom'; break;
+                case 'bottom-right': x = cw - padding; y = ch - padding; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; break;
+                case 'center': default: break; 
+            }
+
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            drawFn();
+            ctx.restore();
+        };
+
+        // Pattern Helpers
+        const drawTiledText = (text, cw, ch, angle, fontSize) => {
+            const metrics = ctx.measureText(text);
+            const textWidth = metrics.width;
+            const stepX = textWidth + (cw * 0.1); 
+            const stepY = fontSize + (ch * 0.1);
+            const diag = Math.sqrt(cw*cw + ch*ch);
+            const startX = (cw - diag) / 2;
+            const startY = (ch - diag) / 2;
+
+            ctx.save();
+            ctx.translate(cw/2, ch/2);
+            ctx.rotate(angle);
+            ctx.translate(-cw/2, -ch/2);
+
+            for (let x = startX; x < cw + (diag - cw)/2; x += stepX) {
+                for (let y = startY; y < ch + (diag - ch)/2; y += stepY) {
+                    ctx.fillText(text, x, y);
+                }
+            }
+            ctx.restore();
+        };
+
+        const drawTiledImage = (lw, lh, cw, ch, angle) => {
+            const stepX = lw + (cw * 0.1);
+            const stepY = lh + (ch * 0.1);
+            const diag = Math.sqrt(cw*cw + ch*ch);
+            const startX = (cw - diag) / 2;
+            const startY = (ch - diag) / 2;
+
+            ctx.save();
+            ctx.translate(cw/2, ch/2);
+            ctx.rotate(angle);
+            ctx.translate(-cw/2, -ch/2);
+
+            for (let x = startX; x < cw + (diag - cw)/2; x += stepX) {
+                for (let y = startY; y < ch + (diag - ch)/2; y += stepY) {
+                    ctx.drawImage(logoImgObj, x - lw/2, y - lh/2, lw, lh);
+                }
+            }
+            ctx.restore();
+        };
+
+        // === Processing Pipeline ===
+        els.processBtn.addEventListener('click', () => {
+            if(!baseImgObj) return showToast('Please upload a base image first.', 'error');
+            if(activeTab === 'tab-logo' && !logoImgObj) return showToast('Please upload a logo image first.', 'warning');
+            
+            els.loader.style.display = 'flex';
+            
+            setTimeout(() => {
+                try {
+                    const q = exportFormatVal === 'image/png' ? undefined : parseInt(els.qualSlider.value)/100;
+                    
+                    els.canvas.toBlob((blob) => {
+                        finalBlob = blob;
+                        showResults();
+                        els.loader.style.display = 'none';
+                        showToast('Watermark Applied Perfectly!', 'success');
+                    }, exportFormatVal, q);
+                    
+                } catch(err) {
+                    console.error(err);
+                    els.loader.style.display = 'none';
+                    showToast('Error generating watermark.', 'error');
+                }
+            }, 100);
+        });
+
+        const showResults = () => {
+            els.resOrig.src = baseImgUrl;
+            els.statOrig.innerText = `${formatBytes(baseFile.size)}`;
+            els.dimOrig.innerText = `${baseImgObj.width} × ${baseImgObj.height} px`;
+            
+            const compUrl = URL.createObjectURL(finalBlob);
+            els.resProc.src = compUrl;
+            
+            els.dimProc.innerText = `${baseImgObj.width} × ${baseImgObj.height} px • ${exportFormatVal.split('/')[1].toUpperCase()}`;
+            els.statProc.innerText = `Size: ${formatBytes(finalBlob.size)}`;
+            
+            els.resSec.style.display = 'block';
+            els.resSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        // === Actions ===
+        els.dlBtn.addEventListener('click', () => {
+            if(!finalBlob) return;
+            const ext = exportFormatVal.split('/')[1] === 'jpeg' ? 'jpg' : exportFormatVal.split('/')[1];
+            const originalName = baseFile.name.split('.')[0] || 'Image';
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(finalBlob);
+            link.download = `${originalName}_Watermarked_PDFly.${ext}`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            showToast('Download Initiated');
+        });
+
+        els.copyBtn.addEventListener('click', async () => {
+            if(!finalBlob) return;
+            if(!navigator.clipboard || !window.isSecureContext) return showToast('Clipboard requires secure HTTPS.', 'error');
+            try {
+                let blobToCopy = finalBlob;
+                if(finalBlob.type !== 'image/png') {
+                    const img = await createImageBitmap(finalBlob);
+                    const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+                    c.getContext('2d').drawImage(img, 0, 0);
+                    blobToCopy = await new Promise(r => c.toBlob(r, 'image/png'));
+                }
+                await navigator.clipboard.write([new ClipboardItem({ 'image/png': blobToCopy })]);
+                showToast('Image copied to clipboard!');
+            } catch(e) { console.error(e); showToast('Copy failed. Browser may block it.', 'error'); }
+        });
+
+        els.startOverBtn.addEventListener('click', () => { els.resetImgBtn.click(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+    </script>
+</body>
+</html>

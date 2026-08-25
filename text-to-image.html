@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro AI Image Generator - PDFly Tools</title>
+    <meta name="description" content="Transform your text into stunning, high-resolution masterpieces instantly using an advanced, lifetime-free AI engine.">
+    
+    <!-- Plus Jakarta Sans Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* === UI/UX Variables (GT Rao Standard) === */
+        :root {
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --radius-card: 16px;
+            --radius-pill: 9999px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Light Theme */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.75);
+            --bg-input: #f1f5f9;
+            --bg-hover: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.25);
+            
+            /* Status Colors */
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #020617;
+            --bg-card: #0f172a;
+            --bg-glass: rgba(2, 6, 23, 0.75);
+            --bg-input: #1e293b;
+            --bg-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.35);
+        }
+
+        /* === Base Styles === */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+        html, body { overflow-x: hidden; background-color: var(--bg-body); color: var(--text-main); transition: background-color 0.3s ease, color 0.3s ease; }
+
+        /* === Smart Tools === */
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--gradient); width: 0%; z-index: 9999; transition: width 0.1s ease; }
+
+        /* === Glassmorphism Navbar === */
+        .navbar {
+            position: sticky; top: 15px; z-index: 1000; max-width: 1300px; margin: 0 auto 2rem; width: 95%;
+            background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm);
+        }
+        .nav-brand { font-size: clamp(1.2rem, 3vw, 1.5rem); font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 10px; text-decoration: none;}
+        .nav-brand i { color: var(--primary); -webkit-text-fill-color: initial; }
+        .theme-toggle { background: var(--bg-input); border: none; outline: none; color: var(--text-main); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); font-size: 1.2rem; }
+        .theme-toggle:hover { background: var(--bg-hover); transform: scale(1.1) rotate(15deg); color: var(--primary); }
+
+        /* === Layout === */
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+        
+        /* Fixed Header */
+        .header { text-align: center; margin-bottom: 3rem; padding: 2rem 0 1rem; }
+        .header .badge-pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 100px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--primary); font-size: 0.85rem; font-weight: 700; margin-bottom: 12px; }
+        .header h1 { font-size: clamp(2rem, 6vw, 4rem); font-weight: 800; margin-bottom: 1rem; line-height: 1.2; letter-spacing: -0.5px; }
+        .header h1 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.2rem); max-width: 600px; margin: 0 auto; }
+
+        /* === Cards === */
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); padding: clamp(1.2rem, 3vw, 2rem); transition: var(--transition); }
+        .card.hoverable:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: rgba(59, 130, 246, 0.4); }
+
+        /* === Tool Grid Interface === */
+        .tool-grid { display: grid; gap: clamp(1.5rem, 3vw, 2rem); align-items: start; }
+        @media (min-width: 992px) { .tool-grid { grid-template-columns: 1fr 450px; } }
+
+        /* === Form Inputs & Textarea === */
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.8rem; }
+        
+        .prompt-box { position: relative; }
+        .prompt-textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); padding: 1.2rem; padding-bottom: 3.5rem; border-radius: 12px; font-size: 1rem; outline: none; transition: var(--transition); min-height: 160px; resize: vertical; font-weight: 500; line-height: 1.5; }
+        .prompt-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); background: var(--bg-card); }
+        
+        .random-inline-btn { position: absolute; bottom: 15px; left: 15px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--primary); padding: 8px 14px; border-radius: var(--radius-pill); font-size: 0.8rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: var(--transition); z-index: 10; }
+        .random-inline-btn:hover { background: var(--primary); color: #fff; transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+        
+        .char-count { position: absolute; bottom: 20px; right: 15px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; pointer-events: none; }
+        
+        .input-field { width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); padding: 1rem 1.2rem; border-radius: 12px; font-size: 1rem; outline: none; transition: var(--transition); font-weight: 500; }
+        .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); background: var(--bg-card); }
+
+        /* Enhance Tags */
+        .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .enhance-tag { padding: 6px 14px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 6px; }
+        .enhance-tag:hover { border-color: var(--primary); color: var(--primary); background: rgba(59, 130, 246, 0.05); transform: translateY(-2px); }
+
+        /* Badges / Selectors */
+        .badge-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.8rem; }
+        .format-badge { background: var(--bg-input); border: 1px solid var(--border); padding: 0.8rem 0.5rem; text-align: center; border-radius: 12px; cursor: pointer; font-weight: 700; color: var(--text-muted); transition: var(--transition); font-size: 0.9rem; }
+        .format-badge.active, .format-badge:hover { background: var(--primary); color: white; border-color: var(--primary); box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+
+        /* Buttons */
+        .btn { padding: 1rem 1.5rem; border: none; font-family: inherit; font-weight: 700; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; transition: var(--transition); font-size: 1rem; width: 100%; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); }
+        .btn:active:not(:disabled) { transform: translateY(0); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-primary { background: var(--gradient); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover:not(:disabled) { box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5); }
+        .btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-secondary:hover:not(:disabled) { background: var(--bg-hover); color: var(--primary); border-color: var(--primary); }
+        .btn-success { background: var(--success); color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+        .btn-success:hover:not(:disabled) { box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5); }
+
+        /* === Preview & Output Area === */
+        .preview-sticky-box { position: sticky; top: 96px; display: flex; flex-direction: column; height: 100%; gap: 1.5rem; }
+        
+        .canvas-container { width: 100%; background: var(--bg-input); border: 1px dashed var(--border); border-radius: 16px; padding: 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; position: relative; overflow: hidden; transition: var(--transition); }
+        .canvas-container.has-image { border-style: solid; border-color: var(--primary); box-shadow: var(--shadow-hover); background: var(--bg-card); padding: 0.5rem; }
+        
+        #resultPreview { max-width: 100%; max-height: 550px; border-radius: 12px; display: none; object-fit: contain; cursor: zoom-in; }
+        
+        .placeholder-state { text-align: center; color: var(--text-muted); padding: 2rem 1rem; }
+        .placeholder-state i { font-size: 4rem; margin-bottom: 1rem; color: var(--primary); opacity: 0.5; }
+        .placeholder-state h3 { font-size: 1.2rem; color: var(--text-main); margin-bottom: 0.5rem; font-weight: 800;}
+        
+        .image-meta-bar { display: none; align-items: center; justify-content: space-between; background: var(--bg-input); padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+        .image-meta-bar span { color: var(--primary); }
+
+        /* Action Bar */
+        .action-bar { display: none; gap: 1rem; margin-top: 1rem; animation: fadeIn 0.4s ease; }
+
+        /* History Grid */
+        .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .history-header h2 { font-size: 1.1rem; font-weight: 800; color: var(--text-main); }
+        .history-count { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-muted); background: var(--bg-input); padding: 6px 14px; border-radius: var(--radius-pill); border: 1px solid var(--border); font-weight: 700; }
+        .history-count i { color: var(--primary); }
+        
+        .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
+        .history-grid::-webkit-scrollbar { width: 6px; }
+        .history-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        
+        .history-item { aspect-ratio: 1; border-radius: 10px; overflow: hidden; position: relative; cursor: pointer; border: 2px solid transparent; transition: var(--transition); background: var(--bg-input); }
+        .history-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-sm); border-color: var(--primary); }
+        .history-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .empty-history { grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem; font-style: italic; border: 1px dashed var(--border); border-radius: 12px; }
+
+        /* Loader Overlay */
+        .loader-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(10px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 50; }
+        .loader-overlay.active { display: flex; }
+        .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader-text { font-weight: 700; font-size: 1.1rem; margin-bottom: 1rem; color: white; }
+        .progress-bar { width: 60%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background: var(--gradient); transition: width 0.4s ease; }
+
+        /* === SEO Grid Section === */
+        .seo-container { margin-top: 50px; padding-top: 30px; border-top: 1px solid var(--border); }
+        .section-headline { text-align: center; margin-bottom: 28px; }
+        .section-headline h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 800; margin-bottom: 6px;}
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        .feature-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; transition: var(--transition); }
+        .feature-card:hover { transform: translateY(-6px); border-color: rgba(59, 130, 246, 0.4); box-shadow: var(--shadow-hover); }
+        .feature-icon-box { width: 50px; height: 50px; border-radius: 12px; background: rgba(59, 130, 246, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px; transition: var(--transition); }
+        .feature-card:hover .feature-icon-box { background: var(--gradient); color: #fff; transform: scale(1.1); }
+        .feature-card h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; color: var(--text-main); }
+        .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+
+        @media (max-width: 600px) {
+            .feature-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+            .feature-card { padding: 16px; align-items: center; text-align: center; }
+            .feature-card p { display: none; }
+            .feature-card h3 { font-size: 0.9rem; margin-bottom: 0; }
+            .feature-icon-box { margin-bottom: 8px; width: 40px; height: 40px; font-size: 1.2rem; }
+        }
+
+        /* === SEO Friendly Text Section === */
+        .seo-text-section { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 2.5rem; margin: 3rem 0; width: 100%; }
+        @media (max-width: 576px) { .seo-text-section { padding: 1.5rem; } }
+        .seo-text-section h2 { font-size: clamp(1.3rem, 2.5vw, 1.8rem); font-weight: 800; margin-bottom: 1rem; }
+        .seo-text-section h3 { font-size: clamp(1.1rem, 2vw, 1.3rem); font-weight: 700; margin-bottom: 0.5rem; margin-top: 1.5rem; }
+        .seo-text-section p { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.6; }
+        .seo-text-section li { color: var(--text-muted); line-height: 1.6; margin-bottom: 0.5rem; font-size: 0.95rem; }
+        .seo-text-section ul { margin-left: 1.5rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+        /* === Modals === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 1rem; }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 2.5rem); border: 1px solid var(--border); box-shadow: var(--shadow-hover); position: relative; max-height: 90vh; overflow-y: auto; }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-input); border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; transition: var(--transition); z-index: 10;}
+        .modal-close:hover { color: var(--danger); transform: rotate(90deg); background: rgba(239,68,68,0.1); }
+        
+        .modal-content.img-modal { max-width: 90vw; background: transparent; border: none; box-shadow: none; display: flex; justify-content: center; overflow: visible;}
+        .modal-content.img-modal img { max-width: 100%; max-height: 85vh; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); object-fit: contain; }
+        .modal-content.img-modal .modal-close { top: -45px; right: 0; background: var(--danger); color: white; }
+
+        /* Developer Profile (Exact details, no password) */
+        .dev-profile { text-align: center; }
+        .dev-avatar { width: 110px; height: 110px; border-radius: 50%; background: var(--bg-card); margin: 0 auto 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); border: 4px solid var(--primary); overflow: hidden; padding: 0; }
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .dev-tags { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+        .dev-tag { background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(59,130,246,0.2); }
+        .dev-social { width: 45px; height: 45px; border-radius: 50%; background: var(--bg-input); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: var(--transition); border: 1px solid var(--border); text-decoration: none; }
+        .dev-social:hover { background: var(--primary); color: white; transform: translateY(-3px); border-color: var(--primary); }
+
+        /* === Footer === */
+        .footer { margin-top: 4rem; padding: 3rem 1rem 2rem; border-top: 1px solid var(--border); background: var(--bg-card); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; max-width: 1300px; margin: 0 auto 2rem; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--text-main); font-weight: 800; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; transition: var(--transition); font-size: 0.95rem; cursor: pointer; font-weight: 600; }
+        .footer-links a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        .dev-badge { background: var(--bg-input); padding: 0.6rem 1.2rem; border-radius: var(--radius-pill); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 700; font-size: 0.9rem; border: 1px solid var(--border); transition: var(--transition); }
+        .dev-badge:hover { background: rgba(139, 92, 246, 0.1); color: var(--secondary); border-color: var(--secondary); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+
+        /* === Toast & Utils === */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: var(--bg-card); border-left: 4px solid var(--primary); color: var(--text-main); padding: 1rem 1.5rem; border-radius: 12px; box-shadow: var(--shadow-hover); display: flex; align-items: center; gap: 12px; animation: slideIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards, slideOut 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards 3s; font-weight: 700; font-size: 0.95rem; border: 1px solid var(--border); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast i { font-size: 1.2rem; }
+        .toast.success i { color: var(--success); }
+        .toast.error i { color: var(--danger); }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        #backToTop { position: fixed; bottom: 30px; left: 30px; width: 45px; height: 45px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: var(--shadow-hover); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 1000; font-size: 1.2rem; }
+        #backToTop.show { opacity: 1; visibility: visible; }
+        #backToTop:hover { transform: translateY(-5px); background: var(--secondary); }
+    </style>
+</head>
+<body>
+    <div id="scroll-progress"></div>
+
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>PDFly Tools</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+            <i class="fa-solid fa-sun"></i>
+        </button>
+    </nav>
+
+    <div class="container">
+        <!-- Perfected Header Layout Without Float Issues -->
+        <header class="header">
+            <div class="badge-pill">
+                <i class="fa-solid fa-bolt"></i> Fast, Free & Unlimited
+            </div>
+            <h1>Pro AI <span>Image Creator</span></h1>
+            <p>Transform your text into stunning, high-resolution masterpieces instantly using an advanced, lifetime-free stable diffusion engine.</p>
+        </header>
+
+        <main class="tool-grid">
+            <!-- Left Side: Creation Studio Controls -->
+            <section class="controls-column">
+                <div class="card hoverable" style="height: auto;">
+                    <div class="card-title-row">
+                        <div class="card-title-left">
+                            <div class="icon-wrapper"><i class="fa-solid fa-pen-nib"></i></div>
+                            <h2>1. Creation Studio</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Image Prompt (Describe your vision)</label>
+                        <div class="prompt-box">
+                            <textarea id="promptInput" class="prompt-textarea" placeholder="e.g., A futuristic cyberpunk city at sunset, flying cars, neon lights, highly detailed, 8k..."></textarea>
+                            <button class="random-inline-btn" id="randomPromptBtn" title="Generate Random Idea">
+                                <i class="fa-solid fa-dice"></i> Random Idea
+                            </button>
+                            <div class="char-count"><span id="charCount">0</span> / 1000</div>
+                        </div>
+                        
+                        <!-- Enhancement Tags -->
+                        <div class="tag-container" id="enhanceTags">
+                            <span class="enhance-tag" data-val="ultra detailed, 8k resolution, masterpiece"><i class="fa-solid fa-plus"></i> 8K Detail</span>
+                            <span class="enhance-tag" data-val="cinematic lighting, dramatic shadows, ray tracing"><i class="fa-solid fa-plus"></i> Cinematic</span>
+                            <span class="enhance-tag" data-val="photorealistic, raw photo, taken on 35mm lens"><i class="fa-solid fa-plus"></i> Realistic</span>
+                            <span class="enhance-tag" data-val="concept art, trending on artstation, digital painting"><i class="fa-solid fa-plus"></i> Concept Art</span>
+                            <span class="enhance-tag" data-val="vibrant colors, vivid, glowing"><i class="fa-solid fa-plus"></i> Vibrant</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Negative Prompt <span style="font-weight: 500; font-size: 0.8rem; color:var(--text-muted);">(What to AVOID)</span></label>
+                        <input type="text" id="negativePromptInput" class="input-field" placeholder="e.g., blurry, watermark, low quality, deformed, text...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Aspect Ratio</label>
+                        <div class="badge-grid" id="ratioControl">
+                            <div class="format-badge active" data-ratio="1:1"><i class="fa-regular fa-square"></i> 1:1 Square</div>
+                            <div class="format-badge" data-ratio="16:9"><i class="fa-solid fa-display"></i> 16:9 Landscape</div>
+                            <div class="format-badge" data-ratio="9:16"><i class="fa-solid fa-mobile-screen"></i> 9:16 Portrait</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label>Art Style</label>
+                        <div class="badge-grid" id="styleControl" style="grid-template-columns: repeat(2, 1fr);">
+                            <div class="format-badge active" data-val="">None (Auto)</div>
+                            <div class="format-badge" data-val="anime artwork, anime style, highly detailed">Anime Studio</div>
+                            <div class="format-badge" data-val="oil painting, traditional art, brush strokes">Oil Painting</div>
+                            <div class="format-badge" data-val="cyberpunk, neon glow, futuristic city">Cyberpunk</div>
+                            <div class="format-badge" data-val="3D render, octane render, unreal engine 5, isometric">3D Render</div>
+                            <div class="format-badge" data-val="pencil sketch, ink drawing, monochrome">Sketch Art</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="generateBtn" style="padding: 1.2rem; font-size: 1.1rem;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Image
+                    </button>
+                </div>
+            </section>
+
+            <!-- Right Side: Live Output & History -->
+            <section class="preview-sticky-box">
+                <div class="card hoverable" style="margin-bottom: 1.5rem;">
+                    <div class="card-title-row">
+                        <div class="card-title-left">
+                            <div class="icon-wrapper"><i class="fa-solid fa-eye"></i></div>
+                            <h2>2. Final Output</h2>
+                        </div>
+                    </div>
+
+                    <!-- Meta details shown after generation -->
+                    <div class="image-meta-bar" id="imageMetaBar">
+                        <div><i class="fa-solid fa-terminal" style="color:var(--primary)"></i> <span id="metaPrompt" style="color:var(--text-main); font-weight:500;">...</span></div>
+                        <div id="metaDim" style="color:var(--primary);">1024x1024</div>
+                    </div>
+
+                    <div class="canvas-container" id="canvasContainer">
+                        <div class="loader-overlay" id="loaderOverlay">
+                            <div class="spinner"></div>
+                            <div class="loader-text" id="loaderText">Connecting to AI Core...</div>
+                            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                        </div>
+                        
+                        <div class="placeholder-state" id="emptyPlaceholder">
+                            <i class="fa-solid fa-image"></i>
+                            <h3>Empty Canvas</h3>
+                            <p style="font-size: 0.9rem;">Describe your vision on the left and hit Generate.</p>
+                        </div>
+                        
+                        <img id="resultPreview" src="#" alt="Generated Image" crossorigin="anonymous">
+                    </div>
+
+                    <div class="action-bar" id="actionSettings" style="display: none; padding: 1rem;">
+                        <button class="btn btn-success" id="downloadBtn" style="flex:1;">
+                            <i class="fa-solid fa-download"></i> Download HD
+                        </button>
+                        <button class="btn btn-secondary" id="fullscreenBtn" style="width: auto; padding: 1rem;" title="View Fullscreen">
+                            <i class="fa-solid fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Local History Grid -->
+                <div class="card hoverable">
+                    <div class="history-header">
+                        <h2>Recent History</h2>
+                        <div class="history-count">
+                            <i class="fa-regular fa-clock"></i> <span id="historyCount">0</span>
+                        </div>
+                    </div>
+                    <div class="history-grid" id="historyGrid">
+                        <div class="empty-history" id="emptyHistory">No recent images generated yet.</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 4 Features Grid -->
+        <div class="features-grid">
+            <div class="card feature-card hoverable">
+                <div class="feature-icon-box"><i class="fa-solid fa-infinity"></i></div>
+                <h3>Free & Unlimited</h3>
+                <p>No credits, no paywalls, no login required. Generate as many high-quality images as your imagination allows securely.</p>
+            </div>
+            <div class="card feature-card hoverable">
+                <div class="feature-icon-box"><i class="fa-solid fa-bolt"></i></div>
+                <h3>Lightning Fast</h3>
+                <p>Powered by highly optimized stable diffusion networks, watch your prompts turn into high-resolution art in mere seconds.</p>
+            </div>
+            <div class="card feature-card hoverable">
+                <div class="feature-icon-box"><i class="fa-solid fa-sliders"></i></div>
+                <h3>Pro Control</h3>
+                <p>Take full control over aspect ratios, enhancement tags, and negative prompts for precise and flawless image generation.</p>
+            </div>
+            <div class="card feature-card hoverable">
+                <div class="feature-icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+                <h3>Private Gallery</h3>
+                <p>Your history is saved locally to your browser. Keep track of your best generations without uploading data to external servers.</p>
+            </div>
+        </div>
+
+        <!-- SEO Friendly Card Section -->
+        <div class="seo-text-section">
+            <h2>Why Use Our AI Image Generator?</h2>
+            <p>Artificial Intelligence has revolutionized how we create digital art. Whether you are a graphic designer needing quick concept art, a marketer looking for unique blog graphics, or a hobbyist exploring creative ideas, the PDFly Pro AI Image Creator turns your words into breathtaking visuals without needing complex software like Photoshop.</p>
+            
+            <h3>Tips for Perfect Prompts</h3>
+            <ul>
+                <li><strong>Be Specific:</strong> Instead of "a dog," write "A golden retriever puppy wearing a red collar sitting in a sunny green park."</li>
+                <li><strong>Use Enhancement Tags:</strong> Click our quick-add tags like "8K Detail" or "Cinematic" to instantly improve the lighting, rendering quality, and texture of your output.</li>
+                <li><strong>Utilize Negative Prompts:</strong> Tell the AI what <em>not</em> to draw. Adding words like "blurry, deformed, low resolution, watermark" to the negative prompt ensures a much cleaner, professional result.</li>
+                <li><strong>Experiment with Styles:</strong> A simple prompt can look entirely different depending on the style. Try changing your output from "Photorealistic" to "Cyberpunk" or "Anime Studio" for completely fresh aesthetics.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>
+                    <a href="index.html" style="text-decoration: none; color: var(--text-main);">
+                        <i class="fa-solid fa-layer-group" style="color:var(--primary)"></i> PDFly Tools
+                    </a>
+                </h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Your ultimate suite for free, secure, and blazing-fast web utilities. Designed with modern fluid UI tech.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Top Tools</h4>
+                <ul class="footer-links">
+                    <li><a href="resize-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Image Resizer Pro</a></li>
+                    <li><a href="compress-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Compress Image</a></li>
+                    <li><a href="generate-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> AI Image Generator</a></li>
+                    <li><a href="watermark-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Image Watermark</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal & Info</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="openModal('privacyModal', event)"><i class="fa-solid fa-shield"></i> Privacy Policy</a></li>
+                    <li><a href="#" onclick="openModal('termsModal', event)"><i class="fa-solid fa-file-contract"></i> Terms of Service</a></li>
+                    <li><a href="#" onclick="openModal('contactModal', event)"><i class="fa-solid fa-headset"></i> Contact Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="dev-badge" id="devBadge">
+                <i class="fa-solid fa-code"></i> Developed by GT Rao
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">&copy; 2026 PDFly Tools. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals (Privacy, Terms, Contact) -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('privacyModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-shield" style="color: var(--primary);"></i> Privacy Policy</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.6;">At PDFly Tools, user privacy is fundamental. This tool utilizes free, no-auth external API services (Pollinations.ai) to generate images.</p>
+            <ul style="color: var(--text-muted); font-size: 0.95rem; padding-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                <li>Your text prompts are processed securely.</li>
+                <li>Your session history is volatile and saved only locally on your browser.</li>
+                <li>We never sync your generated images to our servers.</li>
+            </ul>
+            <button class="btn btn-primary" style="width:100%" onclick="closeModal('privacyModal')">Acknowledge</button>
+        </div>
+    </div>
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('termsModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-file-contract" style="color: var(--primary);"></i> Terms of Service</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">PDFly Tools provides this utility free of charge. Users are responsible for the content they generate and must adhere to standard ethical guidelines regarding AI-generated media. We do not hold copyrights to generated results.</p>
+            <button class="btn btn-primary" style="width:100%" onclick="closeModal('termsModal')">I Agree</button>
+        </div>
+    </div>
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('contactModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> Get in Touch</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">Have suggestions or found a bug? We'd love to hear from you. Email us directly or reach out via our developer portals.</p>
+            <div style="background: var(--bg-input); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <p style="color: var(--text-main); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope" style="color: var(--primary);"></i> 
+                    <a href="mailto:pdflytools@gmail.com" style="text-decoration: none; color: inherit;">pdflytools@gmail.com</a>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> Azamgarh, Uttar Pradesh, India
+                </p>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="closeModal('contactModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- Image Fullscreen Modal -->
+    <div class="modal-overlay" id="imgModalOverlay">
+        <div class="modal-content img-modal">
+            <button class="modal-close" id="closeImgModal"><i class="fa-solid fa-xmark"></i></button>
+            <img id="modalFullImg" src="" alt="Fullscreen Generated Art">
+        </div>
+    </div>
+
+    <!-- Exact GT Rao Developer Profile Modal (Password Removed) -->
+    <div class="modal-overlay" id="devProfileModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('devProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="dev-profile">
+                <div class="dev-avatar">
+                    <img src="dev-profile.png" alt="GT Rao - Developer" class="profile-pic" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GT+Rao&background=3b82f6&color=fff&size=128&font-size=0.33&bold=true';">
+                </div>
+                <h2 style="font-size: 2.2rem; margin-bottom: 0.2rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">GT Rao</h2>
+                <p style="color: var(--text-main); font-weight: 600; font-size: 1rem; margin-top: 0.2rem;">Student & Web Developer</p>
+                <p style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Azamgarh, Uttar Pradesh, India</p>
+                
+                <div class="dev-tags">
+                    <span class="dev-tag"><i class="fa-brands fa-html5"></i> Web Dev</span>
+                    <span class="dev-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
+                    <span class="dev-tag"><i class="fa-solid fa-wand-magic"></i> UI/UX Design</span>
+                    <span class="dev-tag"><i class="fa-solid fa-layer-group"></i> Web Apps</span>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center; padding: 1.25rem; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">
+                        Passionate Web Developer dedicated to crafting lightning-fast, secure, and user-centric web applications. As the creator of <strong>PDFly Tools</strong>, I focus on writing clean code, building responsive interfaces, and ensuring client-side security to deliver premium, highly functional digital experiences that are accessible to everyone.
+                    </p>
+                </div>
+                
+                <!-- Explicitly linked Social Media / Emails -->
+                <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                     <a href="mailto:pdflytools@gmail.com" class="dev-social" title="Email Contact" target="_blank"><i class="fa-solid fa-envelope"></i></a>
+                     <a href="https://instagram.com/mr_gt_rao" class="dev-social" title="Personal Instagram" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                     <a href="https://instagram.com/educate_path" class="dev-social" title="Business / PDFly Tools" target="_blank"><i class="fa-solid fa-briefcase"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Utilities -->
+    <div id="toast-container"></div>
+    <button id="backToTop" title="Go to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <!-- Logic Script -->
+    <script>
+        // === Core State Management ===
+        const state = {
+            history: [],
+            currentUrl: null,
+            currentPrompt: '',
+            isGenerating: false,
+            progressInterval: null,
+            loadingMessages: ["Connecting to AI Core...", "Painting pixels...", "Adding magic details...", "Finalizing image..."]
+        };
+
+        // === DOM Elements ===
+        const els = {
+            html: document.documentElement,
+            themeToggle: document.getElementById('themeToggle'),
+            scrollProg: document.getElementById('scroll-progress'),
+            btt: document.getElementById('backToTop'),
+            
+            // Inputs
+            promptInput: document.getElementById('promptInput'),
+            charCount: document.getElementById('charCount'),
+            enhanceTags: document.querySelectorAll('.enhance-tag'),
+            negativeInput: document.getElementById('negativePromptInput'),
+            ratioBtns: document.querySelectorAll('#ratioControl .format-badge'),
+            styleBtns: document.querySelectorAll('#styleControl .format-badge'),
+            generateBtn: document.getElementById('generateBtn'),
+            randomBtn: document.getElementById('randomPromptBtn'),
+            
+            // Outputs
+            canvasContainer: document.getElementById('canvasContainer'),
+            resultPreview: document.getElementById('resultPreview'),
+            emptyPlaceholder: document.getElementById('emptyPlaceholder'),
+            loaderOverlay: document.getElementById('loaderOverlay'),
+            loaderText: document.getElementById('loaderText'),
+            progressFill: document.getElementById('progressFill'),
+            actionSettings: document.getElementById('actionSettings'),
+            downloadBtn: document.getElementById('downloadBtn'),
+            fullscreenBtn: document.getElementById('fullscreenBtn'),
+
+            // Meta & History
+            imageMetaBar: document.getElementById('imageMetaBar'),
+            metaPrompt: document.getElementById('metaPrompt'),
+            metaDim: document.getElementById('metaDim'),
+            historyGrid: document.getElementById('historyGrid'),
+            historyCount: document.getElementById('historyCount'),
+            
+            // Modals
+            imgModalOverlay: document.getElementById('imgModalOverlay'),
+            modalFullImg: document.getElementById('modalFullImg'),
+            closeImgModal: document.getElementById('closeImgModal')
+        };
+
+        // === Theme & Smart Tools System (GT Rao Standard) ===
+        const initTheme = () => {
+            const saved = localStorage.getItem('pdfly-theme') || 'dark';
+            els.html.setAttribute('data-theme', saved);
+            els.themeToggle.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+        };
+        els.themeToggle.addEventListener('click', () => {
+            const next = els.html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            els.html.setAttribute('data-theme', next); localStorage.setItem('pdfly-theme', next);
+            els.themeToggle.innerHTML = next === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+            showToast(`${next.charAt(0).toUpperCase() + next.slice(1)} Mode Activated`, 'success');
+        });
+        initTheme();
+
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            els.scrollProg.style.width = (winScroll / height) * 100 + "%";
+            if (winScroll > 300) els.btt.classList.add('show'); else els.btt.classList.remove('show');
+        });
+        els.btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        const showToast = (msg, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div'); toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-circle-xmark' : 'fa-info-circle';
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${msg}</span>`;
+            container.appendChild(toast); setTimeout(() => { if(container.contains(toast)) toast.remove(); }, 3500);
+        };
+
+        // Modals (Password removed)
+        window.openModal = (id, e) => { if(e) e.preventDefault(); document.getElementById(id).classList.add('active'); };
+        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+        document.getElementById('devBadge').addEventListener('click', () => { openModal('devProfileModal'); });
+
+        // === Creation Studio Logic ===
+        
+        // Character Count
+        els.promptInput.addEventListener('input', function() {
+            els.charCount.textContent = this.value.length;
+        });
+
+        // Enhance Tags Logic
+        els.enhanceTags.forEach(tag => {
+            tag.addEventListener('click', () => {
+                const val = tag.getAttribute('data-val');
+                let current = els.promptInput.value;
+                if (current && !current.endsWith(', ') && !current.endsWith(',')) current += ', ';
+                els.promptInput.value = current + val;
+                els.charCount.textContent = els.promptInput.value.length;
+                showToast('Enhancement Added', 'success');
+            });
+        });
+
+        // Setup Selection Badges
+        const setupBadges = (btns) => {
+            btns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    btns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+        };
+        setupBadges(els.styleBtns);
+        setupBadges(els.ratioBtns);
+
+        // Random Prompts Generator
+        const RANDOM_PROMPTS = [
+            "A cinematic shot of a samurai standing in a neon-lit cyberpunk tokyo street, raining",
+            "A highly detailed digital painting of a floating island with glowing waterfalls",
+            "Macro photography of a tiny glowing blue mushroom in a dark magical forest",
+            "An astronaut drinking coffee on the moon looking at earth, retro futuristic style",
+            "A majestic dragon made of blue lightning soaring through dark storm clouds"
+        ];
+        els.randomBtn.addEventListener('click', () => {
+            const p = RANDOM_PROMPTS[Math.floor(Math.random() * RANDOM_PROMPTS.length)];
+            els.promptInput.value = p;
+            els.charCount.textContent = p.length;
+        });
+
+        // === Core Generation Pipeline ===
+        const getActiveVal = (btns) => {
+            const active = Array.from(btns).find(b => b.classList.contains('active'));
+            return active ? active.getAttribute('data-val') || active.getAttribute('data-ratio') : '';
+        };
+
+        const getDims = () => {
+            const ratio = getActiveVal(els.ratioBtns);
+            const map = {
+                '1:1': { w: 1024, h: 1024 },
+                '16:9': { w: 1280, h: 720 },
+                '9:16': { w: 720, h: 1280 },
+                '4:3': { w: 1024, h: 768 }
+            };
+            return map[ratio] || map['1:1'];
+        };
+
+        const startLoading = () => {
+            state.isGenerating = true;
+            els.generateBtn.disabled = true;
+            els.generateBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+            els.actionSettings.style.display = 'none';
+            els.emptyPlaceholder.style.display = 'none';
+            els.resultPreview.style.display = 'none';
+            els.imageMetaBar.style.display = 'none';
+            els.canvasContainer.classList.remove('has-image');
+            els.loaderOverlay.classList.add('active');
+
+            let width = 0; let msgIdx = 0;
+            els.progressFill.style.width = '0%';
+            els.loaderText.textContent = state.loadingMessages[0];
+
+            state.progressInterval = setInterval(() => {
+                width += Math.random() * 10;
+                if(width > 90) width = 90; // Hold at 90% until done
+                els.progressFill.style.width = width + '%';
+                
+                if(width > 25 && msgIdx === 0) { msgIdx=1; els.loaderText.textContent = state.loadingMessages[1]; }
+                if(width > 50 && msgIdx === 1) { msgIdx=2; els.loaderText.textContent = state.loadingMessages[2]; }
+                if(width > 75 && msgIdx === 2) { msgIdx=3; els.loaderText.textContent = state.loadingMessages[3]; }
+            }, 500);
+        };
+
+        const stopLoading = () => {
+            clearInterval(state.progressInterval);
+            els.progressFill.style.width = '100%';
+            setTimeout(() => {
+                els.loaderOverlay.classList.remove('active');
+                state.isGenerating = false;
+                els.generateBtn.disabled = false;
+                els.generateBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Image';
+            }, 300);
+        };
+
+        // Generation Trigger
+        els.generateBtn.addEventListener('click', async () => {
+            if(state.isGenerating) return;
+            
+            const rawPrompt = els.promptInput.value.trim();
+            if (!rawPrompt) {
+                els.promptInput.focus();
+                return showToast('Please describe your image first.', 'warning');
+            }
+
+            let finalPrompt = rawPrompt;
+            const style = getActiveVal(els.styleBtns);
+            if (style) finalPrompt += `, ${style}`;
+            
+            const neg = els.negativeInput.value.trim();
+            if (neg) finalPrompt += `. Avoid: ${neg}`;
+
+            const dims = getDims();
+            const seed = Math.floor(Math.random() * 99999999);
+
+            // API Routing (Pollinations.ai Free Endpoint)
+            const encodedPrompt = encodeURIComponent(finalPrompt);
+            const primaryUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${dims.w}&height=${dims.h}&seed=${seed}&nologo=1`;
+            const fallbackUrl = `https://pollinations.ai/p/${encodedPrompt}?width=${dims.w}&height=${dims.h}&seed=${seed}`;
+
+            startLoading();
+
+            try {
+                // Fetch Image Blob to prevent CORS and cross-origin download issues
+                let response = await fetch(primaryUrl);
+                if (!response.ok) response = await fetch(fallbackUrl);
+                if (!response.ok) throw new Error('API servers overloaded.');
+
+                const blob = await response.blob();
+                const objUrl = URL.createObjectURL(blob);
+
+                stopLoading();
+                
+                // Show Result
+                els.resultPreview.src = objUrl;
+                els.resultPreview.style.display = 'block';
+                els.canvasContainer.classList.add('has-image');
+                els.actionSettings.style.display = 'block';
+                
+                // Meta info setup
+                els.metaPrompt.textContent = rawPrompt.length > 50 ? rawPrompt.substring(0, 50) + '...' : rawPrompt;
+                els.metaDim.textContent = `${dims.w}x${dims.h}`;
+                els.imageMetaBar.style.display = 'flex';
+
+                // Save State
+                state.currentUrl = objUrl;
+                state.currentPrompt = rawPrompt;
+                
+                addToHistory(objUrl, rawPrompt);
+                showToast('Image generated successfully!', 'success');
+                
+                // Scroll to view
+                els.canvasContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+            } catch (err) {
+                stopLoading();
+                els.emptyPlaceholder.style.display = 'block';
+                showToast('Failed to generate image. Try again.', 'error');
+                console.error("API Error:", err);
+            }
+        });
+
+        // === Actions & Output ===
+        els.downloadBtn.addEventListener('click', () => {
+            if (!state.currentUrl) return;
+            const link = document.createElement('a');
+            link.href = state.currentUrl;
+            link.download = `PDFly_AI_Art_${Date.now()}.png`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            showToast('Download complete!', 'success');
+        });
+
+        els.fullscreenBtn.addEventListener('click', () => {
+            if (!state.currentUrl) return;
+            els.modalFullImg.src = state.currentUrl;
+            els.imgModalOverlay.style.display = 'flex';
+        });
+        
+        els.closeImgModal.addEventListener('click', () => { els.imgModalOverlay.style.display = 'none'; });
+
+        // === History System ===
+        const addToHistory = (url, prompt) => {
+            if(state.history.length > 0 && state.history[0].url === url) return;
+            state.history.unshift({ url, prompt, id: Date.now() });
+            if (state.history.length > 12) state.history.pop();
+            renderHistory();
+        };
+
+        const renderHistory = () => {
+            els.historyCount.textContent = state.history.length;
+            if (state.history.length === 0) {
+                els.historyGrid.innerHTML = '<div class="empty-history" id="emptyHistory">No recent images generated yet.</div>';
+                return;
+            }
+            els.historyGrid.innerHTML = state.history.map(item => `
+                <div class="history-item" onclick="loadHistoryItem('${item.url}', '${item.prompt.replace(/'/g, "\\'")}')">
+                    <img src="${item.url}" alt="History" loading="lazy">
+                </div>
+            `).join('');
+        };
+
+        window.loadHistoryItem = (url, prompt) => {
+            state.currentUrl = url;
+            state.currentPrompt = prompt;
+            
+            els.emptyPlaceholder.style.display = 'none';
+            els.resultPreview.src = url;
+            els.resultPreview.style.display = 'block';
+            els.canvasContainer.classList.add('has-image');
+            els.actionSettings.style.display = 'block';
+            
+            els.promptInput.value = prompt;
+            els.charCount.textContent = prompt.length;
+            
+            els.metaPrompt.textContent = prompt.length > 50 ? prompt.substring(0, 50) + '...' : prompt;
+            els.imageMetaBar.style.display = 'flex';
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showToast('Loaded from history', 'success');
+        };
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                els.generateBtn.click();
+            }
+        });
+
+    </script>
+</body>
+</html>

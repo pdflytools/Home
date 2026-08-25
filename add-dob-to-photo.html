@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo ID Stamper & Maker - PDFly Tools</title>
+    <meta name="description" content="Add official name and date stamps for SSC, UPSC, Railway, State PSC, and Passport applications with pixel-perfect resolution. 100% Free.">
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Cropper.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+    
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        /* === UI/UX Variables (GT Rao Standard) === */
+        :root {
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --radius-card: 16px;
+            --radius-pill: 9999px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Light Theme */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.75);
+            --bg-input: #f1f5f9;
+            --bg-hover: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.25);
+            
+            /* Status Colors */
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #020617;
+            --bg-card: #0f172a;
+            --bg-glass: rgba(2, 6, 23, 0.75);
+            --bg-input: #1e293b;
+            --bg-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.35);
+        }
+
+        /* === Base Styles === */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+        html, body { overflow-x: hidden; background-color: var(--bg-body); color: var(--text-main); transition: background-color 0.3s ease, color 0.3s ease; }
+
+        /* === Smart Tools === */
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--gradient); width: 0%; z-index: 9999; transition: width 0.1s ease; }
+
+        /* === Glassmorphism Navbar === */
+        .navbar {
+            position: sticky; top: 15px; z-index: 1000; max-width: 1300px; margin: 0 auto 2rem; width: 95%;
+            background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm);
+        }
+        .nav-brand { font-size: clamp(1.2rem, 3vw, 1.5rem); font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 10px; text-decoration: none;}
+        .nav-brand i { color: var(--primary); -webkit-text-fill-color: initial; }
+        .theme-toggle { background: var(--bg-input); border: none; outline: none; color: var(--text-main); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); font-size: 1.2rem; }
+        .theme-toggle:hover { background: var(--bg-hover); transform: scale(1.1) rotate(15deg); color: var(--primary); }
+
+        /* === Layout === */
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+        
+        /* Fixed Header */
+        .header { text-align: center; margin-bottom: 3rem; padding: 2rem 0 1rem; }
+        .header .badge-pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 100px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--primary); font-size: 0.85rem; font-weight: 700; margin-bottom: 12px; }
+        .header h1 { font-size: clamp(2rem, 6vw, 4rem); font-weight: 800; margin-bottom: 1rem; line-height: 1.2; letter-spacing: -0.5px; }
+        .header h1 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.2rem); max-width: 600px; margin: 0 auto; }
+
+        /* === Cards === */
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); padding: clamp(1rem, 3vw, 1.5rem); transition: var(--transition); }
+        .card.hoverable:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); border-color: rgba(59, 130, 246, 0.4); }
+
+        /* === Tool Grid Interface === */
+        .tool-grid { display: grid; gap: clamp(1rem, 3vw, 2rem); align-items: start; }
+        @media (min-width: 992px) { .tool-grid { grid-template-columns: 1fr 400px; } }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed var(--primary); border-radius: var(--radius-card); padding: clamp(2rem, 5vw, 4rem) 1rem; text-align: center;
+            background: rgba(59, 130, 246, 0.03); cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; position: relative; overflow: hidden; min-height: 250px; margin-bottom: 1rem;
+        }
+        .upload-area:hover { background: rgba(59, 130, 246, 0.08); transform: scale(1.02); }
+        .upload-area i { font-size: clamp(3rem, 8vw, 5rem); color: var(--primary); transition: var(--transition); }
+        .upload-area:hover i { transform: translateY(-8px) scale(1.05); }
+        .upload-area h3 { font-size: 1.2rem; color: var(--text-main); font-weight: 700; }
+        .upload-area p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Main Preview Canvas Area */
+        #preview-section { display: none; position: relative; height: 100%; min-height: clamp(350px, 50vh, 550px); }
+        .preview-wrapper { background: var(--bg-input); border-radius: var(--radius-card); padding: 1.5rem; display: flex; justify-content: center; align-items: center; min-height: clamp(350px, 50vh, 550px); position: relative; overflow: hidden; flex-direction: column; }
+        #liveCanvas { max-width: 100%; max-height: 60vh; border-radius: 8px; box-shadow: var(--shadow-hover); background: #fff; }
+        
+        .floating-actions { position: absolute; top: 1.5rem; right: 1.5rem; z-index: 10; display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
+
+        /* Controls Area */
+        .controls-wrapper { display: flex; flex-direction: column; gap: 1.5rem; height: 100%; }
+        
+        /* Pill Tabs */
+        .tabs { display: flex; background: var(--bg-input); border-radius: var(--radius-pill); padding: 0.4rem; gap: 0.4rem; }
+        .tab-btn { flex: 1; padding: 0.8rem 0.5rem; border: none; background: transparent; color: var(--text-muted); font-weight: 600; font-family: inherit; border-radius: var(--radius-pill); cursor: pointer; transition: var(--transition); font-size: clamp(0.75rem, 1.5vw, 0.9rem); display: flex; align-items: center; justify-content: center; gap: 0.4rem; }
+        .tab-btn.active, .tab-btn:hover { background: var(--bg-card); color: var(--primary); box-shadow: var(--shadow-sm); }
+        .tab-content { display: none; padding-top: 1rem; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Form Inputs */
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem; }
+        .input-group { display: flex; gap: 0.5rem; }
+        input[type="number"], input[type="text"], input[type="date"], select { width: 100%; padding: 0.8rem 1rem; font-family: inherit; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 12px; font-size: 1rem; transition: var(--transition); font-weight: 600; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); background: var(--bg-card); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
+
+        /* Range Sliders */
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: var(--bg-input); border-radius: var(--radius-pill); outline: none; margin: 12px 0; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: var(--primary); border-radius: 50%; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: var(--transition); }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+        /* Toggle Switch */
+        .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-input); border: 1px solid var(--border); transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: var(--text-muted); transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); border-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); background-color: white; }
+
+        /* Modern Color Picker UI */
+        .color-picker-modern { background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 10px; display: flex; align-items: center; justify-content: space-between; }
+        .color-wheel-wrapper { position: relative; width: 35px; height: 35px; border-radius: 8px; overflow: hidden; border: 2px solid rgba(139, 92, 246, 0.2); cursor: pointer; display: flex; align-items: center; justify-content: center; background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); }
+        .color-wheel-wrapper input[type="color"] { position: absolute; opacity: 0; width: 200%; height: 200%; cursor: pointer; top: -50%; left: -50%; }
+        .color-hex-text { font-family: monospace; font-size: 0.95rem; font-weight: 700; color: var(--text-main); background: var(--bg-card); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); text-align: center; }
+
+        /* Buttons & Badges */
+        .btn { padding: 0.8rem 1.5rem; border: none; font-family: inherit; font-weight: 700; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; transition: var(--transition); font-size: 1rem; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); }
+        .btn:active:not(:disabled) { transform: translateY(0); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-primary { background: var(--gradient); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover:not(:disabled) { box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5); }
+        .btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-secondary:hover:not(:disabled) { background: var(--bg-hover); color: var(--primary); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover:not(:disabled) { background: var(--danger); color: white; }
+        .btn-icon { width: 45px; height: 45px; padding: 0; border-radius: 12px; flex-shrink: 0; }
+        .label-action { color: var(--primary); font-size: 0.8rem; cursor: pointer; background: var(--bg-input); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border); transition: var(--transition); }
+        .label-action:hover { background: var(--primary); color: white; }
+
+        .badge-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+        .format-badge { background: var(--bg-input); border: 1px solid var(--border); padding: 0.8rem 0.5rem; text-align: center; border-radius: 10px; cursor: pointer; font-weight: 700; color: var(--text-muted); transition: var(--transition); font-size: 0.9rem; }
+        .format-badge.active, .format-badge:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Result Section */
+        #result-section { display: none; margin-top: 2rem; animation: fadeIn 0.5s ease; }
+        .result-box { text-align: center; background: var(--bg-input); padding: 2rem; border-radius: var(--radius-card); border: 1px solid var(--border); }
+        .result-box img { max-width: 100%; height: auto; max-height: 400px; border-radius: 8px; margin-bottom: 1.5rem; image-rendering: high-quality; box-shadow: var(--shadow-sm); background: #fff; }
+        .stat-pill { display: inline-block; padding: 0.4rem 1rem; background: var(--bg-card); border-radius: var(--radius-pill); font-weight: 800; font-size: 1rem; color: var(--primary); border: 1px solid var(--border); box-shadow: var(--shadow-sm); margin: 0 5px; }
+        .action-bar { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; background: var(--bg-card); padding: 1.5rem; border-radius: var(--radius-card); box-shadow: var(--shadow-sm); border: 1px solid var(--border); margin-top: 1.5rem; }
+
+        /* === 4 Features Grid === */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin: 4rem 0; }
+        @media (max-width: 576px) { .features-grid { grid-template-columns: 1fr; } }
+        .feature-card { padding: 1.5rem; }
+        .feature-card i { font-size: 1.8rem; margin-bottom: 0.8rem; }
+        .feature-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 700; color: var(--text-main); }
+        .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;}
+
+        /* === SEO Friendly Card Section === */
+        .seo-text-section { background: var(--bg-glass); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 2rem; margin: 3rem 0; width: 100%; word-wrap: break-word; overflow-wrap: break-word; overflow: hidden; }
+        @media (max-width: 576px) { .seo-text-section { padding: 1.25rem; } }
+        .seo-text-section h2 { font-size: clamp(1.3rem, 2.5vw, 1.8rem); font-weight: 700; margin-bottom: 1rem; }
+        .seo-text-section h3 { font-size: clamp(1.1rem, 2vw, 1.3rem); font-weight: 600; margin-bottom: 0.5rem; margin-top: 1.5rem; }
+        .seo-text-section p { font-size: clamp(0.9rem, 1.5vw, 1rem); color: var(--text-muted); margin-bottom: 1rem; line-height: 1.6; word-break: break-word; }
+        .seo-text-section li { word-break: break-word; color: var(--text-muted); line-height: 1.6; margin-bottom: 0.5rem; }
+        .seo-text-section ul { list-style: disc; margin-left: 1.5rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+        /* === Modals === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 1rem; }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 2.5rem); border: 1px solid var(--border); box-shadow: var(--shadow-hover); position: relative; max-height: 90vh; overflow-y: auto; }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-input); border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; transition: var(--transition); z-index: 10;}
+        .modal-close:hover { color: var(--danger); transform: rotate(90deg); background: rgba(239,68,68,0.1); }
+        
+        #cropContainer { max-width: 700px; width: 100%; }
+        .cropper-area { width: 100%; height: 50vh; background: var(--bg-input); border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem; }
+        .cropper-area img { display: block; max-width: 100%; }
+
+        /* Exact GT Rao Developer Profile */
+        .dev-profile { text-align: center; }
+        .dev-avatar { width: 110px; height: 110px; border-radius: 50%; background: var(--bg-card); margin: 0 auto 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); border: 4px solid var(--primary); overflow: hidden; padding: 0; }
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .dev-tags { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+        .dev-tag { background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(59,130,246,0.2); }
+        .dev-social { width: 45px; height: 45px; border-radius: 50%; background: var(--bg-input); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: var(--transition); border: 1px solid var(--border); text-decoration: none; }
+        .dev-social:hover { background: var(--primary); color: white; transform: translateY(-3px); border-color: var(--primary); }
+
+        /* === Footer === */
+        .footer { margin-top: 4rem; padding: 3rem 1rem 2rem; border-top: 1px solid var(--border); background: var(--bg-card); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; max-width: 1300px; margin: 0 auto 2rem; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--text-main); font-weight: 700; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; transition: var(--transition); font-size: 0.95rem; cursor: pointer; font-weight: 500; }
+        .footer-links a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        .dev-badge { background: var(--bg-input); padding: 0.6rem 1.2rem; border-radius: var(--radius-pill); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 700; font-size: 0.9rem; border: 1px solid var(--border); transition: var(--transition); }
+        .dev-badge:hover { background: rgba(139, 92, 246, 0.1); color: var(--secondary); border-color: var(--secondary); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+
+        /* === Toast Notification === */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: var(--bg-card); border-left: 4px solid var(--primary); color: var(--text-main); padding: 1rem 1.5rem; border-radius: 12px; box-shadow: var(--shadow-hover); display: flex; align-items: center; gap: 12px; animation: slideIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards, slideOut 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards 3s; font-weight: 600; font-size: 0.95rem; border: 1px solid var(--border); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast i { font-size: 1.2rem; }
+        .toast.success i { color: var(--success); }
+        .toast.error i { color: var(--danger); }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
+
+        /* === Back to Top & Loader === */
+        #backToTopBtn { position: fixed; bottom: 30px; left: 30px; width: 45px; height: 45px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: var(--shadow-hover); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 1000; font-size: 1.2rem; }
+        #backToTopBtn.visible { opacity: 1; visibility: visible; }
+        #backToTopBtn:hover { transform: translateY(-5px); background: var(--secondary); }
+        
+        .loader-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; flex-direction: column; gap: 1.5rem; z-index: 9999; color: var(--primary); font-weight: 800; font-size: 1.2rem; }
+        .loader-overlay.active { display: flex; }
+        .spinner { width: 60px; height: 60px; border: 5px solid var(--bg-input); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; box-shadow: 0 0 20px rgba(59,130,246,0.2); }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="scroll-progress"></div>
+
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>PDFly Tools</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+            <i class="fa-solid fa-sun"></i>
+        </button>
+    </nav>
+
+    <div class="container">
+        <!-- Exact Header Layout Without Float Issues -->
+        <header class="header">
+            <div class="badge-pill">
+                <i class="fa-solid fa-bolt"></i> Fast, Precise & Free
+            </div>
+            <h1>Photo ID <span>Name & Date Stamper</span></h1>
+            <p>Add official name and date stamps for SSC, UPSC, Railway, State PSC, and Passport applications with pixel-perfect resolution.</p>
+        </header>
+
+        <!-- Main Tool Area -->
+        <main class="tool-grid">
+            <!-- Left Side: Upload & Live Canvas Preview -->
+            <section class="left-panel">
+                <div class="card hoverable" style="padding: 1rem; overflow: hidden; border: none; background: transparent; box-shadow: none; height: 100%;">
+                    
+                    <div id="upload-section" class="upload-area" onclick="document.getElementById('fileInput').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <h3>Choose or Drag Photo Here</h3>
+                        <p>Supports JPG, PNG, WEBP (Any dimension)</p>
+                        <input type="file" id="fileInput" style="display:none;" accept="image/jpeg,image/png,image/webp">
+                    </div>
+
+                    <!-- Live Canvas Preview Section -->
+                    <div id="preview-section" class="card" style="padding: 0; border:none; box-shadow: var(--shadow-sm);">
+                        <div class="floating-actions">
+                            <button class="btn btn-secondary btn-icon" id="recropBtn" title="Crop Image" style="background: var(--bg-card); box-shadow: var(--shadow-sm);">
+                                <i class="fa-solid fa-crop-simple" style="color: var(--primary);"></i>
+                            </button>
+                            <button class="btn btn-secondary btn-icon" id="resetAllBtn" title="Clear All Workspace" style="background: var(--bg-card); box-shadow: var(--shadow-sm);">
+                                <i class="fa-solid fa-trash" style="color: var(--danger);"></i>
+                            </button>
+                        </div>
+                        <div class="preview-wrapper">
+                            <canvas id="liveCanvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Side: Controls -->
+            <section class="controls-wrapper card hoverable">
+                <div class="tabs">
+                    <button class="tab-btn active" data-target="tab-details"><i class="fa-solid fa-user-pen"></i> Details</button>
+                    <button class="tab-btn" data-target="tab-styling"><i class="fa-solid fa-paintbrush"></i> Styling</button>
+                    <button class="tab-btn" data-target="tab-export"><i class="fa-solid fa-download"></i> Output</button>
+                </div>
+
+                <!-- Tab: Details -->
+                <div id="tab-details" class="tab-content active">
+                    <div class="form-group">
+                        <label>Quick Presets</label>
+                        <div class="badge-grid" style="grid-template-columns: 1fr 1fr;">
+                            <div class="format-badge active" data-preset="custom"><i class="fa-solid fa-sliders"></i> Custom</div>
+                            <div class="format-badge" data-preset="ssc"><i class="fa-solid fa-stamp"></i> SSC / Govt</div>
+                            <div class="format-badge" data-preset="upsc"><i class="fa-solid fa-graduation-cap"></i> UPSC Format</div>
+                            <div class="format-badge" data-preset="dob"><i class="fa-solid fa-cake-candles"></i> Name + DOB</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 1.5rem;">
+                        <label>
+                            <span>Candidate Name</span>
+                            <span class="label-action" id="uppercaseToggleBtn">To UPPERCASE</span>
+                        </label>
+                        <input type="text" id="nameInput" placeholder="e.g., ADITYA SHARMA">
+                    </div>
+
+                    <div class="input-group" style="margin-top: 1rem;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Date Type</label>
+                            <select id="dateTypeSelect">
+                                <option value="DOP">Photo Date (DOP)</option>
+                                <option value="DOB">Birth Date (DOB)</option>
+                                <option value="CUSTOM">Custom Label</option>
+                                <option value="NONE">No Label</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>
+                                <span>Select Date</span>
+                                <span class="label-action" id="setTodayDateBtn" style="color: var(--success); border-color: var(--success);">Set Today</span>
+                            </label>
+                            <input type="date" id="dateInput">
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="customLabelGroup" style="display: none;">
+                        <label>Custom Prefix</label>
+                        <input type="text" id="customLabelInput" placeholder="e.g. TAKEN ON">
+                    </div>
+
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Text Order Preference</label>
+                        <div class="badge-grid" style="grid-template-columns: 1fr 1fr;" id="orderSegment">
+                            <div class="format-badge active" data-order="name_first">Name First</div>
+                            <div class="format-badge" data-order="date_first">Date First</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Styling -->
+                <div id="tab-styling" class="tab-content">
+                    <div class="form-group">
+                        <label>Font Size: <span id="valFontSize" style="color: var(--primary);">26px</span></label>
+                        <input type="range" id="fontSizeSlider" min="14" max="64" value="26">
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Strip Height Padding: <span id="valPadding" style="color: var(--primary);">12px</span></label>
+                        <input type="range" id="paddingSlider" min="4" max="40" value="12">
+                    </div>
+
+                    <div class="input-group" style="margin-top: 1rem;">
+                        <div class="form-group" style="flex:1;">
+                            <label>Text Color</label>
+                            <div class="color-picker-modern">
+                                <div class="color-wheel-wrapper"><input type="color" id="textColorPicker" value="#000000"></div>
+                                <div class="color-hex-text" id="textColorHex">#000000</div>
+                            </div>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Strip BG</label>
+                            <div class="color-picker-modern">
+                                <div class="color-wheel-wrapper"><input type="color" id="bgColorPicker" value="#ffffff"></div>
+                                <div class="color-hex-text" id="bgColorHex">#FFFFFF</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Text Alignment</label>
+                        <div class="badge-grid" style="grid-template-columns: repeat(3, 1fr);" id="alignSegment">
+                            <div class="format-badge" data-align="left"><i class="fa-solid fa-align-left"></i></div>
+                            <div class="format-badge active" data-align="center"><i class="fa-solid fa-align-center"></i></div>
+                            <div class="format-badge" data-align="right"><i class="fa-solid fa-align-right"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 1.5rem; background: var(--bg-input); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+                        <label style="margin-bottom: 0;">
+                            <span>Add Separation Border Line</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="separatorToggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Tab: Export -->
+                <div id="tab-export" class="tab-content">
+                    <div class="form-group">
+                        <label>Output Format</label>
+                        <div class="badge-grid" id="formatSelector" style="grid-template-columns: 1fr 1fr;">
+                            <div class="format-badge active" data-format="image/jpeg">JPEG (.jpg)</div>
+                            <div class="format-badge" data-format="image/png">PNG (.png)</div>
+                            <div class="format-badge" data-format="image/webp">WEBP (.webp)</div>
+                            <div class="format-badge" data-format="application/pdf"><i class="fa-solid fa-file-pdf"></i> PDF Document</div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 1.5rem;">
+                        <label>Render Quality: <span id="valQual">95%</span></label>
+                        <input type="range" id="qualSlider" min="50" max="100" value="95">
+                        <small style="color: var(--text-muted); font-size: 0.8rem; display:block; margin-top: 4px;">Keep high for official applications.</small>
+                    </div>
+                </div>
+
+                <div style="margin-top: auto; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                    <button id="processBtn" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1.1rem;" disabled>
+                        <i class="fa-solid fa-layer-group"></i> Generate Document
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Result Section -->
+        <section id="result-section">
+            <div class="card hoverable">
+                <h2 style="text-align: center; margin-bottom: 2rem; font-weight: 800;">Final Official Document</h2>
+                <div class="result-box" style="border-color: var(--primary); background: rgba(59,130,246,0.03);">
+                    <img id="resProcessed" alt="Merged Result Image">
+                    <div style="margin-top: 10px;">
+                        <div class="stat-pill" id="dimProcessed">--</div>
+                        <div class="stat-pill" id="statProcessed" style="background:var(--bg-input); color:var(--text-main); border-color:var(--border);">--</div>
+                    </div>
+                </div>
+                
+                <div class="action-bar">
+                    <button class="btn btn-primary" id="downloadBtn" style="flex:1; min-width: 200px;">
+                        <i class="fa-solid fa-download"></i> Download File
+                    </button>
+                    <button class="btn btn-secondary" id="copyBtn" style="flex:1; min-width: 200px;">
+                        <i class="fa-solid fa-copy"></i> Copy to Clipboard
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4 Features Grid -->
+        <div class="features-grid">
+            <div class="card feature-card hoverable">
+                <i class="fa-solid fa-bolt-lightning text-primary" style="color: var(--primary);"></i>
+                <h3>Ultra Fast</h3>
+                <p>Instant browser-side processing without uploading files to slow third-party servers.</p>
+            </div>
+            <div class="card feature-card hoverable">
+                <i class="fa-solid fa-shield-halved text-primary" style="color: var(--warning);"></i>
+                <h3>100% Secure</h3>
+                <p>Your photos never leave your device. All rendering is completed locally.</p>
+            </div>
+            <div class="card feature-card hoverable">
+                <i class="fa-solid fa-maximize text-primary" style="color: var(--success);"></i>
+                <h3>High Resolution</h3>
+                <p>Maintains crisp sharpness for clear printing and online portal verification.</p>
+            </div>
+            <div class="card feature-card hoverable">
+                <i class="fa-solid fa-file-pdf text-primary" style="color: var(--secondary);"></i>
+                <h3>PDF Ready</h3>
+                <p>Export directly as a single-page PDF document formatted for standard printing.</p>
+            </div>
+        </div>
+
+        <!-- SEO Friendly Card Section -->
+        <div class="seo-text-section">
+            <h2>Why Use an Online ID Photo Stamper?</h2>
+            <p>For almost all competitive exams like SSC, UPSC, Railway, and State PSCs, the official recruitment boards mandate candidates to upload recent passport size photographs with their Name and Date of Photo clearly printed at the bottom. Doing this manually in complex photo editing software can ruin the image dimensions, aspect ratio, or resolution.</p>
+            
+            <h3>Guidelines for Perfect Stamping</h3>
+            <ul>
+                <li><strong>Format & Background:</strong> Always use a clear photograph with a light or white background. The text strip should have a high contrast—white background with black text is the universally accepted standard.</li>
+                <li><strong>Maintain Proportions:</strong> Do not stretch your image. Our tool automatically attaches a clean strip at the bottom of your photo, preserving your face's true aspect ratio and resolution.</li>
+                <li><strong>Accurate Details:</strong> Ensure there are no typos in your Candidate Name. Use the "Set Today" quick button to instantly apply the current date to avoid date format errors.</li>
+                <li><strong>100% Client-Side Privacy:</strong> ID photographs are sensitive personal data. Unlike traditional online editors, we process all pixel data locally via HTML5 Canvas. Your images are never uploaded to the cloud, ensuring absolute privacy.</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>
+                    <a href="index.html" style="text-decoration: none; color: var(--text-main);">
+                        <i class="fa-solid fa-layer-group" style="color:var(--primary)"></i> PDFly Tools
+                    </a>
+                </h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Your ultimate suite for free, secure, and blazing-fast web utilities. Designed with modern fluid UI tech.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Top Tools</h4>
+                <ul class="footer-links">
+                    <li><a href="resize-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Resize Image</a></li>
+                    <li><a href="compress-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Compress Image</a></li>
+                    <li><a href="merge-photo-signature.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Photo & Signature</a></li>
+                    <li><a href="watermark-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Image Watermark</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal & Info</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="openModal('privacyModal', event)"><i class="fa-solid fa-shield"></i> Privacy Policy</a></li>
+                    <li><a href="#" onclick="openModal('termsModal', event)"><i class="fa-solid fa-file-contract"></i> Terms of Service</a></li>
+                    <li><a href="#" onclick="openModal('contactModal', event)"><i class="fa-solid fa-headset"></i> Contact Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="dev-badge" id="devBadge">
+                <i class="fa-solid fa-code"></i> Developed by GT Rao
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">&copy; 2026 PDFly Tools. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modals (Privacy, Terms, Contact) -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('privacyModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-shield" style="color: var(--primary);"></i> Privacy Policy</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.6;">Your privacy is strictly protected. <strong>Photo ID Stamper</strong> operates 100% within your web browser utilizing client-side processing.</p>
+            <ul style="color: var(--text-muted); font-size: 0.95rem; padding-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                <li>No images or data are ever transmitted to our servers.</li>
+                <li>We do not track, store, or log your personal data.</li>
+                <li>Processing happens utilizing your device's memory safely.</li>
+            </ul>
+            <button class="btn btn-primary" style="width:100%" onclick="closeModal('privacyModal')">Acknowledge</button>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('termsModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-file-contract" style="color: var(--primary);"></i> Terms of Service</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">By using PDFly Tools, you agree to use our utilities provided "as is". Users are responsible for confirming compliance of their generated photographs with the official notification guidelines of recruitment boards.</p>
+            <button class="btn btn-primary" style="width:100%" onclick="closeModal('termsModal')">I Agree</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('contactModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> Get in Touch</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">Have suggestions or found a bug? We'd love to hear from you. Reach out to us directly:</p>
+            <div style="background: var(--bg-input); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <p style="color: var(--text-main); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope" style="color: var(--primary);"></i> 
+                    <a href="mailto:pdflytools@gmail.com" style="text-decoration: none; color: inherit;">pdflytools@gmail.com</a>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> Azamgarh, Uttar Pradesh, India
+                </p>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="closeModal('contactModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- Cropper Modal -->
+    <div class="modal-overlay" id="cropModalOverlay">
+        <div class="modal-content" id="cropContainer" style="max-width: 700px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 style="color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-crop-simple" style="color: var(--primary);"></i> Adjust Photo</h2>
+                <button class="modal-close" style="position: static;" id="closeCropTopBtn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="cropper-area">
+                <img id="cropperImageSource" alt="To Crop">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 1rem;">
+                <button class="btn btn-secondary" id="cancelCropBtn">Cancel</button>
+                <button class="btn btn-primary" id="applyCropBtn"><i class="fa-solid fa-check"></i> Apply Crop</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exact GT Rao Developer Profile Modal (Password Removed) -->
+    <div class="modal-overlay" id="devProfileModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('devProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="dev-profile">
+                <div class="dev-avatar">
+                    <img src="dev-profile.png" alt="GT Rao - Developer" class="profile-pic" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GT+Rao&background=3b82f6&color=fff&size=128&font-size=0.33&bold=true';">
+                </div>
+                <h2 style="font-size: 2.2rem; margin-bottom: 0.2rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">GT Rao</h2>
+                <p style="color: var(--text-main); font-weight: 600; font-size: 1rem; margin-top: 0.2rem;">Student & Web Developer</p>
+                <p style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Azamgarh, Uttar Pradesh, India</p>
+                
+                <div class="dev-tags">
+                    <span class="dev-tag"><i class="fa-brands fa-html5"></i> Web Dev</span>
+                    <span class="dev-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
+                    <span class="dev-tag"><i class="fa-solid fa-wand-magic"></i> UI/UX Design</span>
+                    <span class="dev-tag"><i class="fa-solid fa-layer-group"></i> Web Apps</span>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center; padding: 1.25rem; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">
+                        Passionate Web Developer dedicated to crafting lightning-fast, secure, and user-centric web applications. As the creator of <strong>PDFly Tools</strong>, I focus on writing clean code, building responsive interfaces, and ensuring client-side security to deliver premium, highly functional digital experiences that are accessible to everyone.
+                    </p>
+                </div>
+                
+                <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                     <a href="mailto:pdflytools@gmail.com" class="dev-social" title="Email Contact" target="_blank"><i class="fa-solid fa-envelope"></i></a>
+                     <a href="https://instagram.com/mr_gt_rao" class="dev-social" title="Personal Instagram" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                     <a href="https://instagram.com/educate_path" class="dev-social" title="Business / PDFly Tools" target="_blank"><i class="fa-solid fa-briefcase"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Utilities -->
+    <div id="toast-container"></div>
+    <button id="backToTopBtn" title="Go to top"><i class="fa-solid fa-arrow-up"></i></button>
+    <div class="loader-overlay" id="loadingOverlay"><div class="spinner"></div><p style="font-weight: 800; font-size: 1.2rem; color: var(--primary);">Rendering Document...</p></div>
+
+    <script>
+        // === Core State Management ===
+        const state = {
+            imageLoaded: false,
+            rawImageSrc: null,
+            croppedImageObj: new Image(),
+            cropperInstance: null,
+            isNameFirst: true,
+            order: 'name_first',
+            alignment: 'center',
+            aspectPreset: 'custom',
+            format: 'image/jpeg',
+            quality: 95
+        };
+        let finalDataUrl = null;
+
+        // === DOM Elements ===
+        const els = {
+            html: document.documentElement,
+            themeToggle: document.getElementById('themeToggle'),
+            scrollProg: document.getElementById('scroll-progress'),
+            btt: document.getElementById('backToTopBtn'),
+            
+            uploadSec: document.getElementById('upload-section'),
+            fileIn: document.getElementById('fileInput'),
+            previewSec: document.getElementById('preview-section'),
+            liveCanvas: document.getElementById('liveCanvas'),
+            ctx: document.getElementById('liveCanvas').getContext('2d'),
+            recropBtn: document.getElementById('recropBtn'),
+            resetAllBtn: document.getElementById('resetAllBtn'),
+            
+            tabBtns: document.querySelectorAll('.tab-btn'),
+            tabContents: document.querySelectorAll('.tab-content'),
+            
+            // Details Tab
+            presetBadges: document.querySelectorAll('.format-badge[data-preset]'),
+            nameInput: document.getElementById('nameInput'),
+            uppercaseBtn: document.getElementById('uppercaseToggleBtn'),
+            dateTypeSelect: document.getElementById('dateTypeSelect'),
+            dateInput: document.getElementById('dateInput'),
+            setTodayBtn: document.getElementById('setTodayDateBtn'),
+            customLabelGroup: document.getElementById('customLabelGroup'),
+            customLabelInput: document.getElementById('customLabelInput'),
+            orderSegment: document.querySelectorAll('.format-badge[data-order]'),
+            
+            // Styling Tab
+            fontSizeSlider: document.getElementById('fontSizeSlider'),
+            valFontSize: document.getElementById('valFontSize'),
+            paddingSlider: document.getElementById('paddingSlider'),
+            valPadding: document.getElementById('valPadding'),
+            textColorPicker: document.getElementById('textColorPicker'),
+            textColorHex: document.getElementById('textColorHex'),
+            bgColorPicker: document.getElementById('bgColorPicker'),
+            bgColorHex: document.getElementById('bgColorHex'),
+            alignSegment: document.querySelectorAll('.format-badge[data-align]'),
+            separatorToggle: document.getElementById('separatorToggle'),
+            
+            // Export Tab
+            formatSelector: document.querySelectorAll('.format-badge[data-format]'),
+            qualSlider: document.getElementById('qualSlider'),
+            valQual: document.getElementById('valQual'),
+            
+            processBtn: document.getElementById('processBtn'),
+            
+            // Results
+            resSec: document.getElementById('result-section'),
+            resProc: document.getElementById('resProcessed'),
+            dimProc: document.getElementById('dimProcessed'),
+            statProc: document.getElementById('statProcessed'),
+            dlBtn: document.getElementById('downloadBtn'),
+            copyBtn: document.getElementById('copyBtn'),
+            
+            loader: document.getElementById('loadingOverlay'),
+            
+            cropModal: document.getElementById('cropModalOverlay'),
+            cropTarget: document.getElementById('cropperImageSource'),
+            closeCropTopBtn: document.getElementById('closeCropTopBtn'),
+            cancelCropBtn: document.getElementById('cancelCropBtn'),
+            saveCropBtn: document.getElementById('applyCropBtn')
+        };
+
+        // === Theme & Smart Tools System (GT Rao Standard) ===
+        const initTheme = () => {
+            const saved = localStorage.getItem('pdfly-theme') || 'dark';
+            els.html.setAttribute('data-theme', saved);
+            els.themeToggle.innerHTML = saved === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+        };
+        els.themeToggle.addEventListener('click', () => {
+            const next = els.html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            els.html.setAttribute('data-theme', next); localStorage.setItem('pdfly-theme', next);
+            els.themeToggle.innerHTML = next === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+            showToast(`${next.charAt(0).toUpperCase() + next.slice(1)} HD UI Activated`, 'success');
+        });
+        initTheme();
+
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            els.scrollProg.style.width = (winScroll / height) * 100 + "%";
+            if (winScroll > 300) els.btt.classList.add('visible'); else els.btt.classList.remove('visible');
+        });
+        els.btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        const showToast = (msg, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div'); toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-circle-xmark' : 'fa-info-circle';
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${msg}</span>`;
+            container.appendChild(toast); setTimeout(() => { if(container.contains(toast)) toast.remove(); }, 3500);
+        };
+
+        // === Modals System (Password Removed) ===
+        window.openModal = (id, e) => { if(e) e.preventDefault(); document.getElementById(id).classList.add('active'); };
+        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+        
+        document.getElementById('devBadge').addEventListener('click', () => { 
+            openModal('devProfileModal'); 
+        });
+
+        // Tabs Logic
+        els.tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                els.tabBtns.forEach(b => b.classList.remove('active')); els.tabContents.forEach(c => c.classList.remove('active'));
+                btn.classList.add('active'); document.getElementById(btn.dataset.target).classList.add('active');
+            });
+        });
+
+        // Date Utilities
+        function formatToIndianDate(val) {
+            if (!val) return '';
+            const [year, month, day] = val.split('-');
+            if (year && month && day) return `${day}-${month}-${year}`;
+            return val;
+        }
+
+        function setTodayDate() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            els.dateInput.value = `${yyyy}-${mm}-${dd}`;
+        }
+
+        // === File Handling & Cropper ===
+        els.fileIn.addEventListener('change', (e) => { if (e.target.files[0]) handleSelectedFile(e.target.files[0]); });
+        els.uploadSec.addEventListener('dragover', (e) => { e.preventDefault(); els.uploadSec.style.borderColor = 'var(--secondary)'; els.uploadSec.style.background = 'rgba(139, 92, 246, 0.05)'; });
+        els.uploadSec.addEventListener('dragleave', (e) => { e.preventDefault(); els.uploadSec.style.borderColor = 'var(--primary)'; els.uploadSec.style.background = 'rgba(59, 130, 246, 0.03)'; });
+        els.uploadSec.addEventListener('drop', (e) => { 
+            e.preventDefault(); els.uploadSec.style.borderColor = 'var(--primary)'; els.uploadSec.style.background = 'rgba(59, 130, 246, 0.03)'; 
+            if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); 
+        });
+
+        function handleSelectedFile(file) {
+            if (!file.type.startsWith('image/')) return showToast('Please upload a valid image file.', 'error');
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                state.rawImageSrc = event.target.result;
+                openCropModal(state.rawImageSrc);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function openCropModal(src) {
+            els.cropTarget.src = src;
+            els.cropModal.classList.add('active');
+            setTimeout(() => {
+                if (state.cropperInstance) state.cropperInstance.destroy();
+                state.cropperInstance = new Cropper(els.cropTarget, { viewMode: 1, autoCropArea: 0.9, background: false, responsive: true });
+            }, 50);
+        }
+
+        function closeCrop() {
+            els.cropModal.classList.remove('active');
+            if (state.cropperInstance) { state.cropperInstance.destroy(); state.cropperInstance = null; }
+        }
+
+        els.closeCropTopBtn.addEventListener('click', closeCrop);
+        els.cancelCropBtn.addEventListener('click', closeCrop);
+
+        els.saveCropBtn.addEventListener('click', () => {
+            if (!state.cropperInstance) return;
+            const canvas = state.cropperInstance.getCroppedCanvas({ imageSmoothingEnabled: true, imageSmoothingQuality: 'high' });
+            if (canvas) {
+                state.croppedImageObj.src = canvas.toDataURL();
+                state.croppedImageObj.onload = () => {
+                    state.imageLoaded = true;
+                    els.uploadSec.style.display = 'none';
+                    els.previewSec.style.display = 'block';
+                    els.processBtn.disabled = false;
+                    closeCrop();
+                    renderStamper();
+                    showToast('Photo ready for stamping!', 'success');
+                };
+            }
+        });
+
+        els.recropBtn.addEventListener('click', () => { if (state.rawImageSrc) openCropModal(state.rawImageSrc); });
+
+        els.resetAllBtn.addEventListener('click', () => {
+            state.imageLoaded = false; state.rawImageSrc = null; els.fileIn.value = '';
+            els.uploadSec.style.display = 'flex'; els.previewSec.style.display = 'none';
+            els.resSec.style.display = 'none'; els.processBtn.disabled = true;
+            showToast('Workspace Cleared', 'success');
+        });
+
+        // === Event Listeners for Controls ===
+        els.uppercaseBtn.addEventListener('click', () => { els.nameInput.value = els.nameInput.value.toUpperCase(); renderStamper(); });
+        els.setTodayBtn.addEventListener('click', () => { setTodayDate(); renderStamper(); showToast('Set date to today', 'normal'); });
+
+        els.presetBadges.forEach(btn => btn.addEventListener('click', () => {
+            els.presetBadges.forEach(b => b.classList.remove('active')); btn.classList.add('active');
+            const preset = btn.dataset.preset;
+            state.aspectPreset = preset;
+            if (preset === 'ssc' || preset === 'upsc') {
+                els.dateTypeSelect.value = 'DOP'; els.customLabelGroup.style.display = 'none'; setTodayDate();
+                els.fontSizeSlider.value = preset === 'ssc' ? 26 : 28;
+                els.paddingSlider.value = preset === 'ssc' ? 12 : 14;
+            } else if (preset === 'dob') {
+                els.dateTypeSelect.value = 'DOB'; els.customLabelGroup.style.display = 'none';
+            }
+            updateReadouts(); renderStamper();
+        }));
+
+        els.dateTypeSelect.addEventListener('change', () => {
+            els.customLabelGroup.style.display = els.dateTypeSelect.value === 'CUSTOM' ? 'block' : 'none';
+            renderStamper();
+        });
+
+        els.orderSegment.forEach(btn => btn.addEventListener('click', () => {
+            els.orderSegment.forEach(b => b.classList.remove('active')); btn.classList.add('active');
+            state.order = btn.dataset.order; state.isNameFirst = state.order === 'name_first'; renderStamper();
+        }));
+
+        els.alignSegment.forEach(btn => btn.addEventListener('click', () => {
+            els.alignSegment.forEach(b => b.classList.remove('active')); btn.classList.add('active');
+            state.alignment = btn.dataset.align; renderStamper();
+        }));
+
+        els.formatSelector.forEach(b => b.addEventListener('click', () => {
+            els.formatSelector.forEach(x => x.classList.remove('active')); b.classList.add('active');
+            state.format = b.dataset.format;
+        }));
+
+        function updateReadouts() {
+            els.valFontSize.textContent = els.fontSizeSlider.value + 'px';
+            els.valPadding.textContent = els.paddingSlider.value + 'px';
+            els.valQual.textContent = els.qualSlider.value + '%';
+            els.textColorHex.textContent = els.textColorPicker.value.toUpperCase();
+            els.bgColorHex.textContent = els.bgColorPicker.value.toUpperCase();
+        }
+
+        [els.nameInput, els.dateInput, els.customLabelInput, els.fontSizeSlider, els.paddingSlider, els.textColorPicker, els.bgColorPicker, els.separatorToggle, els.qualSlider].forEach(el => {
+            el.addEventListener('input', () => { updateReadouts(); renderStamper(); });
+        });
+
+        // === Core Rendering Engine ===
+        function renderStamper() {
+            if (!state.imageLoaded || !state.croppedImageObj.naturalWidth) return;
+
+            const img = state.croppedImageObj;
+            const imgWidth = img.naturalWidth;
+            const imgHeight = img.naturalHeight;
+
+            const rawName = els.nameInput.value.trim();
+            const rawDate = els.dateInput.value;
+            const formattedDate = formatToIndianDate(rawDate);
+            const dateType = els.dateTypeSelect.value;
+
+            let dateString = '';
+            if (formattedDate) {
+                if (dateType === 'DOP') dateString = `DOP: ${formattedDate}`;
+                else if (dateType === 'DOB') dateString = `DOB: ${formattedDate}`;
+                else if (dateType === 'CUSTOM') {
+                    const customPrefix = els.customLabelInput.value.trim() || 'DATE';
+                    dateString = `${customPrefix}: ${formattedDate}`;
+                } else dateString = formattedDate;
+            }
+
+            const lineA = state.isNameFirst ? rawName : dateString;
+            const lineB = state.isNameFirst ? dateString : rawName;
+            const activeLines = [lineA, lineB].filter(l => l && l.length > 0);
+
+            const fontSize = parseInt(els.fontSizeSlider.value, 10);
+            const padding = parseInt(els.paddingSlider.value, 10);
+            const fontColor = els.textColorPicker.value;
+            const bgColor = els.bgColorPicker.value;
+            const drawSeparator = els.separatorToggle.checked;
+
+            const lineHeight = fontSize * 1.35;
+            const textStripHeight = activeLines.length > 0 ? (activeLines.length * lineHeight) + (padding * 2) : 0;
+
+            els.liveCanvas.width = imgWidth;
+            els.liveCanvas.height = imgHeight + textStripHeight;
+            
+            els.ctx.imageSmoothingEnabled = true;
+            els.ctx.imageSmoothingQuality = 'high';
+
+            els.ctx.clearRect(0, 0, els.liveCanvas.width, els.liveCanvas.height);
+            els.ctx.drawImage(img, 0, 0, imgWidth, imgHeight);
+
+            if (activeLines.length > 0) {
+                els.ctx.fillStyle = bgColor;
+                els.ctx.fillRect(0, imgHeight, imgWidth, textStripHeight);
+
+                if (drawSeparator) {
+                    els.ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+                    els.ctx.lineWidth = Math.max(1, Math.floor(imgWidth / 400));
+                    els.ctx.beginPath();
+                    els.ctx.moveTo(0, imgHeight);
+                    els.ctx.lineTo(imgWidth, imgHeight);
+                    els.ctx.stroke();
+                }
+
+                els.ctx.fillStyle = fontColor;
+                els.ctx.textAlign = state.alignment;
+                els.ctx.textBaseline = 'middle';
+                els.ctx.font = `700 ${fontSize}px 'Plus Jakarta Sans', sans-serif`;
+
+                let textX = imgWidth / 2;
+                if (state.alignment === 'left') textX = padding + 10;
+                if (state.alignment === 'right') textX = imgWidth - padding - 10;
+
+                activeLines.forEach((lineText, index) => {
+                    const lineY = imgHeight + padding + (lineHeight * index) + (lineHeight / 2);
+                    els.ctx.fillText(lineText, textX, lineY);
+                });
+            }
+        }
+
+        const formatBytesSize = (bytes) => {
+            if (!+bytes) return '0 KB';
+            return `${(bytes / 1024).toFixed(1)} KB`;
+        };
+
+        // === Final Export Generation ===
+        els.processBtn.addEventListener('click', () => {
+            els.loader.classList.add('active');
+            els.processBtn.disabled = true;
+            
+            setTimeout(() => {
+                try {
+                    const mime = state.format;
+                    const q = state.format === 'image/png' || state.format === 'application/pdf' ? undefined : parseInt(els.qualSlider.value) / 100;
+                    
+                    if(mime === 'application/pdf') {
+                        finalDataUrl = els.liveCanvas.toDataURL('image/jpeg', 1.0);
+                        els.dimProc.innerText = `${els.liveCanvas.width} × ${els.liveCanvas.height} px`;
+                        els.statProc.innerText = `PDF Format`;
+                    } else {
+                        els.liveCanvas.toBlob((blob) => {
+                            finalDataUrl = URL.createObjectURL(blob);
+                            els.dimProc.innerText = `${els.liveCanvas.width} × ${els.liveCanvas.height} px`;
+                            els.statProc.innerText = `${formatBytesSize(blob.size)} • ${state.format.split('/')[1].toUpperCase()}`;
+                        }, mime, q);
+                    }
+                    
+                    els.resProc.src = els.liveCanvas.toDataURL('image/jpeg', 0.8); // Display purposes only
+                    els.resSec.style.display = 'block';
+                    els.resSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    
+                    showToast('Document Rendered Successfully!', 'success');
+                } catch(err) {
+                    console.error(err);
+                    showToast('Error generating final file.', 'error');
+                } finally {
+                    els.loader.classList.remove('active');
+                    els.processBtn.disabled = false;
+                }
+            }, 200); 
+        });
+
+        // Actions
+        els.dlBtn.addEventListener('click', () => {
+            if(!finalDataUrl) return;
+            const candidateName = (els.nameInput.value.trim() || 'Exam_Photo').replace(/[^a-z0-9]/gi, '_');
+            const filename = `${candidateName}_Stamped_PDFly`;
+
+            if (state.format === 'application/pdf') {
+                if (!window.jspdf || !window.jspdf.jsPDF) return showToast('PDF Engine is loading. Please try again.', 'error');
+                const { jsPDF } = window.jspdf;
+                const orientation = els.liveCanvas.width > els.liveCanvas.height ? 'l' : 'p';
+                const pdf = new jsPDF({ orientation: orientation, unit: 'px', format: [els.liveCanvas.width, els.liveCanvas.height] });
+                pdf.addImage(finalDataUrl, 'JPEG', 0, 0, els.liveCanvas.width, els.liveCanvas.height);
+                pdf.save(`${filename}.pdf`);
+                showToast('PDF Downloaded!', 'success');
+            } else {
+                const ext = state.format === 'image/jpeg' ? 'jpg' : state.format.split('/')[1];
+                const link = document.createElement('a'); 
+                link.href = finalDataUrl;
+                link.download = `${filename}.${ext}`;
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                showToast('Download Started', 'success');
+            }
+        });
+
+        els.copyBtn.addEventListener('click', async () => {
+            if(!finalDataUrl || state.format === 'application/pdf') return showToast('Copy feature requires Image formats (PNG/JPG).', 'error');
+            if(!navigator.clipboard || !window.isSecureContext) return showToast('Clipboard API requires secure HTTPS context.', 'error');
+            try {
+                const img = await createImageBitmap(els.liveCanvas);
+                const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+                c.getContext('2d').drawImage(img, 0, 0);
+                const blobToCopy = await new Promise(r => c.toBlob(r, 'image/png'));
+                
+                await navigator.clipboard.write([new ClipboardItem({ 'image/png': blobToCopy })]);
+                showToast('Image copied to clipboard!');
+            } catch(e) { console.error(e); showToast('Copy failed. Your browser may restrict this.', 'error'); }
+        });
+
+    </script>
+</body>
+</html>

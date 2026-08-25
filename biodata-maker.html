@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro BioData Maker - PDFly Tools</title>
+    <meta name="description" content="Create professional matrimonial or job biodata instantly with premium themes. Export as PDF, JPG, or PNG. 100% Free and Private.">
+    
+    <!-- Plus Jakarta Sans Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Cropper.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+    
+    <style>
+        /* === UI/UX Variables (GT Rao Standard) === */
+        :root {
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --radius-card: 16px;
+            --radius-pill: 9999px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Light Theme */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.75);
+            --bg-input: #f1f5f9;
+            --bg-hover: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.25);
+            
+            /* Status Colors */
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #020617;
+            --bg-card: #0f172a;
+            --bg-glass: rgba(2, 6, 23, 0.75);
+            --bg-input: #1e293b;
+            --bg-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 10px 25px rgba(59, 130, 246, 0.35);
+        }
+
+        /* === Base Styles === */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+        html, body { overflow-x: hidden; background-color: var(--bg-body); color: var(--text-main); transition: background-color 0.3s ease, color 0.3s ease; }
+
+        /* === Smart Tools === */
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--gradient); width: 0%; z-index: 9999; transition: width 0.1s ease; }
+
+        /* === Glassmorphism Navbar === */
+        .navbar {
+            position: sticky; top: 15px; z-index: 1000; max-width: 1300px; margin: 0 auto 2rem; width: 95%;
+            background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm);
+        }
+        .nav-brand { font-size: clamp(1.2rem, 3vw, 1.5rem); font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 10px; text-decoration: none;}
+        .nav-brand i { color: var(--primary); -webkit-text-fill-color: initial; }
+        .theme-toggle { background: var(--bg-input); border: none; outline: none; color: var(--text-main); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); font-size: 1.2rem; }
+        .theme-toggle:hover { background: var(--bg-hover); transform: scale(1.1) rotate(15deg); color: var(--primary); }
+
+        /* === Layout === */
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem; width: 100%; }
+        
+        /* Fixed Header */
+        .header { text-align: center; margin-bottom: 3rem; padding: 2rem 0 1rem; }
+        .header .badge-pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 100px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--primary); font-size: 0.85rem; font-weight: 700; margin-bottom: 12px; }
+        .header h1 { font-size: clamp(2rem, 6vw, 4rem); font-weight: 800; margin-bottom: 1rem; line-height: 1.2; letter-spacing: -0.5px; }
+        .header h1 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.2rem); max-width: 600px; margin: 0 auto; }
+
+        /* === Tool Grid Interface (Left: Forms, Right: Sticky Preview) === */
+        .tool-grid { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem); align-items: start; }
+        @media (min-width: 1024px) { .tool-grid { grid-template-columns: 1fr 500px; } }
+
+        /* === Cards & Accordeons === */
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); transition: var(--transition); margin-bottom: 1.5rem; overflow: hidden; }
+        .card-header { background: var(--bg-input); padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; border-bottom: 1px solid var(--border); color: var(--text-main); cursor: pointer; user-select: none; }
+        .card-header i { color: var(--primary); font-size: 1.2rem; }
+        .card-body { padding: 1.5rem; }
+
+        /* === Form Elements === */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+        
+        .form-group { margin-bottom: 1rem; position: relative; }
+        .form-group label { display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem; }
+        .optional-text { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; margin-left: 5px; }
+        
+        input[type="text"], input[type="number"], input[type="email"], input[type="tel"], input[type="url"], input[type="date"], input[type="time"], select, textarea {
+            width: 100%; padding: 0.8rem 1rem; font-family: inherit; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 12px; font-size: 0.95rem; transition: var(--transition); font-weight: 500; outline: none;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: var(--bg-card); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
+        textarea { resize: vertical; min-height: 80px; }
+
+        .input-group { display: flex; align-items: center; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: var(--transition); }
+        .input-group:focus-within { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); background: var(--bg-card); }
+        .input-group input { border: none; box-shadow: none; border-radius: 0; background: transparent; }
+        .input-group-text { padding: 0 1rem; color: var(--text-muted); font-weight: 700; background: rgba(0,0,0,0.05); height: 100%; display: flex; align-items: center; border-left: 1px solid var(--border); }
+
+        .required-marker { color: var(--danger); margin-left: 3px; font-weight: bold; }
+        .invalid-feedback { display: none; color: var(--danger); font-size: 0.8rem; margin-top: 5px; font-weight: 600; }
+        .is-invalid { border-color: var(--danger) !important; }
+        .is-invalid ~ .invalid-feedback { display: block; }
+
+        /* Custom Fields Area */
+        .custom-field-display { background: var(--bg-input); padding: 10px 15px; margin-bottom: 10px; border-radius: 10px; border: 1px solid var(--border); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; transition: var(--transition); }
+        .custom-field-display:hover { border-color: var(--primary); }
+        .field-info { flex-grow: 1; word-break: break-word; }
+        .field-title { font-weight: 800; color: var(--text-main); margin-right: 5px; }
+        .field-value { color: var(--text-muted); }
+        .field-actions { display: flex; gap: 5px; flex-shrink: 0; }
+        
+        .add-custom-btn { background: rgba(59, 130, 246, 0.1); color: var(--primary); border: 1px dashed rgba(59, 130, 246, 0.3); width: 100%; padding: 10px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: var(--transition); margin-top: 10px; }
+        .add-custom-btn:hover { background: var(--primary); color: white; border-style: solid; }
+
+        /* Upload Area */
+        .upload-area { border: 2px dashed var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; background: var(--bg-input); cursor: pointer; transition: var(--transition); position: relative; overflow: hidden; margin-bottom: 1rem; }
+        .upload-area:hover { border-color: var(--primary); background: rgba(59, 130, 246, 0.05); }
+        .upload-area input { position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; }
+        .upload-area i { font-size: 2rem; color: var(--primary); margin-bottom: 10px; }
+        .upload-area p { font-size: 0.9rem; font-weight: 600; margin: 0; }
+        
+        #profilePicPreview { margin-top: 10px; text-align: center; }
+        #profilePicPreview img { max-width: 120px; height: 120px; object-fit: cover; border-radius: 12px; border: 2px solid var(--border); box-shadow: var(--shadow-sm); }
+        
+        #otherPhotosInputPreview { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+        #otherPhotosInputPreview img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+
+        /* Buttons */
+        .btn { padding: 0.8rem 1.5rem; border: none; font-family: inherit; font-weight: 700; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; transition: var(--transition); font-size: 1rem; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); }
+        .btn:active:not(:disabled) { transform: translateY(0); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-primary { background: var(--gradient); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover:not(:disabled) { box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5); }
+        .btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-secondary:hover:not(:disabled) { background: var(--bg-hover); color: var(--primary); border-color: var(--primary); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover:not(:disabled) { background: var(--danger); color: white; }
+        .btn-sm { padding: 6px 10px; font-size: 0.8rem; border-radius: 8px; }
+
+        /* === Right Side Sticky Preview Container === */
+        .preview-sticky-box { position: sticky; top: 96px; display: flex; flex-direction: column; max-height: calc(100vh - 120px); }
+        
+        .preview-controls { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 1rem; margin-bottom: 1rem; box-shadow: var(--shadow-sm); display: grid; gap: 10px; }
+        
+        /* Template Theme Swatches */
+        .theme-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+        .swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: var(--transition); box-shadow: var(--shadow-sm); }
+        .swatch:hover, .swatch.active { transform: scale(1.2); border-color: var(--primary); }
+
+        .export-actions { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+        
+        /* The Actual Document Preview Box */
+        .biodata-document-wrapper { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 1rem; overflow-y: auto; display: flex; justify-content: center; align-items: flex-start; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); }
+        .biodata-document-wrapper::-webkit-scrollbar { width: 6px; }
+        .biodata-document-wrapper::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        
+        .empty-preview-state { text-align: center; color: var(--text-muted); margin: auto; padding: 2rem; }
+        .empty-preview-state i { font-size: 3rem; margin-bottom: 1rem; color: var(--primary); opacity: 0.5; }
+        
+        /* Generated Document Styling (The PDF Template) */
+        #biodataPreview { 
+            width: 100%; max-width: 800px; background: #fff; color: #333; 
+            padding: 40px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            display: none; transform-origin: top center; transition: all 0.3s ease;
+        }
+        
+        .preview-header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid rgba(0,0,0,0.1); }
+        .preview-header h1 { font-size: 2.5rem; margin-bottom: 5px; font-weight: 800; font-family: 'Times New Roman', Times, serif; }
+        .preview-header h3 { font-size: 1.1rem; font-style: italic; opacity: 0.8; font-weight: 500; }
+        
+        #headerProfilePic { margin: 20px auto 10px auto; width: 150px; height: 150px; overflow: hidden; border: 4px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        #headerProfilePic img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .section-block { margin-bottom: 25px; padding: 20px; background: rgba(0,0,0,0.02); border-radius: 8px; border: 1px solid rgba(0,0,0,0.05); }
+        .section-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.1); text-transform: uppercase; letter-spacing: 1px; }
+        
+        .detail-row { display: flex; flex-wrap: wrap; gap: 10px; }
+        .detail-col { flex: 1 1 calc(50% - 10px); min-width: 250px; }
+        .detail-item { margin-bottom: 8px; font-size: 0.95rem; line-height: 1.5; display: flex; }
+        .detail-item strong { min-width: 130px; display: inline-block; opacity: 0.9; }
+        .detail-item span { flex: 1; word-break: break-word; }
+        
+        .contact-icon { width: 20px; text-align: center; margin-right: 5px; opacity: 0.7; }
+        
+        .other-photos-container { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 15px; }
+        .other-photos-container img { width: 180px; height: 240px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: 4px solid #fff; }
+
+        /* Template Themes Definition */
+        /* Light Themes */
+        .theme-white { --tpl-bg: #FFFFFF; --tpl-text: #333333; --tpl-accent: rgba(0,0,0,0.05); --tpl-border: rgba(0,0,0,0.1); }
+        .theme-cream { --tpl-bg: #fdfbf5; --tpl-text: #4a4036; --tpl-accent: rgba(139, 69, 19, 0.05); --tpl-border: rgba(139, 69, 19, 0.1); }
+        .theme-blue { --tpl-bg: #f0f7ff; --tpl-text: #1e3a5f; --tpl-accent: rgba(30, 58, 95, 0.05); --tpl-border: rgba(30, 58, 95, 0.1); }
+        .theme-pink { --tpl-bg: #fff0f5; --tpl-text: #4a154b; --tpl-accent: rgba(74, 21, 75, 0.05); --tpl-border: rgba(74, 21, 75, 0.1); }
+        /* Dark Themes */
+        .theme-navy { --tpl-bg: #0a192f; --tpl-text: #e6f1ff; --tpl-accent: rgba(255,255,255,0.05); --tpl-border: rgba(255,255,255,0.1); }
+        .theme-maroon { --tpl-bg: #2d0a0a; --tpl-text: #ffe6e6; --tpl-accent: rgba(255,255,255,0.05); --tpl-border: rgba(255,255,255,0.1); }
+        .theme-emerald { --tpl-bg: #022c22; --tpl-text: #ecfdf5; --tpl-accent: rgba(255,255,255,0.05); --tpl-border: rgba(255,255,255,0.1); }
+        .theme-slate { --tpl-bg: #0f172a; --tpl-text: #f8fafc; --tpl-accent: rgba(255,255,255,0.05); --tpl-border: rgba(255,255,255,0.1); }
+
+        #biodataPreview.themed { background: var(--tpl-bg); color: var(--tpl-text); }
+        #biodataPreview.themed .preview-header { border-color: var(--tpl-border); }
+        #biodataPreview.themed .section-block { background: var(--tpl-accent); border-color: var(--tpl-border); }
+        #biodataPreview.themed .section-title { border-color: var(--tpl-border); color: var(--tpl-text); }
+
+        /* === SEO Grid Section === */
+        .seo-container { margin-top: 50px; padding-top: 30px; border-top: 1px solid var(--border); }
+        .section-headline { text-align: center; margin-bottom: 28px; }
+        .section-headline h2 { font-size: clamp(1.4rem, 2.5vw, 2rem); font-weight: 800; margin-bottom: 6px;}
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        .feature-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        .feature-card:hover { transform: translateY(-6px); border-color: rgba(59, 130, 246, 0.4); box-shadow: var(--shadow-hover); }
+        .feature-icon-box { width: 44px; height: 44px; border-radius: 12px; background: rgba(59, 130, 246, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin-bottom: 16px; transition: all 0.3s; }
+        .feature-card:hover .feature-icon-box { background: var(--gradient); color: #fff; transform: scale(1.1); }
+        .feature-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
+        .feature-card p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; }
+
+        @media (max-width: 600px) {
+            .feature-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+            .feature-card { padding: 16px; align-items: center; text-align: center; }
+            .feature-card p { display: none; }
+            .feature-card h3 { font-size: 0.9rem; margin-bottom: 0; }
+            .feature-icon-box { margin-bottom: 8px; width: 38px; height: 38px; font-size: 1.1rem; }
+        }
+
+        /* === Modals === */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 1rem; }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 550px; border-radius: var(--radius-card); padding: clamp(1.5rem, 4vw, 2.5rem); border: 1px solid var(--border); box-shadow: var(--shadow-hover); position: relative; max-height: 90vh; overflow-y: auto; }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-input); border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; transition: var(--transition); z-index: 10;}
+        .modal-close:hover { color: var(--danger); transform: rotate(90deg); background: rgba(239,68,68,0.1); }
+        
+        #cropContainer { max-width: 600px; width: 100%; }
+        .cropper-area { width: 100%; height: 40vh; background: var(--bg-input); border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem; }
+        .cropper-area img { display: block; max-width: 100%; }
+
+        /* Developer Profile */
+        .dev-profile { text-align: center; }
+        .dev-avatar { width: 110px; height: 110px; border-radius: 50%; background: var(--bg-card); margin: 0 auto 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); border: 4px solid var(--primary); overflow: hidden; padding: 0; }
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .dev-tags { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+        .dev-tag { background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(59,130,246,0.2); }
+        .dev-social { width: 45px; height: 45px; border-radius: 50%; background: var(--bg-input); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: var(--transition); border: 1px solid var(--border); text-decoration: none; }
+        .dev-social:hover { background: var(--primary); color: white; transform: translateY(-3px); border-color: var(--primary); }
+
+        /* === Footer === */
+        .footer { margin-top: 4rem; padding: 3rem 1rem 2rem; border-top: 1px solid var(--border); background: var(--bg-card); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; max-width: 1300px; margin: 0 auto 2rem; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 1.2rem; color: var(--text-main); font-weight: 700; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; transition: var(--transition); font-size: 0.95rem; cursor: pointer; font-weight: 500; }
+        .footer-links a:hover { color: var(--primary); padding-left: 5px; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        .dev-badge { background: var(--bg-input); padding: 0.6rem 1.2rem; border-radius: var(--radius-pill); display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 700; font-size: 0.9rem; border: 1px solid var(--border); transition: var(--transition); }
+        .dev-badge:hover { background: rgba(139, 92, 246, 0.1); color: var(--secondary); border-color: var(--secondary); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+
+        /* === Toast Notification === */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: var(--bg-card); border-left: 4px solid var(--primary); color: var(--text-main); padding: 1rem 1.5rem; border-radius: 12px; box-shadow: var(--shadow-hover); display: flex; align-items: center; gap: 12px; animation: slideIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards, slideOut 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards 3s; font-weight: 600; font-size: 0.95rem; border: 1px solid var(--border); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast i { font-size: 1.2rem; }
+        .toast.success i { color: var(--success); }
+        .toast.error i { color: var(--danger); }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Loader Overlay inside button */
+        .btn .spinner { display: none; margin-left: 8px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        #backToTopBtn { position: fixed; bottom: 30px; left: 30px; width: 45px; height: 45px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: var(--shadow-hover); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 1000; font-size: 1.2rem; }
+        #backToTopBtn.show { opacity: 1; visibility: visible; }
+        #backToTopBtn:hover { transform: translateY(-5px); background: var(--secondary); }
+    </style>
+</head>
+<body>
+    <div id="scroll-progress"></div>
+
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>PDFly Tools</span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+            <i class="fa-solid fa-sun"></i>
+        </button>
+    </nav>
+
+    <div class="container">
+        <!-- Clean Fixed Header -->
+        <header class="header">
+            <div class="badge-pill">
+                <i class="fa-solid fa-bolt"></i> Fast, Private & Unlimited
+            </div>
+            <h1>Pro <span>BioData Maker</span></h1>
+            <p>Create professional matrimonial or job biodata instantly. Choose premium themes and export securely in PDF format directly from your browser.</p>
+        </header>
+
+        <main class="tool-grid">
+            <!-- Left Side: Data Entry Forms -->
+            <section class="forms-column" id="biodataForm">
+                
+                <!-- General Section -->
+                <div class="card">
+                    <div class="card-header"><i class="fa-solid fa-heading"></i> BioData Headline</div>
+                    <div class="card-body" style="display: block;">
+                        <div class="form-group mb-0">
+                            <input type="text" id="bioHeadline" value="BioData" placeholder="e.g., Matrimonial BioData, Professional Profile">
+                        </div>
+                        <div class="form-group mt-3 mb-0">
+                            <label>Sacred Text / Motto <span class="optional-text">(Optional)</span></label>
+                            <input type="text" id="sacredText" value="|| Shri Ganeshay Namah ||" placeholder="e.g., Religious Verse, Personal Motto">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Details Section -->
+                <div class="card">
+                    <div class="card-header"><i class="fa-solid fa-user"></i> Personal Details</div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group"><label>Full Name <span class="required-marker">*</span></label><input type="text" id="fullName" required placeholder="Enter full name"></div>
+                            <div class="form-group"><label>Date of Birth</label><input type="date" id="dob"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Birth Time</label><input type="time" id="birthTime"></div>
+                            <div class="form-group"><label>Place of Birth</label><input type="text" id="placeOfBirth" placeholder="City, State, Country"></div>
+                        </div>
+                        <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <select id="gender">
+                                    <option value="">Select</option>
+                                    <option>Male</option><option>Female</option><option>Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Religion</label>
+                                <select id="religion">
+                                    <option value="">Select</option>
+                                    <option>Hindu</option><option>Muslim</option><option>Christian</option><option>Sikh</option><option>Jain</option><option>Buddhist</option><option>Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label>Caste <span class="optional-text">(Opt)</span></label><input type="text" id="caste" placeholder="Caste/Community"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Height</label>
+                                <div class="input-group">
+                                    <input type="number" id="heightFeet" placeholder="Ft" min="0" step="1">
+                                    <span class="input-group-text">ft</span>
+                                    <input type="number" id="heightInches" placeholder="In" min="0" max="11" step="1" style="border-left:none;">
+                                    <span class="input-group-text">in</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Weight</label>
+                                <div class="input-group">
+                                    <input type="number" id="weightKg" placeholder="Weight" min="0" step="0.1">
+                                    <span class="input-group-text">Kg</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                            <div class="form-group">
+                                <label>Complexion</label>
+                                <select id="complexion">
+                                    <option value="">Select</option>
+                                    <option>Very Fair</option><option>Fair</option><option>Wheatish</option><option>Medium</option><option>Dark</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label>Gotra <span class="optional-text">(Opt)</span></label><input type="text" id="gotra" placeholder="Gotra/Clan"></div>
+                            <div class="form-group"><label>Hobbies</label><input type="text" id="hobbies" placeholder="e.g., Reading, Music"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Highest Education</label><input type="text" id="education" placeholder="e.g., B.Tech, MBA"></div>
+                            <div class="form-group"><label>Occupation / Profession</label><input type="text" id="occupation" placeholder="e.g., Software Engineer"></div>
+                        </div>
+
+                        <div id="personalCustomFields" style="margin-top: 10px;"></div>
+                        <button type="button" class="add-custom-btn" data-section="personal">+ Add More Personal Detail</button>
+                    </div>
+                </div>
+
+                <!-- Family Details Section -->
+                <div class="card">
+                    <div class="card-header"><i class="fa-solid fa-people-roof"></i> Family Details</div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group"><label>Father's Name</label><input type="text" id="fatherName" placeholder="Full name"></div>
+                            <div class="form-group"><label>Father's Occupation</label><input type="text" id="fatherOccupation" placeholder="Occupation"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Mother's Name</label><input type="text" id="motherName" placeholder="Full name"></div>
+                            <div class="form-group"><label>Mother's Occupation</label><input type="text" id="motherOccupation" placeholder="Occupation"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Number of Brothers</label><input type="number" id="numBrothers" placeholder="0" min="0" step="1"></div>
+                            <div class="form-group"><label>Number of Sisters</label><input type="number" id="numSisters" placeholder="0" min="0" step="1"></div>
+                        </div>
+                        <div id="familyCustomFields" style="margin-top: 10px;"></div>
+                        <button type="button" class="add-custom-btn" data-section="family">+ Add More Family Detail</button>
+                    </div>
+                </div>
+
+                <!-- Astrology Details -->
+                <div class="card">
+                    <div class="card-header"><i class="fa-solid fa-star-and-crescent"></i> Astrology Details <span class="optional-text" style="color:var(--text-main); font-weight:normal;">(Optional)</span></div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group"><label>Rashi (Zodiac)</label><input type="text" id="rashi" placeholder="e.g., Mesh (Aries)"></div>
+                            <div class="form-group"><label>Nakshatra</label><input type="text" id="nakshatra" placeholder="e.g., Ashwini"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Manglik Status</label>
+                                <select id="manglik">
+                                    <option value="">Select Status</option>
+                                    <option>Yes</option><option>No</option><option>Anshik (Partial)</option><option>Don't Know</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="astrologyCustomFields" style="margin-top: 10px;"></div>
+                        <button type="button" class="add-custom-btn" data-section="astrology">+ Add More Astrology Detail</button>
+                    </div>
+                </div>
+
+                <!-- Contact Details -->
+                <div class="card">
+                    <div class="card-header"><i class="fa-solid fa-address-book"></i> Contact Details</div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group"><label>Phone</label><input type="tel" id="phone" placeholder="Primary number"></div>
+                            <div class="form-group"><label>WhatsApp</label><input type="tel" id="whatsapp" placeholder="WhatsApp number"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Email</label><input type="email" id="email" placeholder="Email address"></div>
+                            <div class="form-group"><label>Current Address</label><textarea id="address" placeholder="Full address"></textarea></div>
+                        </div>
+                        <div id="contactCustomFields" style="margin-top: 10px;"></div>
+                        <button type="button" class="add-custom-btn" data-section="contact">+ Add More Contact Detail</button>
+                    </div>
+                </div>
+
+                <!-- Photos Section -->
+                <div class="card">
+                    <div class="card-header"><i class="fa-solid fa-image"></i> Media Uploads</div>
+                    <div class="card-body">
+                        <div class="form-group" style="border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+                            <label style="justify-content: center; font-size: 1rem; margin-bottom: 1rem;">Profile Picture <span class="required-marker">*</span></label>
+                            
+                            <div class="upload-area" onclick="document.getElementById('profilePic').click()" style="min-height: 150px; padding: 1.5rem;">
+                                <i class="fa-solid fa-user-circle" style="font-size: 2.5rem; margin-bottom: 5px;"></i>
+                                <p>Click to Upload Profile Pic</p>
+                                <input type="file" id="profilePic" accept="image/*" style="display:none;">
+                            </div>
+                            
+                            <div id="profilePicPreview"></div>
+                            <div id="profilePic-invalid-feedback" class="invalid-feedback text-center mt-2">Profile picture is required.</div>
+                            
+                            <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 15px;">
+                                <label style="margin:0; font-size: 0.9rem;">Crop Shape:</label>
+                                <select id="cropShape" style="width: auto; padding: 0.4rem 1rem;">
+                                    <option value="circle" selected>Circular</option>
+                                    <option value="square">Rounded Square</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-0">
+                            <label style="justify-content: center; font-size: 1rem; margin-bottom: 1rem;">Gallery Photos <span class="optional-text">(Optional, Max 10)</span></label>
+                            <div class="upload-area" onclick="document.getElementById('otherPhotos').click()" style="min-height: 100px; padding: 1rem;">
+                                <i class="fa-solid fa-images" style="font-size: 2rem; margin-bottom: 5px;"></i>
+                                <p>Add Additional Photos</p>
+                                <input type="file" id="otherPhotos" accept="image/*" multiple style="display:none;">
+                            </div>
+                            <div id="otherPhotosInputPreview"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-bottom: 2rem;">
+                    <button type="button" class="btn btn-primary" id="generateBiodata" style="flex:2; padding: 1.2rem; font-size: 1.1rem;">
+                        <span class="btn-text"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate BioData Preview</span>
+                        <i class="fa-solid fa-circle-notch spinner"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger" id="resetForm" style="flex:1;">
+                        <i class="fa-solid fa-trash-can"></i> Reset All
+                    </button>
+                </div>
+            </section>
+
+            <!-- Right Side: Sticky Preview & Export -->
+            <section class="preview-sticky-box">
+                <div class="preview-controls">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label style="font-weight: 800; font-size: 0.95rem; margin:0;">Template Theme</label>
+                        <select id="exportFormat" style="width: auto; padding: 0.4rem 1rem;">
+                            <option value="pdf" selected>Export PDF</option>
+                            <option value="png">Export PNG</option>
+                            <option value="jpg">Export JPG</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Color Swatches for Themes -->
+                    <div class="theme-swatches" id="themeSelector">
+                        <div class="swatch active" data-theme="theme-white" style="background: #FFFFFF; border: 1px solid #ccc;" title="Clean White"></div>
+                        <div class="swatch" data-theme="theme-cream" style="background: #fdfbf5; border: 1px solid #ccc;" title="Warm Cream"></div>
+                        <div class="swatch" data-theme="theme-blue" style="background: #f0f7ff; border: 1px solid #ccc;" title="Soft Blue"></div>
+                        <div class="swatch" data-theme="theme-pink" style="background: #fff0f5; border: 1px solid #ccc;" title="Blush Pink"></div>
+                        <div class="swatch" data-theme="theme-navy" style="background: #0a192f; border: 1px solid #444;" title="Dark Navy"></div>
+                        <div class="swatch" data-theme="theme-maroon" style="background: #2d0a0a; border: 1px solid #444;" title="Deep Maroon"></div>
+                        <div class="swatch" data-theme="theme-emerald" style="background: #022c22; border: 1px solid #444;" title="Emerald Green"></div>
+                        <div class="swatch" data-theme="theme-slate" style="background: #0f172a; border: 1px solid #444;" title="Slate Black"></div>
+                    </div>
+
+                    <button class="btn btn-success" id="downloadBtn" style="width: 100%; margin-top: 5px;" disabled>
+                        <span class="btn-text"><i class="fa-solid fa-download"></i> Download Document</span>
+                        <i class="fa-solid fa-circle-notch spinner"></i>
+                    </button>
+                </div>
+
+                <!-- The Actual Document Wrapper -->
+                <div class="biodata-document-wrapper">
+                    <div class="empty-preview-state" id="emptyPreviewState">
+                        <i class="fa-solid fa-file-contract"></i>
+                        <h3>Document Preview</h3>
+                        <p>Fill out the details and click Generate to see your Biodata here.</p>
+                    </div>
+                    
+                    <!-- Template Container (Hidden initially) -->
+                    <div id="biodataPreview" class="themed theme-white">
+                        <div class="preview-header">
+                            <h1 id="previewHeadline">BioData</h1>
+                            <h3 id="previewSacredText" style="display: none;"></h3>
+                            <div id="headerProfilePic"></div>
+                        </div>
+                        <div id="detailsSection"></div>
+                        <!-- imageSection will be appended here dynamically -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- SEO/Features Section -->
+        <section class="seo-container">
+            <div class="section-headline">
+                <h2>Create Professional Profiles Instantly</h2>
+                <p style="color: var(--text-muted);">A powerful, private tool for matrimonial and professional biodatas.</p>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <h3>Smart Formatting</h3>
+                    <p>Simply fill in your details and our engine perfectly aligns and formats your data into a clean, readable layout automatically.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-palette"></i></div>
+                    <h3>Premium Color Themes</h3>
+                    <p>Choose from 8 professional light and dark color palettes to match the tone of your matrimonial or job profile.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+                    <h3>100% Private & Secure</h3>
+                    <p>Your personal information is highly sensitive. All document generation happens locally in your browser memory. Nothing is uploaded.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i class="fa-solid fa-file-pdf"></i></div>
+                    <h3>Smart PDF Engine</h3>
+                    <p>Our advanced PDF exporter intelligently handles page breaks so your sections and photos don't get cut in half across pages.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modals -->
+
+    <!-- Custom Field Modal -->
+    <div class="modal-overlay" id="customFieldModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="customFieldModalLabel">Add Custom Detail</h3>
+                <button class="modal-close-btn" id="closeCustomFieldModal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="customFieldForm" style="margin-top: 15px;">
+                <input type="hidden" id="customFieldSection">
+                <input type="hidden" id="editCustomFieldId">
+                <div class="form-group">
+                    <label>Field Title / Label <span class="required-marker">*</span></label>
+                    <input type="text" id="customFieldTitle" placeholder="e.g., Nickname, Annual Income">
+                    <div class="invalid-feedback">Field Title is required.</div>
+                </div>
+                <div class="form-group">
+                    <label>Field Value / Detail <span class="required-marker">*</span></label>
+                    <input type="text" id="customFieldValue" placeholder="e.g., Sonu, 12 LPA">
+                    <div class="invalid-feedback">Field Value is required.</div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" id="cancelCustomFieldBtn" style="flex:1;">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveCustomField" style="flex:1;">Save Detail</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cropper Modal -->
+    <div class="modal-overlay" id="cropModalOverlay">
+        <div class="modal-content" id="cropContainer" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-crop-simple" style="color: var(--primary);"></i> Crop Profile Picture</h3>
+                <button class="modal-close-btn" id="closeCropModal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="cropper-area">
+                <img id="cropImage" src="" alt="To Crop">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 1rem;">
+                <button class="btn btn-secondary" id="cancelCropBtn">Cancel</button>
+                <button class="btn btn-primary" id="cropConfirmBtn"><i class="fa-solid fa-check"></i> Apply Crop</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('privacyModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-shield" style="color: var(--primary);"></i> Privacy Policy</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.6;">Your privacy is strictly protected. <strong>BioData Maker Pro</strong> operates 100% within your web browser utilizing client-side processing.</p>
+            <ul style="color: var(--text-muted); font-size: 0.95rem; padding-left: 1.5rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                <li>No personal data, images, or documents are ever transmitted to our servers.</li>
+                <li>We do not track, store, or log your personal data.</li>
+                <li>Processing happens utilizing your device's memory safely.</li>
+            </ul>
+            <button class="btn btn-primary" style="width:100%" onclick="closeModal('privacyModal')">Acknowledge</button>
+        </div>
+    </div>
+    
+    <!-- Terms Modal -->
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('termsModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-file-contract" style="color: var(--primary);"></i> Terms of Service</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">By using PDFly Tools, you agree to use our utilities provided "as is". Because all tools run client-side, we are not liable for any data loss. Always verify your exported document before official use.</p>
+            <button class="btn btn-primary" style="width:100%" onclick="closeModal('termsModal')">I Agree</button>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content" style="text-align: center;">
+            <button class="modal-close" onclick="closeModal('contactModal')"><i class="fa-solid fa-xmark"></i></button>
+            <h2 style="margin-bottom: 1rem; color: var(--text-main); font-weight: 800;"><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> Get in Touch</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">Have suggestions or found a bug? We'd love to hear from you. Reach out to us directly:</p>
+            <div style="background: var(--bg-input); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <p style="color: var(--text-main); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope" style="color: var(--primary);"></i> 
+                    <a href="mailto:pdflytools@gmail.com" style="text-decoration: none; color: inherit;">pdflytools@gmail.com</a>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--danger);"></i> Azamgarh, Uttar Pradesh, India
+                </p>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="closeModal('contactModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- Exact GT Rao Developer Profile Modal (No Password) -->
+    <div class="modal-overlay" id="devProfileModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('devProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="dev-profile">
+                <div class="dev-avatar">
+                    <img src="dev-profile.png" alt="GT Rao - Developer" class="profile-pic" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=GT+Rao&background=3b82f6&color=fff&size=128&font-size=0.33&bold=true';">
+                </div>
+                <h2 style="font-size: 2.2rem; margin-bottom: 0.2rem; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">GT Rao</h2>
+                <p style="color: var(--text-main); font-weight: 600; font-size: 1rem; margin-top: 0.2rem;">Student & Web Developer</p>
+                <p style="font-size: 0.85rem; margin-top: 0.3rem; color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Azamgarh, Uttar Pradesh, India</p>
+                
+                <div class="dev-tags">
+                    <span class="dev-tag"><i class="fa-brands fa-html5"></i> Web Dev</span>
+                    <span class="dev-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
+                    <span class="dev-tag"><i class="fa-solid fa-wand-magic"></i> UI/UX Design</span>
+                    <span class="dev-tag"><i class="fa-solid fa-layer-group"></i> Web Apps</span>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center; padding: 1.25rem; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">
+                        Passionate Web Developer dedicated to crafting lightning-fast, secure, and user-centric web applications. As the creator of <strong>PDFly Tools</strong>, I focus on writing clean code, building responsive interfaces, and ensuring client-side security to deliver premium, highly functional digital experiences that are accessible to everyone.
+                    </p>
+                </div>
+                
+                <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                     <a href="mailto:pdflytools@gmail.com" class="dev-social" title="Email Contact" target="_blank"><i class="fa-solid fa-envelope"></i></a>
+                     <a href="https://instagram.com/mr_gt_rao" class="dev-social" title="Personal Instagram" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                     <a href="https://instagram.com/educate_path" class="dev-social" title="Business / PDFly Tools" target="_blank"><i class="fa-solid fa-briefcase"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>
+                    <a href="index.html" style="text-decoration: none; color: var(--text-main);">
+                        <i class="fa-solid fa-layer-group" style="color:var(--primary)"></i> PDFly Tools
+                    </a>
+                </h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">Your ultimate suite for free, secure, and blazing-fast web utilities. Designed with modern fluid UI tech.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Top Tools</h4>
+                <ul class="footer-links">
+                    <li><a href="resize-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Image Resizer</a></li>
+                    <li><a href="compress-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Image Compressor</a></li>
+                    <li><a href="biodata-maker.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> BioData Maker</a></li>
+                    <li><a href="watermark-image.html"><i class="fa-solid fa-chevron-right" style="font-size: 0.7em;"></i> Image Watermark</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal & Info</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="openModal('privacyModal', event)"><i class="fa-solid fa-shield"></i> Privacy Policy</a></li>
+                    <li><a href="#" onclick="openModal('termsModal', event)"><i class="fa-solid fa-file-contract"></i> Terms of Service</a></li>
+                    <li><a href="#" onclick="openModal('contactModal', event)"><i class="fa-solid fa-headset"></i> Contact Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="dev-badge" id="devBadge">
+                <i class="fa-solid fa-code"></i> Developed by GT Rao
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">&copy; 2026 PDFly Tools. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Utilities -->
+    <div id="toast-container"></div>
+    <button id="backToTopBtn" title="Go to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script>
+        // Global variables
+        let cropper = null;
+        let croppedProfilePicURL = null;
+        let customFieldsData = { personal: [], family: [], astrology: [], contact: [] };
+        const MAX_OTHER_PHOTOS = 10;
+
+        // Theme Setup
+        const initTheme = () => {
+            const saved = localStorage.getItem('pdfly-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+            document.getElementById('themeToggle').innerHTML = saved === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+        };
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next); localStorage.setItem('pdfly-theme', next);
+            document.getElementById('themeToggle').innerHTML = next === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+            showToast(`${next.charAt(0).toUpperCase() + next.slice(1)} Mode Activated`, 'success');
+        });
+        initTheme();
+
+        // Utils
+        const showToast = (msg, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div'); toast.className = `toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-circle-xmark' : 'fa-info-circle';
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${msg}</span>`;
+            container.appendChild(toast); setTimeout(() => { if(container.contains(toast)) toast.remove(); }, 3500);
+        };
+
+        window.openModal = (id, e) => { if(e) e.preventDefault(); document.getElementById(id).classList.add('active'); };
+        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+        document.getElementById('devBadge').addEventListener('click', () => openModal('devProfileModal'));
+
+        // Scroll
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            document.getElementById('scroll-progress').style.width = (winScroll / height) * 100 + "%";
+            if (winScroll > 300) document.getElementById('backToTopBtn').classList.add('show'); else document.getElementById('backToTopBtn').classList.remove('show');
+        });
+        document.getElementById('backToTopBtn').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Accordeon Cards
+        $('.card-header').click(function() {
+            $(this).next('.card-body').slideToggle(300);
+            const icon = $(this).find('i').first();
+            if(icon.hasClass('fa-chevron-down')) { icon.removeClass('fa-chevron-down').addClass('fa-chevron-up'); } 
+            else if(icon.hasClass('fa-chevron-up')) { icon.removeClass('fa-chevron-up').addClass('fa-chevron-down'); }
+        });
+
+        // Theme Swatches
+        $('.swatch').click(function(){
+            $('.swatch').removeClass('active');
+            $(this).addClass('active');
+            const themeClass = $(this).data('theme');
+            const previewElement = $("#biodataPreview");
+            const currentClasses = previewElement.attr('class').split(' ').filter(c => !c.startsWith('theme-')).join(' ');
+            previewElement.attr('class', `${currentClasses} ${themeClass}`);
+        });
+
+        // Add custom markers to required fields
+        $('input[required], select[required], textarea[required], #fullName').each(function() {
+            let label = $(`label[for='${this.id}']`);
+            if (!label.length) label = $(this).closest('.form-group').find('label').first();
+            if (label.length && !label.find('.required-marker').length) {
+                label.append(' <span class="required-marker">*</span>');
+            }
+        });
+
+        // File Inputs & Cropper
+        $("#profilePic").change(function() {
+            const file = this.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $("#cropImage").attr("src", e.target.result);
+                    $("#cropModalOverlay").addClass('active');
+                    setTimeout(() => {
+                        if (cropper) cropper.destroy();
+                        cropper = new Cropper(document.getElementById('cropImage'), { 
+                            aspectRatio: 1 / 1, viewMode: 1, autoCropArea: 0.9, background: false, responsive: true 
+                        });
+                    }, 50);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        const closeCropOverlay = () => {
+            $("#cropModalOverlay").removeClass('active');
+            if(cropper) { cropper.destroy(); cropper = null; }
+        };
+        $("#closeCropModal, #cancelCropBtn").click(closeCropOverlay);
+
+        $("#cropConfirmBtn").click(function() {
+            if (!cropper) return;
+            const canvas = cropper.getCroppedCanvas({ width: 400, height: 400, imageSmoothingEnabled: true, imageSmoothingQuality: "high" });
+            croppedProfilePicURL = canvas.toDataURL("image/png"); 
+            
+            const shape = $("#cropShape").val();
+            const br = shape === "circle" ? "50%" : "12px";
+            $("#profilePicPreview").html(`<img src="${croppedProfilePicURL}" style="border-radius: ${br};">`);
+            
+            $("#profilePic").removeClass('is-invalid');
+            $("#profilePic-invalid-feedback").hide();
+            closeCropOverlay();
+        });
+
+        $("#cropShape").change(function() {
+            if(croppedProfilePicURL) {
+                const shape = $(this).val();
+                const br = shape === "circle" ? "50%" : "12px";
+                $("#profilePicPreview img").css('border-radius', br);
+                if ($("#biodataPreview").is(':visible')) {
+                    $("#headerProfilePic").css('border-radius', shape === "circle" ? "50%" : "10px");
+                }
+            }
+        });
+
+        $("#otherPhotos").change(function() {
+            const container = $("#otherPhotosInputPreview"); container.empty(); 
+            const files = Array.from(this.files).filter(f => f.type.startsWith('image/'));
+            if (files.length > MAX_OTHER_PHOTOS) { showToast(`Max ${MAX_OTHER_PHOTOS} photos allowed.`, 'error'); $(this).val(""); return; }
+            
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => container.append(`<img src="${e.target.result}">`);
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Custom Fields Logic
+        $(document).on('click', '.add-custom-btn', function() {
+            const section = $(this).data("section");
+            $("#customFieldSection").val(section);
+            $("#customFieldForm")[0].reset();
+            $("#editCustomFieldId").val("");
+            $("#customFieldTitle, #customFieldValue").removeClass('is-invalid');
+            $("#customFieldModalLabel").text("Add Custom " + section.charAt(0).toUpperCase() + section.slice(1) + " Detail");
+            $("#customFieldModal").addClass("active");
+        });
+
+        $("#closeCustomFieldModal, #cancelCustomFieldBtn").click(() => $("#customFieldModal").removeClass("active"));
+
+        $("#saveCustomField").click(function() {
+            const title = $("#customFieldTitle").val().trim();
+            const value = $("#customFieldValue").val().trim();
+            const section = $("#customFieldSection").val();
+            const editId = $("#editCustomFieldId").val();
+            let isValid = true;
+
+            if (!title) { $("#customFieldTitle").addClass('is-invalid'); isValid = false; } else $("#customFieldTitle").removeClass('is-invalid');
+            if (!value) { $("#customFieldValue").addClass('is-invalid'); isValid = false; } else $("#customFieldValue").removeClass('is-invalid');
+            if (!isValid) return;
+
+            if (editId) {
+                const fieldIndex = customFieldsData[section].findIndex(f => f.id === editId);
+                if (fieldIndex > -1) customFieldsData[section][fieldIndex] = { id: editId, title: title, value: value };
+                renderCustomFieldDisplay(editId, section, title, value, true);
+            } else {
+                const uniqueId = `custom-${section}-${Date.now()}`;
+                customFieldsData[section].push({ id: uniqueId, title: title, value: value });
+                renderCustomFieldDisplay(uniqueId, section, title, value, false);
+            }
+            $("#customFieldModal").removeClass("active");
+        });
+
+        function renderCustomFieldDisplay(uniqueId, section, title, value, isUpdate) {
+            const safeTitle = sanitizeHTML(title); const safeValue = sanitizeHTML(value);
+            if (isUpdate) {
+                const div = $('#' + uniqueId);
+                div.find('.field-title').text(safeTitle + ':');
+                div.find('.field-value').text(safeValue);
+            } else {
+                const html = `
+                <div class="custom-field-display" id="${uniqueId}">
+                    <div class="field-info"><span class="field-title">${safeTitle}:</span> <span class="field-value">${safeValue}</span></div>
+                    <div class="field-actions">
+                        <button type="button" class="btn btn-sm btn-secondary edit-custom-field" data-id="${uniqueId}" data-section="${section}"><i class="fa-solid fa-pen"></i></button>
+                        <button type="button" class="btn btn-sm btn-danger remove-custom-field" data-id="${uniqueId}" data-section="${section}"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+                $(`#${section}CustomFields`).append(html);
+            }
+        }
+
+        $(document).on('click', '.remove-custom-field', function() {
+            const id = $(this).data('id'); const section = $(this).data('section');
+            customFieldsData[section] = customFieldsData[section].filter(f => f.id !== id);
+            $('#' + id).remove();
+        });
+
+        $(document).on('click', '.edit-custom-field', function() {
+            const id = $(this).data('id'); const section = $(this).data('section');
+            const data = customFieldsData[section].find(f => f.id === id);
+            if (data) {
+                $("#customFieldSection").val(section);
+                $("#customFieldTitle").val(data.title);
+                $("#customFieldValue").val(data.value);
+                $("#editCustomFieldId").val(id);
+                $("#customFieldModalLabel").text("Edit Detail");
+                $("#customFieldTitle, #customFieldValue").removeClass('is-invalid');
+                $("#customFieldModal").addClass("active");
+            }
+        });
+
+        // HTML Sanitizer
+        function sanitizeHTML(str) {
+            if (str == null) return ""; 
+            return String(str).replace(/&/g, '&amp;').replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, '&#39;');
+        }
+
+        // Generator Pipeline
+        function buildFieldsArray(section) {
+            let fields = [];
+            const addField = (label, value, iconClass = '') => {
+                const v = value ? String(value).trim() : '';
+                if (v) {
+                    const icon = iconClass ? `<i class="fa-solid ${iconClass} contact-icon"></i>` : '';
+                    fields.push(`<div class="detail-item"><strong>${icon} ${sanitizeHTML(label)}:</strong> <span>${sanitizeHTML(v)}</span></div>`);
+                }
+            };
+            const addCombined = (label, parts) => {
+                const v = parts.filter(p => p).join(' ');
+                if(v) addField(label, v);
+            };
+
+            if (section === "personal") {
+                addField("Full Name", $("#fullName").val());
+                const dob = $("#dob").val(); if(dob) { try { const d = new Date(dob); addField("Date of Birth", d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })); } catch(e){ addField("Date of Birth", dob); } }
+                addField("Birth Time", $("#birthTime").val()); addField("Place of Birth", $("#placeOfBirth").val()); addField("Gender", $("#gender").val()); addField("Religion", $("#religion").val()); addField("Caste", $("#caste").val());
+                addCombined("Height", [$("#heightFeet").val() ? `${$("#heightFeet").val()} ft` : null, $("#heightInches").val() ? `${$("#heightInches").val()} in` : null]);
+                addCombined("Weight", [$("#weightKg").val() ? `${$("#weightKg").val()} Kg` : null]);
+                addField("Complexion", $("#complexion").val()); addField("Gotra", $("#gotra").val()); addField("Education", $("#education").val()); addField("Occupation", $("#occupation").val()); addField("Hobbies", $("#hobbies").val());
+            } else if (section === "family") {
+                addField("Father's Name", $("#fatherName").val()); addField("Father's Occupation", $("#fatherOccupation").val()); addField("Mother's Name", $("#motherName").val()); addField("Mother's Occupation", $("#motherOccupation").val()); addField("Brothers", $("#numBrothers").val()); addField("Sisters", $("#numSisters").val());
+            } else if (section === "astrology") {
+                addField("Rashi", $("#rashi").val()); addField("Nakshatra", $("#nakshatra").val()); addField("Manglik Status", $("#manglik").val());
+            } else if (section === "contact") {
+                addField("Phone", $("#phone").val(), 'fa-phone'); addField("WhatsApp", $("#whatsapp").val(), 'fa-whatsapp'); addField("Email", $("#email").val(), 'fa-envelope');
+                const addr = $("#address").val().trim(); if(addr) fields.push(`<div class="detail-item"><strong><i class="fa-solid fa-location-dot contact-icon"></i> Address:</strong> <span>${sanitizeHTML(addr).replace(/\n/g, '<br>')}</span></div>`);
+            }
+
+            if (customFieldsData[section]) {
+                customFieldsData[section].forEach(f => {
+                    let icon = '';
+                    if(section === 'contact') {
+                        const t = f.title.toLowerCase();
+                        if(t.includes('phone')||t.includes('mobile')) icon='fa-phone'; else if(t.includes('whatsapp')) icon='fa-whatsapp'; else if(t.includes('email')) icon='fa-envelope'; else if(t.includes('address')) icon='fa-location-dot'; else if(t.includes('link')) icon='fa-link';
+                    }
+                    addField(f.title, f.value, icon);
+                });
+            }
+            return fields;
+        }
+
+        function buildSectionHTML(title, fields) {
+            if (!fields || fields.length === 0) return "";
+            let html = `<div class="section-block"><h2 class="section-title">${sanitizeHTML(title)}</h2><div class="detail-row">`;
+            const mid = Math.ceil(fields.length / 2);
+            html += `<div class="detail-col">${fields.slice(0, mid).join('')}</div>`;
+            if (fields.length > mid) html += `<div class="detail-col">${fields.slice(mid).join('')}</div>`;
+            html += `</div></div>`;
+            return html;
+        }
+
+        $("#generateBiodata").click(function() {
+            const btn = $(this); const icon = btn.find('.fa-wand-magic-sparkles'); const spin = btn.find('.spinner');
+            btn.prop('disabled', true); icon.hide(); spin.show();
+
+            let isValid = true; let firstErr = null;
+            $('.is-invalid').removeClass('is-invalid');
+            
+            if (!croppedProfilePicURL) { isValid = false; $("#profilePic").addClass('is-invalid'); $("#profilePic-invalid-feedback").show(); firstErr = $("#profilePic"); }
+            if (!$("#fullName").val().trim()) { isValid = false; $("#fullName").addClass('is-invalid'); if(!firstErr) firstErr = $("#fullName"); }
+
+            if (!isValid) {
+                showToast("Please fill required fields and upload profile pic.", "error");
+                btn.prop('disabled', false); icon.show(); spin.hide();
+                if(firstErr) {
+                    const target = firstErr.closest('.card').length ? firstErr.closest('.card') : firstErr;
+                    $('html, body').animate({ scrollTop: target.offset().top - 100 }, 500);
+                }
+                return;
+            }
+
+            setTimeout(() => {
+                $("#previewHeadline").text(sanitizeHTML($("#bioHeadline").val().trim() || "BioData"));
+                const sacred = $("#sacredText").val().trim();
+                if(sacred) { $("#previewSacredText").html(sanitizeHTML(sacred)).show(); } else { $("#previewSacredText").hide(); }
+
+                const shape = $("#cropShape").val();
+                $("#headerProfilePic").css('border-radius', shape === "circle" ? "50%" : "10px").html(`<img src="${croppedProfilePicURL}">`);
+
+                let details = "";
+                details += buildSectionHTML("Personal Details", buildFieldsArray("personal"));
+                details += buildSectionHTML("Family Details", buildFieldsArray("family"));
+                details += buildSectionHTML("Astrology Details", buildFieldsArray("astrology"));
+                details += buildSectionHTML("Contact Details", buildFieldsArray("contact"));
+                $("#detailsSection").html(details);
+
+                $("#imageSection").remove();
+                if ($("#otherPhotosInputPreview img").length > 0) {
+                    let imgs = "";
+                    $("#otherPhotosInputPreview img").each(function(){ imgs += `<img src="${$(this).attr('src')}">`; });
+                    $("#biodataPreview").append(`<div id="imageSection" class="section-block"><h2 class="section-title">Gallery</h2><div class="other-photos-container">${imgs}</div></div>`);
+                }
+
+                $("#emptyPreviewState").hide();
+                $("#biodataPreview").show();
+                $("#downloadBtn").prop('disabled', false);
+                
+                showToast('Preview Generated Successfully', 'success');
+                btn.prop('disabled', false); icon.show(); spin.hide();
+                
+                // Scroll Preview into view if on mobile
+                if(window.innerWidth < 1024) {
+                    $('html, body').animate({ scrollTop: $(".preview-sticky-box").offset().top - 30 }, 500);
+                }
+            }, 100);
+        });
+
+        $("#resetForm").click(function() {
+            $("#biodataForm").find('input, select, textarea').val('');
+            $("#personalCustomFields, #familyCustomFields, #astrologyCustomFields, #contactCustomFields").empty();
+            customFieldsData = { personal: [], family: [], astrology: [], contact: [] };
+            
+            $("#profilePicPreview, #otherPhotosInputPreview").empty();
+            croppedProfilePicURL = null;
+            if(cropper) { cropper.destroy(); cropper = null; }
+            
+            $("#biodataPreview").hide();
+            $("#emptyPreviewState").show();
+            $("#downloadBtn").prop('disabled', true);
+            
+            $('.swatch').removeClass('active');
+            $('.swatch[data-theme="theme-white"]').addClass('active');
+            $("#biodataPreview").attr('class', 'themed theme-white');
+            
+            $('.is-invalid').removeClass('is-invalid');
+            showToast('Form Reset Successfully', 'normal');
+            $('html, body').animate({ scrollTop: 0 }, 300);
+        });
+
+        // === Smart PDF Generation (Using html2canvas & jsPDF) ===
+        $("#downloadBtn").click(async function() {
+            const btn = $(this); const icon = btn.find('.fa-download'); const spin = btn.find('.spinner');
+            const format = $("#exportFormat").val();
+            const previewElement = document.querySelector("#biodataPreview");
+            const $preview = $(previewElement);
+            
+            const name = $("#fullName").val().trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'biodata';
+            const filename = `${name}_pdfly.${format}`;
+
+            btn.prop('disabled', true); icon.hide(); spin.show();
+
+            const origWidth = $preview.css('width');
+            $preview.css('width', '800px'); // Force standard width for high-quality consistent render
+            
+            // Get computed background color from CSS variables applied by theme classes
+            const tempDiv = document.createElement("div");
+            tempDiv.className = $preview.attr('class');
+            document.body.appendChild(tempDiv);
+            const bgColor = getComputedStyle(tempDiv).getPropertyValue('--tpl-bg').trim() || '#ffffff';
+            document.body.removeChild(tempDiv);
+
+            const options = { scale: 2, useCORS: true, logging: false, backgroundColor: bgColor, windowWidth: 800 };
+
+            try {
+                if (format === "pdf") {
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF({ orientation: "p", unit: "pt", format: "a4" });
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    const margin = 30;
+                    const usableW = pdfWidth - (margin * 2);
+                    const usableH = pdfHeight - (margin * 2);
+                    let currY = margin;
+
+                    pdf.setFillColor(bgColor); pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
+
+                    const blocks = $preview.children('div');
+                    
+                    const renderBlock = async (el) => {
+                        if (!el || $(el).is(':hidden')) return;
+                        const canvas = await html2canvas(el, { ...options, windowHeight: $(el).prop('scrollHeight') });
+                        const aspect = canvas.height / canvas.width;
+                        const imgH = usableW * aspect;
+
+                        if (currY + imgH > usableH + margin) {
+                            pdf.addPage(); currY = margin;
+                            pdf.setFillColor(bgColor); pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
+                        }
+
+                        pdf.addImage(canvas.toDataURL("image/jpeg", 0.95), "JPEG", margin, currY, usableW, imgH, undefined, 'FAST');
+                        currY += imgH + 15;
+                    };
+                    
+                    for (let i = 0; i < blocks.length; i++) {
+                        if ($(blocks[i]).attr('id') === 'detailsSection') {
+                            const details = $(blocks[i]).children('.section-block');
+                            for (let j = 0; j < details.length; j++) await renderBlock(details[j]);
+                        } else {
+                            await renderBlock(blocks[i]);
+                        }
+                    }
+                    pdf.save(filename);
+                    showToast('PDF Downloaded Successfully', 'success');
+
+                } else {
+                    const canvas = await html2canvas(previewElement, { ...options, windowHeight: $preview.prop('scrollHeight') });
+                    const mime = format === "png" ? "image/png" : "image/jpeg";
+                    const link = document.createElement("a");
+                    link.download = filename; link.href = canvas.toDataURL(mime, 0.95);
+                    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                    showToast('Image Downloaded Successfully', 'success');
+                }
+            } catch (err) {
+                console.error("Export Error:", err);
+                showToast("Export failed. Please try again.", "error");
+            } finally {
+                $preview.css('width', origWidth);
+                btn.prop('disabled', false); icon.show(); spin.hide();
+            }
+        });
+
+    </script>
+</body>
+</html>

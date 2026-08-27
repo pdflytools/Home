@@ -101,22 +101,38 @@
         .theme-btn:hover { background: var(--primary); border-color: var(--primary); color: #fff; transform: rotate(15deg) scale(1.05); }
 
         /* ================= HERO SECTION ================= */
-        .hero { padding: clamp(130px, 15vh, 160px) 5% clamp(30px, 4vh, 40px); text-align: center; position: relative; }
+        .hero { padding: clamp(100px, 12vh, 140px) 5% clamp(30px, 4vh, 40px); text-align: center; position: relative; }
         .greeting-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 6px 18px; border-radius: 30px; font-size: clamp(0.85rem, 1.5vw, 0.95rem); font-weight: 700; margin-bottom: 20px; border: 1px solid rgba(59, 130, 246, 0.25); letter-spacing: 0.5px; }
-        .hero h1 { font-size: clamp(2.4rem, 6vw, 4.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 18px; letter-spacing: -1px; }
+        .hero h1 { font-size: clamp(2.4rem, 5.5vw, 4.2rem); font-weight: 800; line-height: 1.2; margin-bottom: 18px; letter-spacing: -1px; }
         .hero h1 span { background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.15rem); max-width: 700px; margin: 0 auto; line-height: 1.6; }
-
-        /* ================= TABS STRUCTURE (Matched to Uploaded Image) ================= */
-        .tabs-layout { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-bottom: clamp(35px, 6vh, 55px); padding: 0 5%; position: relative; }
+        .hero p { color: var(--text-muted); font-size: clamp(0.95rem, 2vw, 1.15rem); max-width: 750px; margin: 0 auto; line-height: 1.7; }
         
-        /* Subtle Glow Behind Tabs */
+        .hide-mobile { display: block; }
+
+        /* ================= SINGLE LINE TABS ================= */
+        .tabs-layout { 
+            position: relative; 
+            margin-bottom: clamp(35px, 6vh, 55px); 
+            padding: 0 5%; 
+        }
+        
         .tabs-layout::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 180px; height: 100px; background: rgba(59, 130, 246, 0.2); filter: blur(40px); z-index: -1; pointer-events: none; }
         
-        .tab-top { display: flex; justify-content: center; width: 100%; }
-        .tab-bottom { display: flex; justify-content: center; gap: clamp(10px, 2vw, 18px); flex-wrap: wrap; }
-        
-        .tab-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.15); color: var(--text-main); padding: clamp(10px, 1.5vw, 14px) clamp(22px, 3vw, 30px); border-radius: 30px; font-size: clamp(0.9rem, 1.5vw, 1rem); font-weight: 600; cursor: pointer; transition: var(--transition); letter-spacing: 0.3px; }
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            gap: clamp(10px, 2vw, 15px);
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 5px 10px;
+            -ms-overflow-style: none;  
+            scrollbar-width: none;  
+            -webkit-overflow-scrolling: touch;
+        }
+        .tabs-container::-webkit-scrollbar { display: none; }
+
+        .tab-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.15); color: var(--text-main); padding: clamp(10px, 1.5vw, 14px) clamp(22px, 3vw, 30px); border-radius: 30px; font-size: clamp(0.9rem, 1.5vw, 1rem); font-weight: 600; cursor: pointer; transition: var(--transition); letter-spacing: 0.3px; flex-shrink: 0; }
         .tab-btn:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.3); }
         .tab-btn.active { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5); }
 
@@ -184,20 +200,16 @@
         .modal-close { position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-main); font-size: 1.1rem; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; z-index: 2; }
         .modal-close:hover { background: #ef4444; color: white; border-color: #ef4444; transform: rotate(90deg); }
 
-        /* Enhanced Dev Image (Increased Height & Blue Border) */
         .dev-img-container { 
-            width: clamp(130px, 20vw, 150px); 
-            height: clamp(130px, 20vw, 150px); 
-            margin: 0 auto 20px; 
-            padding: 4px; position: relative; border-radius: 40px; 
+            width: clamp(130px, 20vw, 150px); height: clamp(130px, 20vw, 150px); 
+            margin: 0 auto 20px; padding: 4px; position: relative; border-radius: 40px; 
         }
         .dev-img-container img { 
             width: 100%; height: 100%; border-radius: 36px; object-fit: cover; 
-            background: var(--bg-body); border: 4px solid var(--primary); /* Blue Border */
+            background: var(--bg-body); border: 4px solid var(--primary); 
             box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
         }
         
-        /* Gradient Name */
         .dev-name { font-size: clamp(1.6rem, 3vw, 2rem); font-weight: 800; margin-bottom: 2px; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .dev-subtitle { color: var(--text-main); opacity: 0.9; font-size: 0.95rem; font-weight: 700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1.5px; }
         .dev-bio { color: var(--text-muted); font-size: clamp(0.95rem, 1.5vw, 1.05rem); line-height: 1.7; margin-bottom: 25px; }
@@ -215,14 +227,12 @@
         .legal-content { overflow-y: auto; text-align: left; font-size: clamp(0.9rem, 1.5vw, 1rem); color: var(--text-muted); line-height: 1.8; padding-right: 15px; }
         .legal-content h4 { color: var(--text-main); margin: 20px 0 10px; font-size: 1.1rem; }
 
-        /* Contact Details Box in Modal */
         .contact-box { background: var(--bg-body); border: 1px solid var(--border-color); padding: 15px 20px; border-radius: 16px; display: inline-flex; align-items: center; gap: 15px; transition: var(--transition); text-decoration: none; width: 100%; cursor: default; }
         a.contact-box { cursor: pointer; }
         .contact-box i { font-size: 1.5rem; color: var(--primary); width: 25px; text-align: center; }
         .contact-box div { display: flex; flex-direction: column; text-align: left; }
         .contact-box span.title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 2px; }
         .contact-box span.detail { font-size: 1rem; font-weight: 600; color: var(--text-main); }
-        
         a.contact-box:hover { border-color: var(--primary); box-shadow: var(--shadow-glow); transform: translateY(-3px); }
 
         /* ================= SMART UI COMPONENTS ================= */
@@ -238,11 +248,29 @@
         @media (max-width: 768px) {
             .navbar-wrapper { width: 100%; top: 0; }
             nav { border-radius: 0; border-top: none; border-left: none; border-right: none; }
+            
+            /* FILTER BUTTONS 2x2 GRID FOR MOBILE */
+            .tabs-container { 
+                display: grid; 
+                grid-template-columns: 1fr 1fr; /* 2 Columns */
+                gap: 12px; 
+                padding: 5px 15px; 
+                overflow-x: hidden; 
+                white-space: normal;
+            }
+            .tab-btn {
+                width: 100%;
+                padding: 12px 10px;
+                text-align: center;
+                font-size: 0.85rem;
+            }
+            
             .grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
             .footer-grid { grid-template-columns: 1fr 1fr; gap: 35px; }
             .footer-brand { grid-column: span 2; text-align: center; }
             .footer-brand p { margin: 0 auto 20px; }
             .footer-bottom { flex-direction: column; text-align: center; }
+            .hide-mobile { display: none; }
         }
 
         @media (max-width: 480px) {
@@ -276,19 +304,17 @@
         </nav>
     </div>
 
+    <!-- Main Headings Adjusted and 2 Line Paragraph -->
     <section class="hero">
         <div class="greeting-badge" id="greetingBadge"><i class="fa-regular fa-sun"></i> Good Morning</div>
-        <h1><span id="heroTitle">PDFly</span> Digital Suite.</h1>
-        <!-- Condensed 2 Line Description Covering All Core Features -->
-        <p>An ultra-fast, privacy-first digital suite. Seamlessly edit PDFs, enhance images, and utilize smart daily tools instantly on your device—zero server uploads required.</p>
+        <h1>Welcome to <span id="heroTitle">PDFly Tools</span></h1>
+        <p>Your all-in-one digital suite for ultra-fast image editing, secure PDF formatting, and smart daily utilities.<br class="hide-mobile"> Experience privacy-first, serverless processing directly on your device.</p>
     </section>
 
-    <!-- UI TABS MATCHING UPLOADED DESIGN -->
+    <!-- Filters In One Line for Desktop / 2x2 Grid for Mobile -->
     <div class="tabs-layout">
-        <div class="tab-top">
+        <div class="tabs-container">
             <button class="tab-btn active" onclick="filterCategory('all')">All Tools</button>
-        </div>
-        <div class="tab-bottom">
             <button class="tab-btn" onclick="filterCategory('image')">Image Tools</button>
             <button class="tab-btn" onclick="filterCategory('pdf')">PDF Tools</button>
             <button class="tab-btn" onclick="filterCategory('other')">Smart Utilities</button>
@@ -504,29 +530,27 @@
         <div class="modal-box">
             <button class="modal-close" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></button>
             
-            <!-- Increased Image Height & Blue Border Applied -->
             <div class="dev-img-container">
                 <img src="dev-profile.png" alt="Developer Profile">
             </div>
             
-            <!-- Name with gradient style -->
             <div class="dev-name">GT Rao</div>
             <div class="dev-subtitle">Creator & Developer</div>
             
-            <!-- Bio mentioning student & coding passion -->
             <div class="dev-bio">
                 Hello! I am a student and a passionate web developer. Coding responsive web applications and building smart digital utilities like PDFly Tools are my core passions.
             </div>
 
             <div class="dev-social-icons">
                 <a href="mailto:pdflytools@gmail.com" title="Email Me"><i class="fa-solid fa-envelope"></i></a>
+                <a href="https://t.me/Gt_Rao" target="_blank" title="Telegram (@Gt_Rao)"><i class="fa-brands fa-telegram"></i></a>
                 <a href="https://instagram.com/mr_gt_rao" target="_blank" title="Personal Instagram"><i class="fa-brands fa-instagram"></i></a>
                 <a href="https://instagram.com/educate_path" target="_blank" title="Business Instagram"><i class="fa-solid fa-briefcase"></i></a>
             </div>
         </div>
     </div>
 
-    <!-- 2. Contact Us Modal (Opens on Click) -->
+    <!-- 2. Contact Us Modal -->
     <div class="modal-overlay" id="contactModal">
         <div class="modal-box">
             <button class="modal-close" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></button>
@@ -562,6 +586,29 @@
         </div>
     </div>
 
+    <!-- 4. User Guide PDF Modal (Updated with ./ path and object tag for strict local support) -->
+    <div class="modal-overlay" id="guideModal">
+        <div class="modal-box" style="max-width: 850px; height: 85vh; display: flex; flex-direction: column; padding: clamp(20px, 3vw, 30px);">
+            <button class="modal-close" onclick="closeModals()"><i class="fa-solid fa-xmark"></i></button>
+            
+            <h3 style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-bottom: 15px; text-align: center;"><i class="fa-solid fa-book" style="color: var(--primary); margin-right: 8px;"></i> User Guide</h3>
+            
+            <!-- Online View using Object & iframe fallback for strict local server environments -->
+            <div style="flex-grow: 1; border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; background: #fff;">
+                <object data="./user-guide.pdf" type="application/pdf" width="100%" height="100%">
+                    <iframe src="./user-guide.pdf" width="100%" height="100%" style="border: none;">
+                        This browser does not support inline PDFs locally. Please click download below.
+                    </iframe>
+                </object>
+            </div>
+            
+            <!-- Download PDF Button -->
+            <a href="./user-guide.pdf" download="PDFly_User_Guide.pdf" style="background: var(--primary); color: white; padding: 12px 25px; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 1.05rem; align-self: center; display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--shadow-glow); transition: var(--transition);">
+                <i class="fa-solid fa-download"></i> Download PDF
+            </a>
+        </div>
+    </div>
+
     <footer>
         <div class="footer-grid">
             <div class="footer-brand">
@@ -593,6 +640,7 @@
                 <h4>Support</h4>
                 <ul>
                     <li><a onclick="openContactModal()"><i class="fa-solid fa-headset" style="margin-right: 5px;"></i> Contact Us</a></li>
+                    <li><a onclick="openGuideModal()"><i class="fa-solid fa-book" style="margin-right: 5px;"></i> User Guide</a></li>
                 </ul>
             </div>
         </div>
@@ -692,7 +740,7 @@
             
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             // Default back to All Tools styling for search
-            document.querySelector('.tab-top .tab-btn').classList.add('active'); 
+            document.querySelector('.tabs-container .tab-btn').classList.add('active'); 
             document.querySelectorAll('.category-wrapper').forEach(cat => cat.style.display = 'block');
 
             cards.forEach(card => {
@@ -739,21 +787,17 @@
         const profileModal = document.getElementById('profileModal');
         const contactModal = document.getElementById('contactModal');
         const legalModal = document.getElementById('legalModal');
+        const guideModal = document.getElementById('guideModal');
 
-        function openProfileModal() {
-            closeModals();
-            profileModal.classList.add('active');
-        }
-
-        function openContactModal() {
-            closeModals();
-            contactModal.classList.add('active');
-        }
+        function openProfileModal() { closeModals(); profileModal.classList.add('active'); }
+        function openContactModal() { closeModals(); contactModal.classList.add('active'); }
+        function openGuideModal() { closeModals(); guideModal.classList.add('active'); }
 
         function closeModals() {
             profileModal.classList.remove('active');
             contactModal.classList.remove('active');
             legalModal.classList.remove('active');
+            guideModal.classList.remove('active');
         }
 
         const legalData = {
@@ -775,7 +819,7 @@
 
         // Close on clicking outside
         window.onclick = function(event) {
-            if (event.target == profileModal || event.target == contactModal || event.target == legalModal) {
+            if (event.target == profileModal || event.target == contactModal || event.target == legalModal || event.target == guideModal) {
                 closeModals();
             }
         }
